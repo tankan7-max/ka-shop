@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Virtual Snack Shop</title>
+<style>
+  body { margin: 0; font-family: system-ui, sans-serif; display: flex; flex-wrap: wrap; background: #fff; }
+  #shop { position: relative; flex: 1 1 640px; min-height: 480px; align-self: flex-start; }
+  canvas { display: block; width: 100%; height: 70vh; min-height: 480px; touch-action: none; }
+  #crosshair { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 28px; height: 28px; line-height: 28px; text-align: center; font-size: 20px; font-weight: bold; color: #111; background: rgba(255,255,255,.55); border: 2px solid rgba(0,0,0,.55); border-radius: 50%; pointer-events: none; }
+  #help { position: absolute; left: 10px; top: 10px; background: rgba(255,255,255,.92); padding: 8px 48px 8px 10px; border-radius: 8px; font-size: 14px; max-width: 260px; z-index: 4; }
+  #help-close { position: absolute; right: 4px; top: 4px; width: 38px; height: 38px; padding: 0; font-size: 20px; line-height: 1; }
+  #help-btn { position: absolute; left: 10px; top: 10px; z-index: 4; background: rgba(255,255,255,.92); font-weight: bold; }
+  #shop-tools { position: absolute; right: 10px; top: 10px; display: flex; flex-direction: column; gap: 6px; z-index: 4; align-items: flex-end; }
+  #cart-pill { background: #2a9d8f; color: #fff; border-color: #2a9d8f; font-weight: bold; }
+  #loading { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); background: rgba(255,255,255,.92); padding: 10px 16px; border-radius: 10px; font-size: 15px; z-index: 5; pointer-events: none; box-shadow: 0 4px 16px rgba(0,0,0,.15); }
+  /* Fixed to the window, so "Added …" is visible even when the list below the shop is scrolled into view. */
+  #toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: rgba(20,20,20,.9); color: #fff; font-size: 14px; padding: 8px 14px; border-radius: 20px; display: none; z-index: 4; pointer-events: none; white-space: nowrap; max-width: calc(100% - 40px); overflow: hidden; text-overflow: ellipsis; }
+  #fast-btn { position: absolute; right: 10px; bottom: 70px; z-index: 3; display: none; background: rgba(255,255,255,.92); }
+  #fast-btn.active { background: #2a9d8f; color: #fff; border-color: #2a9d8f; font-weight: bold; }
+  button:focus-visible, input:focus-visible { outline: 3px solid #2a9d8f; outline-offset: 2px; }
+  #cat-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  #cat-chips button { font-size: 12px; padding: 4px 9px; }
+  #cat-chips button.active { background: #2a9d8f; color: #fff; border-color: #2a9d8f; font-weight: bold; }
+  #cart-list li { margin-bottom: 6px; }
+  #cart-list li button { margin-left: 4px; padding: 2px 8px; }
+  @media (min-width: 701px) { #cart { position: sticky; top: 0; max-height: 100vh; overflow-y: auto; } }
+  #popup { position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); background: #fff; border: 1px solid #ccc; border-radius: 10px; padding: 12px 14px; display: none; box-shadow: 0 4px 16px rgba(0,0,0,.15); z-index: 3; max-width: calc(100% - 40px); }
+  #popup-cat { font-size: 12px; color: #666; }
+  /* Small name/price hint that follows the mouse over a product (computers only). */
+  #hover { position: absolute; pointer-events: none; background: rgba(20,20,20,.85); color: #fff; font-size: 13px; padding: 4px 8px; border-radius: 6px; display: none; white-space: nowrap; z-index: 2; }
+  #cart { flex: 0 0 300px; padding: 16px; border-left: 1px solid #ddd; box-sizing: border-box; }
+  #cart ul { padding-left: 18px; }
+  button { cursor: pointer; padding: 6px 10px; border-radius: 6px; border: 1px solid #888; background: #fff; }
+  #checkout-note { color: #555; font-size: 14px; margin-top: 8px; }
+  #data-note { background: #fff4e0; border: 1px solid #f0c27a; border-radius: 6px; padding: 6px 8px; font-size: 13px; color: #6b4a00; }
+  #search { width: 100%; box-sizing: border-box; padding: 7px 9px; border: 1px solid #aaa; border-radius: 6px; font-size: 14px; margin-bottom: 8px; }
+  #product-list h4 { margin: 14px 0 6px; display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 15px; }
+  #product-list h4 button { font-size: 12px; padding: 3px 8px; font-weight: normal; }
+  #product-list .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 3px 0; font-size: 14px; }
+  #product-list .row button { padding: 3px 10px; }
+  /* On-screen walk buttons: only shown on touch / narrow screens, so the desktop version is unchanged. */
+  #mobile-controls { display: none; position: absolute; left: 10px; bottom: 70px; gap: 6px; z-index: 2; }
+  #mobile-controls button { width: 52px; height: 52px; font-size: 20px; background: rgba(255,255,255,.92); }
+  /* Holding a walk button must not select its arrow text (especially on iOS long-press). */
+  #mobile-controls, #mobile-controls button { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; touch-action: none; }
+  #shop, #crosshair, #help { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  #mobile-controls .row { display: flex; gap: 6px; justify-content: center; }
+  @media (pointer: coarse), (max-width: 700px) { #mobile-controls { display: grid; gap: 6px; } }
+  /* Responsive layout: on narrow screens the cart stacks below the shop instead of squeezing beside it. */
+  @media (max-width: 700px) {
+    #cart { flex: 1 1 100%; border-left: none; border-top: 1px solid #ddd; }
+    canvas { height: 60vh; min-height: 380px; }
+    /* Sit below the Cart / Entrance buttons so they never cover the help box or its close button. */
+    #help { font-size: 12px; max-width: 200px; top: 56px; }
+    #popup { bottom: 190px; }
+  }
+  @media (pointer: coarse), (max-width: 700px) { #fast-btn { display: block; } }
+</style>
+<script type="importmap">
+{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+</script>
+<script>
+  window.addEventListener('load', () => setTimeout(() => {
+    const l = document.getElementById('loading');
+    if (l && l.style.display !== 'none' && !l.dataset.failed) l.textContent = 'Still loading the 3D shop — if this stays, refresh the page or check your connection.';
+  }, 12000));
+  // If the shop script fails to start (e.g. no 3D graphics support, or the 3D library could
+  // not be downloaded), say so instead of showing "Loading…" forever.
+  window.addEventListener('error', () => {
+    if (window.__shopReady) return;
+    const l = document.getElementById('loading');
+    if (l) { l.dataset.failed = '1'; l.textContent = 'Sorry, the shop could not start on this device or browser. Try refreshing, or open it in an up-to-date Chrome, Edge, Safari or Firefox.'; }
+  }, true);
+</script>
+</head>
+<body>
+<div id="shop">
+  <div id="help"><button id="help-close" aria-label="Close help">×</button><b>Virtual Snack Shop</b><br>
+  Move: W A S D or arrow keys (hold Shift to walk faster), or the on-screen arrows on a phone. Look: drag. Select: tap or click a snack (don't drag). Use "Go to shelf" in the list to jump to an aisle, "Entrance" to return to the door, and the green cart pill to jump to your cart.<br>
+  This is a demo storefront only — no payment or delivery is connected yet.</div>
+  <button id="help-btn" hidden>Help</button>
+  <div id="shop-tools">
+    <button id="cart-pill" type="button">Cart · 0 items · S$0.00</button>
+    <button id="entrance-btn" type="button">Entrance</button>
+  </div>
+  <div id="loading">Loading shop…</div>
+  <div id="toast" role="status"></div>
+  <button id="fast-btn" type="button" aria-pressed="false">Fast walk: off</button>
+  <div id="mobile-controls">
+    <div class="row"><button data-key="w" aria-label="Move forward">▲</button></div>
+    <div class="row"><button data-key="a" aria-label="Move left">◀</button><button data-key="s" aria-label="Move back">▼</button><button data-key="d" aria-label="Move right">▶</button></div>
+  </div>
+  <div id="crosshair">+</div>
+  <div id="hover"></div>
+  <div id="popup">
+    <div id="popup-cat"></div>
+    <span id="popup-text"></span><br><br>
+    <button id="add-btn">Add to cart</button>
+    <button id="popup-cart-btn">View cart</button>
+    <button id="close-btn">Close</button>
+  </div>
+</div>
+<aside id="cart">
+  <h2>Cart</h2>
+  <p id="data-note" hidden></p>
+  <ul id="cart-list"><li>Empty — click a snack in the shop, or use the list below.</li></ul>
+  <p><b>Total: <span id="total">S$0.00</span></b> · <span id="count">0</span> items</p>
+  <button id="checkout-btn">Checkout</button>
+  <button id="clear-cart-btn">Clear cart</button>
+  <p id="checkout-note"></p>
+  <h3>All snacks</h3>
+  <input id="search" type="search" placeholder="Search snacks…" aria-label="Search snacks">
+  <div id="cat-chips"></div>
+  <div id="product-list"></div>
+  <p id="no-results" role="status" hidden></p>
+  <p style="font-size:13px;color:#555">This is the single responsive shop page to maintain — it works on phone and computer. Products live in the separate products.json database — edit that file to change names, prices, categories, sizes, colours or photos; the room adds aisles by itself when needed. Demo storefront only, no payment or delivery yet.</p>
+</aside>
+<script type="module">
+import * as THREE from 'three';
+
+// ---------------------------------------------------------------------------
+// Products. They come from products.json. FALLBACK_DB is a backup copy used
+// only when that file cannot be read (e.g. the page was opened straight from
+// disk). Refresh it with:  python sync-products.py
+// ---------------------------------------------------------------------------
+const FALLBACK_DB = /*PRODUCTS-START*/{"currency":"SGD","categories":["Chips & crisps","Local & Asian snacks","Biscuits & cookies","Chocolate","Sweets & mints","Instant noodles","Drinks","Nuts & healthier snacks"],"products":[{"id":"mamee-chicken","model":{"type":"box","width":0.4,"height":0.45,"depth":0.14,"color":3046706},"name":"Mamee noodles chicken","pack":"1 pack, 25g","price_sgd":0.5,"reference":{"note":"Shopee Singapore bundle of 8 x 25g packs listed at SGD 2.79–3.46; starting single-pack shop price set at SGD 0.50","source_url":"https://shopee.sg/-Bundle-of-8-Mamee-Monster-Noodle-Snack-25g-BBQ-Spicy-Chicken-Flavour-Halal-Snack-i.17287844.24366412395"},"texture":{"description":"Mamee Monster noodle snack, chicken flavour pack photo","image_url":"https://foodpanda.dhmedia.io/image/darkstores/nv-global-catalog/sg/99a87083-630c-401b-91db-f08c19014fde.jpg?height=480&dpi=3","source_url":"https://www.foodpanda.sg/groceries/product/0KA9B1/mamee-monster-noodle-snack--chicken-10s-x-25g","type":"image"},"category":"Local & Asian snacks"},{"id":"mamee-bbq","model":{"type":"box","width":0.4,"height":0.45,"depth":0.14,"color":15250432},"name":"Mamee noodles BBQ","pack":"1 pack, 25g","price_sgd":0.5,"reference":{"note":"Shopee Singapore bundle of 8 x 25g packs listed at SGD 2.79–3.46; starting single-pack shop price set at SGD 0.50","source_url":"https://shopee.sg/-Bundle-of-8-Mamee-Monster-Noodle-Snack-25g-BBQ-Spicy-Chicken-Flavour-Halal-Snack-i.17287844.24366412395"},"texture":{"description":"Mamee Monster noodle snack, BBQ flavour pack photo","image_url":"https://assets.mydeal.com.au/47695/mamee-monster-noodle-snack-200g-bbq-flavour-8-packs-14127623_00.jpg?v=WJlPetuDBRdnZ0S&im=Resize,width=600,height=600,aspect=fit,type=downsize;Crop,rect=(0,0,600,600),gravity=Center,allowExpansion","source_url":"https://shopee.sg/Mamee-Monster-Noodle-Snack-Family-Pack-(8-x-25g)-i.15167456.25523013678","type":"image"},"category":"Local & Asian snacks"},{"id":"hello-panda","model":{"type":"box","width":0.35,"height":0.5,"depth":0.2,"color":7162945},"name":"Hello Panda","pack":"1 pack, 35g","price_sgd":1.3,"reference":{"note":"Shopee Singapore single 35g pack listed at SGD 1.30","source_url":"https://shopee.sg/Meiji-Hello-Panda-Biscuits-35g-pack-Chocolate-Milk-Strawberry-Biscuit-Assorted-Flavours-i.435361035.22368202347"},"texture":{"description":"Meiji Hello Panda biscuits pack photo","image_url":"https://cdn.shopify.com/s/files/1/0508/4702/3253/files/ezgif.com-webp-to-jpg-converter_2.jpg?v=1759131248","source_url":"https://shopee.sg/Meiji-Hello-Panda-Biscuits-35g-pack-Chocolate-Milk-Strawberry-Biscuit-Assorted-Flavours-i.435361035.22368202347","type":"image"},"category":"Biscuits & cookies"},{"id":"cocque-de-asses","model":{"type":"box","width":0.5,"height":0.35,"depth":0.22,"color":12986408},"name":"Cocque de asses","pack":"1 box, 12 individually wrapped cookies","price_sgd":7.9,"reference":{"note":"Identified from the web as Couque D'asses, a langue de chat cookie in a box of 12 individually wrapped cookies. No clean Singapore single-box price was found in the Shopee search, so SGD 7.90 is a starting estimate only — change it before selling.","source_url":"https://jacobfilipp.com/jacob-eats-couque-dasses/"},"texture":{"description":"Couque D'asses cookies pack photo","image_url":"https://down-sg.img.susercontent.com/file/vn-11134207-7r98o-lt4r1uwjlo6123","source_url":"https://shopee.sg/search?keyword=Couque%20D%27asses","type":"image"},"category":"Biscuits & cookies"},{"id":"twisties-bbq","model":{"type":"box","width":0.5,"height":0.55,"depth":0.18,"color":5606191},"name":"Twisties BBQ","pack":"1 pack, 60g","price_sgd":1.2,"reference":{"note":"Shopee Singapore single 60g pack listed at SGD 0.96–1.20","source_url":"https://shopee.sg/Twisties-Flavoured-Corn-Snacks-60g-Cherry-Tomato-Cheddar-Cheese-BBQ-Curry-Chicken-Irresistible-Crunchy-Snack-i.268415566.24972295677"},"texture":{"description":"Twisties BBQ corn snack pack photo","image_url":"https://huawei-food-cms.grab.com/compressed_webp/items/SGITE2025022012442890124/detail/menueditor_item_f1a44926169648a49206d11650af1508_1740055420200819186.webp","source_url":"https://mart.grab.com/sg/en/merchant/grabmart-grocer-mini-s-mart-booze-beachroad-sultan-gate-place/4-C4EGC7T3NYAXAJ/twisties-bbq-curry/SGITE20250221022450177288","type":"image"},"category":"Chips & crisps"},{"id":"lays-bbq","model":{"type":"box","width":0.5,"height":0.55,"depth":0.18,"color":15690752},"name":"Lays BBQ","pack":"1 pack, 50g","price_sgd":3.2,"reference":{"note":"Shopee Singapore single 50g BBQ pack listed at SGD 3.16","source_url":"https://shopee.sg/Lay's-Potato-Chips-Extra-BBQ-(50g)-Lay's-Kerepek-Kentang-Perisa-BBQ-50g-i.392474457.22873463256"},"texture":{"description":"Lay's BBQ potato chips bag photo","image_url":"https://i5.peapod.com/c/L7/L7BDW.png","source_url":"https://www.foodlion.com/groceries/snacks/chips/potato-chips/barbecue-potato-chips/lays-barbecue-potato-chips-1-oz-bag.html","type":"image"},"category":"Chips & crisps"},{"id":"mo-yu-shuang-mala","model":{"type":"box","width":0.4,"height":0.45,"depth":0.14,"color":8280002},"name":"Mo yu shuang Mala flavour","pack":"1 pack, 50g","price_sgd":3.2,"reference":{"note":"Shopee Singapore single 50g pack listed at SGD 3.16","source_url":"https://shopee.sg/Weilong-Konjac-Shuang-Weilong-Mo-Yu-Shuang-50g-i.1291062615.26854037532"},"texture":{"description":"Weilong Mo Yu Shuang mala konjac snack pack photo","image_url":"https://down-sg.img.susercontent.com/file/812aeab534993e2b1fd602960d777d75","source_url":"https://shopee.sg/Weilong-Konjac-Shuang-Weilong-Mo-Yu-Shuang-50g-i.1291062615.26854037532","type":"image"},"category":"Local & Asian snacks"},{"id":"korean-seaweed","model":{"type":"box","width":0.5,"height":0.35,"depth":0.22,"color":16752640},"name":"Korean seaweed","pack":"1 pack, 40g","price_sgd":5.3,"reference":{"note":"Shopee Singapore 40g Korean seaweed chips pack listed at SGD 5.29","source_url":"https://shopee.sg/HBAF-Korean-Seaweed-Chips-40g-4-Flavors-(Honey-Butter-Wasabi-Salted-Garlic-Bread)-Crispy-Seaweed-Snack-i.1664342463.43126071653"},"texture":{"description":"Korean seaweed snack pack photo","image_url":"https://gdimg.gmarket.co.kr/4538534968/still/600?ver=1781081009","source_url":"https://shopee.sg/HBAF-Korean-Seaweed-Chips-40g-4-Flavors-(Honey-Butter-Wasabi-Salted-Garlic-Bread)-Crispy-Seaweed-Snack-i.1664342463.43126071653","type":"image"},"category":"Local & Asian snacks"},{"id":"calbee-original","name":"Calbee Potato Chips Original","category":"Chips & crisps","price_sgd":2.15,"pack":"1 pack, 72g","model":{"type":"box","width":0.5,"height":0.55,"depth":0.18,"color":15909424},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling. Promotion: any 2 for S$4.30.","source_url":"https://www.fairprice.com.sg/product/calbee-crispy-potato-chips-original-72g-13209243"}},{"id":"calbee-hot-spicy","name":"Calbee Potato Chips Hot & Spicy","category":"Chips & crisps","price_sgd":2.4,"pack":"1 pack, 72g","model":{"type":"box","width":0.5,"height":0.55,"depth":0.18,"color":14099998},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling.","source_url":"https://www.fairprice.com.sg/product/calbee-crispy-potato-chips-hot-spicy-72g-13209239"}},{"id":"calbee-snow-peas","name":"Calbee Snow Pea Crisps Original","category":"Chips & crisps","price_sgd":2.15,"pack":"1 pack, 80g","model":{"type":"box","width":0.5,"height":0.55,"depth":0.18,"color":7192133},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling.","source_url":"https://www.fairprice.com.sg/product/calbee-snow-peas-crisps-original-80g-10428035"}},{"id":"pringles-sco","name":"Pringles Sour Cream & Onion","category":"Chips & crisps","price_sgd":3.5,"pack":"1 tube, 134g","model":{"type":"cylinder","width":0.26,"height":0.52,"depth":0.26,"color":3055172},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling.","source_url":"https://payment.fairprice.com.sg/product/pringles-potato-crisps-sour-cream-onion-150g-12387644"}},{"id":"pringles-original-small","name":"Pringles Original (small)","category":"Chips & crisps","price_sgd":2.0,"pack":"1 tube, 42g","model":{"type":"cylinder","width":0.24,"height":0.3,"depth":0.24,"color":13111342},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling. Price taken from the 42g Sour Cream & Onion listing.","source_url":"https://www.fairprice.com.sg/product/pringles-p-crisps-sour-crm-on-42g-13252003"}},{"id":"irvins-salted-egg-chips","name":"Irvins Salted Egg Potato Chips","category":"Chips & crisps","price_sgd":9.5,"pack":"1 pack, 105g","model":{"type":"box","width":0.5,"height":0.55,"depth":0.18,"color":16175973},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling. Priced like Irvins fish skin.","source_url":"https://www.fairprice.com.sg/product/irvins-salted-egg-potato-chips-105g-13187314"}},{"id":"irvins-fish-skin","name":"Irvins Salted Egg Fish Skin","category":"Local & Asian snacks","price_sgd":9.5,"pack":"1 pack, 105g","model":{"type":"box","width":0.5,"height":0.55,"depth":0.18,"color":16361509},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling.","source_url":"https://www.fairprice.com.sg/product/irvins-salted-egg-fish-skin-105g-13187315"}},{"id":"tao-kae-noi-original","name":"Tao Kae Noi Crispy Seaweed","category":"Local & Asian snacks","price_sgd":2.5,"pack":"1 pack, 32g","model":{"type":"box","width":0.4,"height":0.45,"depth":0.14,"color":1793568},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."}},{"id":"super-ring","name":"Super Ring Cheese Rings","category":"Local & Asian snacks","price_sgd":1.8,"pack":"1 pack, 60g","model":{"type":"box","width":0.4,"height":0.45,"depth":0.14,"color":16766464},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."}},{"id":"haw-flakes","name":"Haw Flakes","category":"Local & Asian snacks","price_sgd":1.2,"pack":"1 roll pack, 10 rolls","model":{"type":"box","width":0.5,"height":0.2,"depth":0.12,"color":12000284},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."}},{"id":"julies-peanut-butter","name":"Julie's Peanut Butter Sandwich","category":"Biscuits & cookies","price_sgd":5.6,"pack":"1 pack, 12 x 30g","model":{"type":"box","width":0.5,"height":0.35,"depth":0.22,"color":16088064},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling. An older 2-for-S$9.95 promotion has ended.","source_url":"https://omni.fairprice.com.sg/product/julie-s-sandwich-biscuits-peanut-butter-360g-12-per-pack-12083675"}},{"id":"julies-choco-more","name":"Julie's Choco More Sandwich","category":"Biscuits & cookies","price_sgd":5.6,"pack":"1 pack, 352g","model":{"type":"box","width":0.5,"height":0.35,"depth":0.22,"color":6111287},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling.","source_url":"https://www.fairprice.com.sg/product/julie-s-sandwich-biscuits-choco-more-352g-13225426"}},{"id":"oreo-vanilla","name":"Oreo Vanilla Multipack","category":"Biscuits & cookies","price_sgd":3.5,"pack":"1 pack, 248.4g","model":{"type":"box","width":0.5,"height":0.35,"depth":0.22,"color":1402304},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"FairPrice listing price from an older page; confirm before selling.","source_url":"https://fairprice.com.sg/product/oreo-sandwich-cookies-multipack-vanilla-248-4g-13098765"}},{"id":"pocky-chocolate","name":"Glico Pocky Chocolate","category":"Biscuits & cookies","price_sgd":1.9,"pack":"1 box, 45g","model":{"type":"box","width":0.35,"height":0.5,"depth":0.2,"color":13840175},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."}},{"id":"koalas-march-choc","name":"Lotte Koala's March Chocolate","category":"Biscuits & cookies","price_sgd":1.4,"pack":"1 box, 37g","model":{"type":"box","width":0.5,"height":0.35,"depth":0.22,"color":15022389},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."}},{"id":"hup-seng-crackers","name":"Hup Seng Cream Crackers","category":"Biscuits & cookies","price_sgd":3.5,"pack":"1 pack, 428g","model":{"type":"box","width":0.5,"height":0.35,"depth":0.22,"color":1668818},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."}},{"id":"kinder-bueno-milk","name":"Kinder Bueno Milk","category":"Chocolate","price_sgd":2.75,"pack":"1 bar, 43g","model":{"type":"box","width":0.5,"height":0.2,"depth":0.12,"color":15094016},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling.","source_url":"https://www.fairprice.com.sg/product/kinder-bueno-chocolate-wafer-bar-milk-43g-303793"}},{"id":"kinder-bueno-white","name":"Kinder Bueno White","category":"Chocolate","price_sgd":2.6,"pack":"1 bar, 39g","model":{"type":"box","width":0.5,"height":0.2,"depth":0.12,"color":15527921},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling.","source_url":"https://www.fairprice.com.sg/product/kinder-bueno-white-cream-39g-13004371"}},{"id":"cadbury-dm-plain","name":"Cadbury Dairy Milk","category":"Chocolate","price_sgd":2.4,"pack":"1 bar, 50g","model":{"type":"box","width":0.55,"height":0.3,"depth":0.08,"color":4854924},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling.","source_url":"https://fairprice.com.sg/product/cadbury-dairy-milk-chocolate-plain-50g-13085274"}},{"id":"cadbury-dm-roll","name":"Cadbury Dairy Milk Roll","category":"Chocolate","price_sgd":2.8,"pack":"1 roll, 55g","model":{"type":"box","width":0.5,"height":0.2,"depth":0.12,"color":6953882},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling.","source_url":"https://www.fairprice.com.sg/product/cadbury-dairy-milk-chocolate-roll-milk-55g-17279"}},{"id":"cadbury-roast-almond","name":"Cadbury Dairy Milk Roast Almond","category":"Chocolate","price_sgd":7.5,"pack":"1 block, 180g","model":{"type":"box","width":0.55,"height":0.3,"depth":0.08,"color":8069026},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling.","source_url":"https://www.fairprice.com.sg/product/cadbury-dairy-milk-chocolate-block-roast-almond-180g-13153005"}},{"id":"kitkat-2f-6pack","name":"Kit Kat 2 Finger (6-pack)","category":"Chocolate","price_sgd":4.65,"pack":"1 pack, 6 x 17g","model":{"type":"box","width":0.5,"height":0.35,"depth":0.22,"color":13959168},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling.","source_url":"https://www.fairprice.com.sg/product/nestle-kit-kat-2-finger-milk-chocolate-6s-x-17g-10868962"}},{"id":"snickers","name":"Snickers","category":"Chocolate","price_sgd":1.6,"pack":"1 bar, 51g","model":{"type":"box","width":0.5,"height":0.2,"depth":0.12,"color":5125166},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."}},{"id":"haribo-goldbears","name":"Haribo Goldbears","category":"Sweets & mints","price_sgd":2.2,"pack":"1 pack, 80g","model":{"type":"box","width":0.4,"height":0.45,"depth":0.14,"color":16498733},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."}},{"id":"hi-chew-strawberry","name":"Hi-Chew Strawberry","category":"Sweets & mints","price_sgd":1.3,"pack":"1 stick, 55g","model":{"type":"box","width":0.5,"height":0.2,"depth":0.12,"color":15483002},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."}},{"id":"mentos-mint","name":"Mentos Mint","category":"Sweets & mints","price_sgd":1.0,"pack":"1 roll, 37.5g","model":{"type":"box","width":0.5,"height":0.2,"depth":0.12,"color":161725},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."}},{"id":"fishermans-friend","name":"Fisherman's Friend Original","category":"Sweets & mints","price_sgd":2.3,"pack":"1 pack, 25g","model":{"type":"box","width":0.5,"height":0.2,"depth":0.12,"color":16119260},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."}},{"id":"kopiko-candy","name":"Kopiko Coffee Candy","category":"Sweets & mints","price_sgd":1.5,"pack":"1 pack, 150g","model":{"type":"box","width":0.4,"height":0.45,"depth":0.14,"color":4073251},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."}},{"id":"indomie-mi-goreng","name":"Indomie Mi Goreng","category":"Instant noodles","price_sgd":0.75,"pack":"1 pack, 85g","model":{"type":"box","width":0.4,"height":0.45,"depth":0.14,"color":12986408},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."}},{"id":"nissin-cup-seafood","name":"Nissin Cup Noodles Seafood","category":"Instant noodles","price_sgd":1.6,"pack":"1 cup, 75g","model":{"type":"cylinder","width":0.32,"height":0.3,"depth":0.32,"color":2001125},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."}},{"id":"maggi-curry","name":"Maggi Curry Noodles","category":"Instant noodles","price_sgd":0.8,"pack":"1 pack, 79g","model":{"type":"box","width":0.4,"height":0.45,"depth":0.14,"color":16635957},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."}},{"id":"prima-taste-laksa","name":"Prima Taste Laksa La Mian","category":"Instant noodles","price_sgd":3.5,"pack":"1 pack, 185g","model":{"type":"box","width":0.5,"height":0.35,"depth":0.22,"color":16740419},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."}},{"id":"pokka-green-tea","name":"Pokka Green Tea (packet)","category":"Drinks","price_sgd":0.6,"pack":"1 packet, 250ml","model":{"type":"box","width":0.2,"height":0.34,"depth":0.13,"color":4431943},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"Based on FairPrice carton price S$11.90 for 24 (search snapshot, 3 Nov 2026); single-pack price set by the shop."}},{"id":"yeos-chrysanthemum","name":"Yeo's Chrysanthemum Tea (packet)","category":"Drinks","price_sgd":0.6,"pack":"1 packet, 250ml","model":{"type":"box","width":0.2,"height":0.34,"depth":0.13,"color":16771899},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"Based on FairPrice carton price S$11.60 for 24 (search snapshot, 3 Nov 2026); single-pack price set by the shop.","source_url":"https://www.fairprice.com.sg/product/ctn-yeos-chrysanthemum-tea-24s-x-250ml-10020227"}},{"id":"pokka-oolong-can","name":"Pokka Oolong Tea (can)","category":"Drinks","price_sgd":0.8,"pack":"1 can, 300ml","model":{"type":"cylinder","width":0.2,"height":0.36,"depth":0.2,"color":9268835},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"Based on FairPrice carton price S$8.75 for 12 (search snapshot, 3 Nov 2026); single-can price set by the shop.","source_url":"https://www.fairprice.com.sg/product/pokka-canned---oolong-tea-13052602"}},{"id":"pokka-sencha-can","name":"Pokka Sencha Green Tea (can)","category":"Drinks","price_sgd":0.8,"pack":"1 can, 300ml","model":{"type":"cylinder","width":0.2,"height":0.36,"depth":0.2,"color":3046706},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"Based on FairPrice carton price S$8.75 for 12 (search snapshot, 3 Nov 2026); single-can price set by the shop.","source_url":"https://www.fairprice.com.sg/product/bcrs-pokka-can-sencha-japanese-green-tea-can-no-sugar-12-x-300ml-13281590"}},{"id":"100plus-can","name":"100Plus Original (can)","category":"Drinks","price_sgd":1.0,"pack":"1 can, 325ml","model":{"type":"cylinder","width":0.2,"height":0.36,"depth":0.2,"color":1402304},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."}},{"id":"milo-uht","name":"Milo UHT Less Sugar (packet)","category":"Drinks","price_sgd":0.9,"pack":"1 packet, 200ml","model":{"type":"box","width":0.2,"height":0.34,"depth":0.13,"color":3046706},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."}},{"id":"coca-cola-can","name":"Coca-Cola (can)","category":"Drinks","price_sgd":1.2,"pack":"1 can, 320ml","model":{"type":"cylinder","width":0.2,"height":0.36,"depth":0.2,"color":13959168},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."}},{"id":"tong-garden-cashew","name":"Tong Garden Salted Cashews","category":"Nuts & healthier snacks","price_sgd":1.5,"pack":"1 pack, 35g","model":{"type":"box","width":0.4,"height":0.45,"depth":0.14,"color":15094016},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."}},{"id":"camel-mixed-nuts","name":"Camel Baked Mixed Nuts","category":"Nuts & healthier snacks","price_sgd":1.8,"pack":"1 pack, 40g","model":{"type":"box","width":0.4,"height":0.45,"depth":0.14,"color":10586239},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."}},{"id":"calbee-harvest-snaps","name":"Calbee Harvest Snaps Original","category":"Nuts & healthier snacks","price_sgd":2.8,"pack":"1 pack, 93g","model":{"type":"box","width":0.5,"height":0.55,"depth":0.18,"color":8172354},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."}},{"id":"nature-valley-oats-honey","name":"Nature Valley Oats & Honey","category":"Nuts & healthier snacks","price_sgd":5.5,"pack":"1 box, 6 x 42g","model":{"type":"box","width":0.5,"height":0.35,"depth":0.22,"color":3706428},"texture":{"type":"generated","description":"Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."},"reference":{"note":"Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."}}]}/*PRODUCTS-END*/;
+
+let db = null, usingFallback = true;
+try {
+  const res = await fetch('products.json', { cache: 'no-cache' });
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const j = await res.json();
+  if (j && Array.isArray(j.products) && j.products.length) { db = j; usingFallback = false; }
+} catch (e) { console.warn('Could not read products.json, using built-in list:', e); }
+if (!db) db = FALLBACK_DB || { products: [] };
+if (usingFallback) {
+  const note = document.getElementById('data-note');
+  note.textContent = 'Showing the built-in product list because products.json could not be read. Changes to products.json will not appear until the shop is opened from a web server (not straight from a file).';
+  note.hidden = false;
+}
+const CURRENCY = db.currency || 'SGD';
+const money = n => (CURRENCY === 'SGD' ? 'S$' : CURRENCY + ' ') + n.toFixed(2);
+
+const PRODUCTS = db.products.map(p => {
+  const m = p.model || {};
+  return {
+    id: p.id || p.name, name: p.name, category: p.category || 'Other snacks',
+    price: p.price_sgd !== undefined ? p.price_sgd : p.price, pack: p.pack || '',
+    color: m.color !== undefined ? m.color : (p.color !== undefined ? p.color : 0xcccccc),
+    shape: m.type === 'cylinder' ? 'cylinder' : 'box',
+    width: m.width || p.width || 0.5, height: m.height || p.height || 0.5, depth: m.depth || p.depth || 0.2,
+    texture_url: (p.texture && p.texture.image_url) || p.texture_url || null,
+  };
+}).filter(p => p.name && typeof p.price === 'number');
+
+// Group by category, in the order given by products.json "categories".
+const groups = new Map();
+(db.categories || []).forEach(c => groups.set(c, []));
+PRODUCTS.forEach(p => { if (!groups.has(p.category)) groups.set(p.category, []); groups.get(p.category).push(p); });
+const SIGN_COLORS = ['#c0392b', '#d35400', '#8e5a2b', '#6c3483', '#c2185b', '#b7950b', '#1f7a8c', '#2e7d32', '#455a64', '#5d4037'];
+const CATS = [...groups.entries()].filter(([, items]) => items.length)
+  .map(([name, items], i) => ({ name, items, sign: SIGN_COLORS[i % SIGN_COLORS.length], units: [] }));
+
+// ---------------------------------------------------------------------------
+// Drawing helpers (signs, shelf tags and pack art are drawn on canvases).
+// ---------------------------------------------------------------------------
+const hex = n => '#' + n.toString(16).padStart(6, '0');
+const isDark = n => (0.299 * (n >> 16 & 255) + 0.587 * (n >> 8 & 255) + 0.114 * (n & 255)) < 150;
+function canvasTexture(w, h, draw) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  draw(c.getContext('2d'), w, h);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t;
+}
+function wrapLines(ctx, text, maxW) {
+  const words = text.split(' '), lines = []; let line = '';
+  words.forEach(w => { const t = line ? line + ' ' + w : w; if (ctx.measureText(t).width <= maxW || !line) line = t; else { lines.push(line); line = w; } });
+  if (line) lines.push(line); return lines;
+}
+// Largest font size (bold) at which `text` wraps into the box.
+function fitWrapped(ctx, text, maxW, maxH, maxSize, minSize = 10) {
+  for (let s = maxSize; s >= minSize; s -= 2) {
+    ctx.font = `bold ${s}px system-ui, sans-serif`;
+    const lines = wrapLines(ctx, text, maxW);
+    if (lines.length * s * 1.1 <= maxH && lines.every(l => ctx.measureText(l).width <= maxW)) return { lines, size: s };
+  }
+  ctx.font = `bold ${minSize}px system-ui, sans-serif`; return { lines: wrapLines(ctx, text, maxW), size: minSize };
+}
+function fitOneLine(ctx, text, maxW, size, weight = '') {
+  let s = size; do { ctx.font = `${weight} ${s}px system-ui, sans-serif`; s -= 1; } while (ctx.measureText(text).width > maxW && s > 8);
+}
+function roundRect(ctx, x, y, w, h, r) { ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(x, y, w, h, r); else ctx.rect(x, y, w, h); }
+
+// Pack art drawn from the product name and colour (used when there is no photo, or the photo fails).
+function packArtTexture(p) {
+  const cyl = p.shape === 'cylinder';
+  const W = cyl ? 512 : 256, H = cyl ? 256 : Math.max(96, Math.min(512, Math.round(256 * p.height / p.width)));
+  return canvasTexture(W, H, (ctx, w, h) => {
+    ctx.fillStyle = hex(p.color); ctx.fillRect(0, 0, w, h);
+    const g = ctx.createLinearGradient(0, 0, 0, h); g.addColorStop(0, 'rgba(255,255,255,.28)'); g.addColorStop(1, 'rgba(0,0,0,.22)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+    (cyl ? [w / 4, 3 * w / 4] : [w / 2]).forEach(cx => {
+      const bw = (cyl ? w / 2 : w) * 0.86, bh = h * 0.56, by = h * 0.14;
+      ctx.fillStyle = 'rgba(255,255,255,.93)'; roundRect(ctx, cx - bw / 2, by, bw, bh, 14); ctx.fill();
+      ctx.fillStyle = '#1d1d1d'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      const { lines, size } = fitWrapped(ctx, p.name, bw - 16, bh - 10, 44);
+      lines.forEach((l, i) => ctx.fillText(l, cx, by + bh / 2 + (i - (lines.length - 1) / 2) * size * 1.1));
+      ctx.fillStyle = isDark(p.color) ? '#fff' : '#1d1d1d';
+      fitOneLine(ctx, p.pack, bw, Math.max(12, Math.round(h * 0.1)));
+      ctx.fillText(p.pack, cx, h * 0.84);
+    });
+  });
+}
+// Shelf-edge price tag.
+function tagTexture(p, accent) {
+  return canvasTexture(512, 84, (ctx, w, h) => {
+    ctx.fillStyle = '#fffdf6'; ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = accent; ctx.fillRect(0, 0, 10, h);
+    ctx.fillStyle = '#c62828'; ctx.textBaseline = 'middle'; ctx.textAlign = 'right';
+    ctx.font = 'bold 40px system-ui, sans-serif'; ctx.fillText(money(p.price), w - 12, h / 2 + 2);
+    const priceW = ctx.measureText(money(p.price)).width;
+    ctx.fillStyle = '#222'; ctx.textAlign = 'left';
+    fitOneLine(ctx, p.name, w - priceW - 46, 28, 'bold'); ctx.fillText(p.name, 22, h / 2 + 2);
+  });
+}
+function signTexture(text, color, w = 1024, h = 150) {
+  return canvasTexture(w, h, (ctx) => {
+    ctx.fillStyle = color; roundRect(ctx, 0, 0, w, h, 26); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    fitOneLine(ctx, text, w - 60, Math.round(h * 0.55), 'bold'); ctx.fillText(text, w / 2, h / 2 + 3);
+  });
+}
+const plane = (w, h, tex, opts = {}) => new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: tex, ...opts }));
+
+// ---------------------------------------------------------------------------
+// Scene, camera, renderer.
+// ---------------------------------------------------------------------------
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xf2efe8);
+scene.fog = new THREE.Fog(0xf2efe8, 22, 45);
+const camera = new THREE.PerspectiveCamera(70, 1, 0.1, 100);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+const shopEl = document.getElementById('shop');
+shopEl.appendChild(renderer.domElement);
+// The CSS decides the canvas size (70vh on computers, 60vh on phones); here we only match the drawing resolution to it.
+function resize() {
+  const c = renderer.domElement, w = c.clientWidth, h = c.clientHeight;
+  renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+}
+window.addEventListener('resize', resize); resize();
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0xcfc3a8, 1.6));
+const sun = new THREE.DirectionalLight(0xffffff, 0.9); sun.position.set(4, 10, 6); scene.add(sun);
+
+// ---------------------------------------------------------------------------
+// Room size. Middle aisles ("gondolas", shelves with two faces) are added as
+// needed, and the room widens to fit them.
+// ---------------------------------------------------------------------------
+const SLOT_W = 0.85;                 // width of one product column
+const LEVELS = [0.12, 0.77, 1.42];   // height of each shelf board's top
+const UNIT_H = 2.1, UNIT_D = 0.55;   // shelf unit height and depth
+const GONDOLA_LEN = 7, GONDOLA_Z = -2, AISLE = 4.2;
+const HALF_D = 8, WALL_H = 3.4;      // room runs from z = -8 (back) to z = 8 (entrance)
+const colsFor = len => Math.floor((len - 0.1) / SLOT_W);
+const MIN_UNIT_SLOTS = colsFor(GONDOLA_LEN) * LEVELS.length;
+const unitsNeeded = CATS.reduce((s, c) => s + Math.ceil(c.items.length / MIN_UNIT_SLOTS), 0);
+const G = Math.max(3, Math.ceil((unitsNeeded - 4) / 2));        // number of middle gondolas
+const HALF_W = Math.max(10, (G - 1) / 2 * AISLE + 5.8);           // room runs from x = -HALF_W to +HALF_W
+const SIDE_LEN = 11, SIDE_Z = -1.7, BACK_LEN = HALF_W - 1.4;
+
+// Every shelf face in the shop, in shopping order: left wall, middle aisles, right wall, back wall.
+const UNITS = [];
+UNITS.push({ x: -HALF_W + UNIT_D / 2 + 0.02, z: SIDE_Z, rotY: Math.PI / 2, length: SIDE_LEN });
+for (let g = 0; g < G; g++) {
+  const gx = (g - (G - 1) / 2) * AISLE;
+  UNITS.push({ x: gx - UNIT_D / 2, z: GONDOLA_Z, rotY: -Math.PI / 2, length: GONDOLA_LEN, gondola: g, face: 'west' });
+  UNITS.push({ x: gx + UNIT_D / 2, z: GONDOLA_Z, rotY: Math.PI / 2, length: GONDOLA_LEN, gondola: g, face: 'east' });
+}
+UNITS.push({ x: HALF_W - UNIT_D / 2 - 0.02, z: SIDE_Z, rotY: -Math.PI / 2, length: SIDE_LEN });
+UNITS.push({ x: -HALF_W / 2, z: -HALF_D + UNIT_D / 2 + 0.02, rotY: 0, length: BACK_LEN });
+UNITS.push({ x: HALF_W / 2, z: -HALF_D + UNIT_D / 2 + 0.02, rotY: 0, length: BACK_LEN });
+
+// Give each category at least the shelf faces it needs, then hand spare faces to the
+// fullest categories so every face is stocked.
+const alloc = CATS.map(c => Math.ceil(c.items.length / MIN_UNIT_SLOTS));
+let spare = UNITS.length - alloc.reduce((a, b) => a + b, 0);
+while (spare > 0) {
+  let best = -1, bestRatio = 1;
+  CATS.forEach((c, i) => { const r = c.items.length / alloc[i]; if (c.items.length > alloc[i] && r > bestRatio) { best = i; bestRatio = r; } });
+  if (best < 0) break;
+  alloc[best]++; spare--;
+}
+let cursor = 0;
+CATS.forEach((c, i) => {
+  const n = c.items.length, a = alloc[i];
+  for (let j = 0; j < a; j++) {
+    const u = UNITS[cursor++];
+    u.cat = c; u.items = c.items.slice(Math.floor(j * n / a), Math.floor((j + 1) * n / a));
+    c.units.push(u);
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Room: floor, ceiling, walls with an entrance, lights, store sign.
+// ---------------------------------------------------------------------------
+const floorTex = canvasTexture(128, 128, (ctx) => {
+  ctx.fillStyle = '#e9e4d8'; ctx.fillRect(0, 0, 128, 128);
+  ctx.fillStyle = '#dcd5c4'; ctx.fillRect(0, 0, 64, 64); ctx.fillRect(64, 64, 64, 64);
+  ctx.strokeStyle = 'rgba(0,0,0,.08)'; ctx.lineWidth = 2; ctx.strokeRect(0, 0, 64, 64); ctx.strokeRect(64, 64, 64, 64);
+});
+floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping; floorTex.repeat.set(HALF_W, HALF_D);
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(HALF_W * 2, HALF_D * 2), new THREE.MeshStandardMaterial({ map: floorTex }));
+floor.rotation.x = -Math.PI / 2; scene.add(floor);
+const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(HALF_W * 2, HALF_D * 2), new THREE.MeshStandardMaterial({ color: 0xf7f7f7 }));
+ceiling.rotation.x = Math.PI / 2; ceiling.position.y = WALL_H; scene.add(ceiling);
+
+// Solid things a click or tap cannot pass through (walls, shelf units), so you can
+// only select products you can actually see.
+const blockers = [];
+const wallMat = new THREE.MeshStandardMaterial({ color: 0xfaf6ee });
+const trimMat = new THREE.MeshStandardMaterial({ color: 0x2a9d8f });
+const skirtMat = new THREE.MeshStandardMaterial({ color: 0x6d5d4b });
+function wall(x0, z0, x1, z1, y0 = 0, y1 = WALL_H) {
+  const len = Math.hypot(x1 - x0, z1 - z0), rot = Math.atan2(-(z1 - z0), x1 - x0);
+  const m = new THREE.Mesh(new THREE.BoxGeometry(len, y1 - y0, 0.1), wallMat);
+  m.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2); m.rotation.y = rot; scene.add(m); blockers.push(m);
+  [[2.55, 0.12, trimMat], [0.06, 0.12, skirtMat]].forEach(([y, h, mat]) => {
+    if (y < y0 || y > y1) return;
+    const t = new THREE.Mesh(new THREE.BoxGeometry(len, h, 0.14), mat); t.position.copy(m.position); t.position.y = y; t.rotation.y = rot; scene.add(t);
+  });
+}
+const DOOR = 1.3;
+wall(-HALF_W, -HALF_D, HALF_W, -HALF_D);                 // back
+wall(-HALF_W, -HALF_D, -HALF_W, HALF_D);                 // left
+wall(HALF_W, -HALF_D, HALF_W, HALF_D);                   // right
+wall(-HALF_W, HALF_D, -DOOR, HALF_D);                    // front, left of the entrance
+wall(DOOR, HALF_D, HALF_W, HALF_D);                      // front, right of the entrance
+wall(-DOOR, HALF_D, DOOR, HALF_D, 2.4, WALL_H);          // above the entrance
+const glass = new THREE.Mesh(new THREE.PlaneGeometry(DOOR * 2, 2.4), new THREE.MeshStandardMaterial({ color: 0xa9d6ec, transparent: true, opacity: 0.55 }));
+glass.position.set(0, 1.2, HALF_D); glass.rotation.y = Math.PI; scene.add(glass);
+const mat = new THREE.Mesh(new THREE.PlaneGeometry(DOOR * 2, 1.2), new THREE.MeshStandardMaterial({ color: 0x3e4a4f }));
+mat.rotation.x = -Math.PI / 2; mat.position.set(0, 0.005, HALF_D - 0.8); scene.add(mat);
+
+// Ceiling light panels (glowing shapes only; the lights above do the lighting).
+const panelMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+for (let x = -HALF_W + 2.5; x <= HALF_W - 2; x += 4.2)
+  for (let z = -6; z <= 6; z += 4) {
+    const p = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.04, 0.45), panelMat); p.position.set(x, WALL_H - 0.03, z); scene.add(p);
+  }
+const storeSign = plane(4.4, 0.6, signTexture('Virtual Snack Shop', '#2a9d8f', 1024, 140));
+storeSign.position.set(0, 2.95, -HALF_D + 0.07); scene.add(storeSign);
+
+// ---------------------------------------------------------------------------
+// Shelf units and products.
+// ---------------------------------------------------------------------------
+const clickable = [];
+const obstacles = [];
+function addObstacle(obj, pad = 0.3) {
+  const b = new THREE.Box3().setFromObject(obj);
+  obstacles.push({ minX: b.min.x - pad, maxX: b.max.x + pad, minZ: b.min.z - pad, maxZ: b.max.z + pad });
+}
+const frameMat = new THREE.MeshStandardMaterial({ color: 0xe0e0e0, metalness: 0.2, roughness: 0.6 });
+const boardMat = new THREE.MeshStandardMaterial({ color: 0xf5f5f5 });
+const backMat = new THREE.MeshStandardMaterial({ color: 0xcfd8dc });
+const kickMat = new THREE.MeshStandardMaterial({ color: 0x546e7a });
+
+// Per-product shared material (pack art first, swapped for the photo if one loads).
+const texLoader = new THREE.TextureLoader();
+const productMats = new Map();
+function productMaterial(p) {
+  if (productMats.has(p)) return productMats.get(p);
+  const m = new THREE.MeshStandardMaterial({ map: packArtTexture(p), roughness: 0.55 });
+  if (p.texture_url) {
+    texLoader.load(p.texture_url,
+      tex => { tex.colorSpace = THREE.SRGBColorSpace; m.map = tex; m.needsUpdate = true; },
+      undefined,
+      () => console.warn(`Photo for "${p.name}" could not be loaded; showing drawn pack art instead.`));
+  }
+  productMats.set(p, m); return m;
+}
+const productInstances = new Map(); // product -> list of world matrices
+
+function buildUnit(u) {
+  const g = new THREE.Group(); g.position.set(u.x, 0, u.z); g.rotation.y = u.rotY; scene.add(g); blockers.push(g);
+  const L = u.length;
+  const add = (geo, matl, x, y, z) => { const m = new THREE.Mesh(geo, matl); m.position.set(x, y, z); g.add(m); return m; };
+  add(new THREE.BoxGeometry(L, UNIT_H, 0.03), backMat, 0, UNIT_H / 2, -UNIT_D / 2 + 0.015);
+  [-1, 1].forEach(s => add(new THREE.BoxGeometry(0.05, UNIT_H, UNIT_D), frameMat, s * (L / 2 - 0.025), UNIT_H / 2, 0));
+  LEVELS.forEach(y => add(new THREE.BoxGeometry(L, 0.04, UNIT_D), boardMat, 0, y - 0.02, 0));
+  add(new THREE.BoxGeometry(L, 0.04, UNIT_D), frameMat, 0, UNIT_H, 0);
+  add(new THREE.BoxGeometry(L, 0.1, 0.02), kickMat, 0, 0.05, UNIT_D / 2);
+  if (u.cat) {
+    const sign = plane(Math.min(L - 0.4, 3.4), 0.42, signTexture(u.cat.name, u.cat.sign));
+    sign.position.set(0, UNIT_H + 0.3, -UNIT_D / 2 + 0.05); g.add(sign);
+  }
+  g.updateMatrixWorld(true);
+  addObstacle(g);
+  if (!u.items || !u.items.length) return;
+
+  // Slots in column order (top to bottom, then next column), so each product
+  // gets a neat vertical block of "facings", like a real shop.
+  const cols = colsFor(L), x0 = -(cols * SLOT_W) / 2 + SLOT_W / 2;
+  const order = [];
+  for (let c = 0; c < cols; c++) for (let l = LEVELS.length - 1; l >= 0; l--) order.push({ c, l });
+  const S = order.length, k = u.items.length;
+  u.items.forEach((p, i) => {
+    const slots = order.slice(Math.floor(i * S / k), Math.floor((i + 1) * S / k));
+    // Fit the pack into a slot.
+    const maxH = (l => (l === LEVELS.length - 1 ? UNIT_H : LEVELS[l + 1] - 0.04) - LEVELS[l] - 0.06);
+    const w = Math.min(p.width, SLOT_W - 0.08), d = Math.min(p.depth, UNIT_D - 0.08);
+    const across = Math.max(1, Math.min(3, Math.floor((SLOT_W - 0.06) / (w + 0.03))));
+    const rows = Math.max(1, Math.min(3, Math.floor((UNIT_D - 0.08) / (d + 0.03))));
+    const list = productInstances.get(p) || []; productInstances.set(p, list);
+    const tagMat = new THREE.MeshBasicMaterial({ map: tagTexture(p, u.cat.sign) });
+    const tagged = new Set();
+    slots.forEach(({ c, l }) => {
+      const h = Math.min(p.height, maxH(l));
+      const sx = x0 + c * SLOT_W;
+      for (let a = 0; a < across; a++) for (let r = 0; r < rows; r++) {
+        const local = new THREE.Matrix4().compose(
+          new THREE.Vector3(sx + (a - (across - 1) / 2) * (w + 0.03), LEVELS[l] + h / 2, (r - (rows - 1) / 2) * (d + 0.03)),
+          new THREE.Quaternion(), new THREE.Vector3(1, h / p.height, 1));
+        list.push({ m: new THREE.Matrix4().multiplyMatrices(g.matrixWorld, local), w, d });
+      }
+      // One price tag per shelf level for this product, under its first column on that level.
+      if (!tagged.has(l)) {
+        tagged.add(l);
+        const tag = new THREE.Mesh(new THREE.PlaneGeometry(SLOT_W - 0.06, 0.12), tagMat);
+        tag.position.set(sx, LEVELS[l] - 0.05, UNIT_D / 2 + 0.012); tag.userData.product = p;
+        g.add(tag); tag.updateMatrixWorld(); clickable.push(tag);
+      }
+    });
+  });
+}
+UNITS.forEach(buildUnit);
+
+// Gondola end signs, readable from the entrance: which categories are down each side.
+for (let g = 0; g < G; g++) {
+  const west = UNITS.find(u => u.gondola === g && u.face === 'west'), east = UNITS.find(u => u.gondola === g && u.face === 'east');
+  const tex = canvasTexture(512, 400, (ctx, w, h) => {
+    ctx.fillStyle = '#263238'; roundRect(ctx, 0, 0, w, h, 24); ctx.fill();
+    ctx.fillStyle = '#ffd54f'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = 'bold 44px system-ui, sans-serif'; ctx.fillText(`Aisle ${g + 1}`, w / 2, 56);
+    [[west, '◀ '], [east, '▶ ']].forEach(([u, arrow], i) => {
+      const t = u && u.cat ? u.cat.name : '—';
+      ctx.fillStyle = u && u.cat ? u.cat.sign : '#555'; roundRect(ctx, 24, 120 + i * 135, w - 48, 115, 16); ctx.fill();
+      ctx.fillStyle = '#fff'; fitOneLine(ctx, arrow + t, w - 80, 40, 'bold'); ctx.fillText(arrow + t, w / 2, 178 + i * 135);
+    });
+  });
+  const s = plane(1.05, 0.82, tex);
+  s.position.set((g - (G - 1) / 2) * AISLE, UNIT_H + 0.15, GONDOLA_Z + GONDOLA_LEN / 2 + 0.03); scene.add(s);
+}
+
+// One instanced mesh per product: all its facings drawn in a single batch (fast on phones).
+productInstances.forEach((list, p) => {
+  const geo = p.shape === 'cylinder'
+    ? new THREE.CylinderGeometry(list[0].w / 2, list[0].w / 2, p.height, 24)
+    : new THREE.BoxGeometry(list[0].w, p.height, list[0].d);
+  const mesh = new THREE.InstancedMesh(geo, productMaterial(p), list.length);
+  list.forEach((it, i) => mesh.setMatrixAt(i, it.m));
+  mesh.instanceMatrix.needsUpdate = true; mesh.computeBoundingSphere();
+  mesh.userData.product = p; scene.add(mesh); clickable.push(mesh);
+});
+
+// Checkout counter by the entrance; clicking it opens the cart.
+const counter = new THREE.Group(); counter.position.set(HALF_W - 3.2, 0, HALF_D - 2.4); scene.add(counter);
+[[new THREE.BoxGeometry(2.6, 0.95, 0.8), 0x37474f, 0.475], [new THREE.BoxGeometry(2.8, 0.06, 0.95), 0xc8a97e, 0.98], [new THREE.BoxGeometry(0.45, 0.3, 0.35), 0x212121, 1.16]]
+  .forEach(([geo, col, y], i) => { const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: col })); m.position.set(i === 2 ? 0.7 : 0, y, 0); m.userData.checkout = true; counter.add(m); clickable.push(m); });
+const counterSign = new THREE.Sprite(new THREE.SpriteMaterial({ map: signTexture('Checkout', '#2a9d8f', 512, 140) }));
+counterSign.scale.set(1.6, 0.44, 1); counterSign.position.set(0, 2.4, 0); counter.add(counterSign);
+counter.updateMatrixWorld(true); addObstacle(counter);
+
+// ---------------------------------------------------------------------------
+// Movement + drag-to-look.
+// ---------------------------------------------------------------------------
+let yaw = 0, pitch = -0.05, dragging = false, lastX = 0, lastY = 0, dragDist = 0;
+camera.position.set(0, 1.6, HALF_D - 1.4);
+function resetView() { camera.position.set(0, 1.6, HALF_D - 1.4); yaw = 0; pitch = -0.05; }
+document.getElementById('entrance-btn').onclick = () => { resetView(); shopEl.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+let fastWalk = false;
+const fastBtn = document.getElementById('fast-btn');
+fastBtn.onclick = () => { fastWalk = !fastWalk; fastBtn.classList.toggle('active', fastWalk); fastBtn.textContent = fastWalk ? 'Fast walk: on' : 'Fast walk: off'; fastBtn.setAttribute('aria-pressed', String(fastWalk)); };
+const toastEl = document.getElementById('toast'); let toastTimer = null;
+function showToast(msg) { toastEl.textContent = msg; toastEl.style.display = 'block'; clearTimeout(toastTimer); toastTimer = setTimeout(() => toastEl.style.display = 'none', 2200); }
+const keys = {};
+document.getElementById('help-close').onclick = () => { document.getElementById('help').style.display = 'none'; document.getElementById('help-btn').hidden = false; };
+document.getElementById('help-btn').onclick = () => { document.getElementById('help').style.display = ''; document.getElementById('help-btn').hidden = true; };
+window.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { document.getElementById('popup').style.display = 'none'; return; }
+  const t = e.target;
+  if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+  const k = e.key.toLowerCase(); keys[k] = true;
+  if (k.startsWith('arrow')) e.preventDefault(); // walk, don't scroll the page
+});
+window.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+window.addEventListener('blur', () => { for (const k in keys) keys[k] = false; });
+// On-screen walk buttons: hold to walk, release to stop — same keys object as WASD.
+document.getElementById('shop').addEventListener('selectstart', e => e.preventDefault());
+document.getElementById('mobile-controls').addEventListener('contextmenu', e => e.preventDefault());
+document.querySelectorAll('#mobile-controls button').forEach(btn => {
+  const k = btn.dataset.key;
+  const on = e => { e.preventDefault(); btn._pid = e.pointerId; keys[k] = true; };
+  const off = e => { if (btn._pid !== undefined && e.pointerId !== btn._pid) return; btn._pid = undefined; keys[k] = false; };
+  btn.addEventListener('pointerdown', on);
+  btn.addEventListener('pointerup', off);
+  btn.addEventListener('pointercancel', off);
+  btn.addEventListener('pointerleave', off);
+});
+// Track the look finger by pointerId, so lifting the move finger does not cancel a look drag.
+let lookPointerId = null;
+const raycaster = new THREE.Raycaster();
+function pick(clientX, clientY) {
+  const rect = renderer.domElement.getBoundingClientRect();
+  raycaster.setFromCamera(new THREE.Vector2(((clientX - rect.left) / rect.width) * 2 - 1, -((clientY - rect.top) / rect.height) * 2 + 1), camera);
+  // Check products and solid objects together and use the nearest hit: if a shelf or
+  // wall is in front of a product, the shelf wins and nothing is selected.
+  // (Shelf units are checked with their parts, which include the price tags.)
+  const hit = raycaster.intersectObjects(clickable.concat(blockers), true)[0];
+  return hit && hit.distance < 12 ? hit.object.userData : null;
+}
+renderer.domElement.addEventListener('pointerdown', e => {
+  if (lookPointerId !== null) return;
+  lookPointerId = e.pointerId; dragging = true; dragDist = 0; lastX = e.clientX; lastY = e.clientY;
+  hoverEl.style.display = 'none';
+});
+let hoverAt = null;
+window.addEventListener('pointermove', e => {
+  if (!dragging && e.pointerType === 'mouse' && e.target === renderer.domElement) hoverAt = { x: e.clientX, y: e.clientY };
+  if (!dragging || e.pointerId !== lookPointerId) return;
+  const dx = e.clientX - lastX, dy = e.clientY - lastY;
+  dragDist += Math.abs(dx) + Math.abs(dy); lastX = e.clientX; lastY = e.clientY;
+  yaw -= dx * 0.005; pitch = Math.max(-1.2, Math.min(1.2, pitch - dy * 0.005));
+});
+renderer.domElement.addEventListener('pointerleave', () => { hoverAt = null; hoverEl.style.display = 'none'; });
+window.addEventListener('pointercancel', e => { if (e.pointerId === lookPointerId) { lookPointerId = null; dragging = false; } });
+window.addEventListener('pointerup', e => {
+  // Only the finger that started the look can end it.
+  if (e.pointerId !== lookPointerId) return;
+  const wasDrag = dragDist > 6; lookPointerId = null; dragging = false;
+  if (wasDrag) return;
+  const hit = pick(e.clientX, e.clientY);
+  if (hit && hit.product) selectProduct(hit.product);
+  else if (hit && hit.checkout) { goToCart(); showCheckoutNote(); }
+});
+
+const hoverEl = document.getElementById('hover');
+function updateHover() {
+  if (!hoverAt) return;
+  const at = hoverAt; hoverAt = null;
+  const hit = pick(at.x, at.y);
+  if (!hit || !(hit.product || hit.checkout)) { hoverEl.style.display = 'none'; renderer.domElement.style.cursor = ''; return; }
+  const rect = shopEl.getBoundingClientRect();
+  hoverEl.textContent = hit.product ? `${hit.product.name} — ${money(hit.product.price)}` : 'Checkout — open your cart';
+  hoverEl.style.left = (at.x - rect.left + 14) + 'px'; hoverEl.style.top = (at.y - rect.top + 14) + 'px';
+  hoverEl.style.display = 'block'; renderer.domElement.style.cursor = 'pointer';
+}
+
+// Jump to a category's shelf: stand in front of it, facing it.
+function goToShelf(cat) {
+  const u = cat.units[0]; if (!u) return;
+  const nx = Math.sin(u.rotY), nz = Math.cos(u.rotY);
+  camera.position.set(u.x + nx * 2.0, 1.6, u.z + nz * 2.0);
+  yaw = u.rotY; pitch = -0.12;
+  shopEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+let selected = null;
+const popup = document.getElementById('popup'), popupText = document.getElementById('popup-text');
+function selectProduct(p) {
+  selected = p;
+  document.getElementById('popup-cat').textContent = p.category;
+  const inCart = cart.get(p) || 0;
+  popupText.textContent = `${p.name} — ${money(p.price)}` + (p.pack ? ` (${p.pack})` : '') + (inCart ? ` · In cart: ${inCart}` : '');
+  popup.style.display = 'block';
+}
+document.getElementById('close-btn').onclick = () => popup.style.display = 'none';
+document.getElementById('popup-cart-btn').onclick = () => { popup.style.display = 'none'; document.getElementById('cart').scrollIntoView({ behavior: 'smooth' }); };
+
+// ---------------------------------------------------------------------------
+// Cart (remembered in this browser, so a refresh doesn't empty it).
+// ---------------------------------------------------------------------------
+const cart = new Map();
+const CART_KEY = 'virtual-snack-shop-cart-v1';
+try {
+  const saved = JSON.parse(localStorage.getItem(CART_KEY) || '{}');
+  PRODUCTS.forEach(p => { const q = saved[p.id]; if (Number.isInteger(q) && q > 0) cart.set(p, q); });
+} catch (e) {}
+function saveCart() {
+  try { const o = {}; cart.forEach((q, p) => o[p.id] = q); localStorage.setItem(CART_KEY, JSON.stringify(o)); } catch (e) {}
+}
+function renderCart() {
+  saveCart();
+  const list = document.getElementById('cart-list'); list.innerHTML = '';
+  let total = 0, count = 0;
+  if (cart.size === 0) list.innerHTML = '<li>Empty — click a snack in the shop, or use the list below.</li>';
+  cart.forEach((qty, p) => {
+    total += qty * p.price; count += qty;
+    const li = document.createElement('li');
+    li.textContent = `${p.name} — ${money(qty * p.price)} `;
+    const minus = document.createElement('button'); minus.textContent = '−'; minus.setAttribute('aria-label', `One fewer ${p.name}`);
+    minus.onclick = () => { if (qty <= 1) cart.delete(p); else cart.set(p, qty - 1); renderCart(); };
+    const q = document.createElement('span'); q.textContent = ` × ${qty} `;
+    const plus = document.createElement('button'); plus.textContent = '+'; plus.setAttribute('aria-label', `One more ${p.name}`);
+    plus.onclick = () => { cart.set(p, qty + 1); renderCart(); };
+    const rm = document.createElement('button'); rm.textContent = 'Remove';
+    rm.onclick = () => { cart.delete(p); renderCart(); };
+    li.append(minus, q, plus, rm); list.appendChild(li);
+  });
+  document.getElementById('total').textContent = money(total);
+  document.getElementById('count').textContent = `${count}`;
+  document.getElementById('cart-pill').textContent = `Cart · ${count} item${count === 1 ? '' : 's'} · ${money(total)}`;
+}
+function addToCart(p) { cart.set(p, (cart.get(p) || 0) + 1); renderCart(); showToast(`Added ${p.name} to cart`); }
+document.getElementById('clear-cart-btn').onclick = () => { if (!cart.size || !confirm('Remove everything from your cart?')) return; cart.clear(); renderCart(); showToast('Cart cleared'); };
+document.getElementById('add-btn').onclick = () => { if (selected) addToCart(selected); popup.style.display = 'none'; };
+function showCheckoutNote() {
+  document.getElementById('checkout-note').textContent =
+    'Demo checkout only: connect this button to a real online store / payment and delivery provider before selling.';
+}
+document.getElementById('checkout-btn').onclick = showCheckoutNote;
+function goToCart() { document.getElementById('cart').scrollIntoView({ behavior: 'smooth' }); }
+document.getElementById('cart-pill').onclick = goToCart;
+
+// "All snacks" list, grouped by shelf, with search.
+const productList = document.getElementById('product-list');
+let activeCat = 'All';
+const chipsEl = document.getElementById('cat-chips');
+function applyListFilter() {
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  let anyVisible = false;
+  productList.querySelectorAll(':scope > div').forEach(section => {
+    if (activeCat !== 'All' && section.dataset.cat !== activeCat) { section.style.display = 'none'; return; }
+    let any = false;
+    section.querySelectorAll('.row').forEach(r => { const show = !q || r.dataset.search.includes(q); r.style.display = show ? '' : 'none'; any = any || show; });
+    section.style.display = any ? '' : 'none';
+    anyVisible = anyVisible || any;
+  });
+  const noResults = document.getElementById('no-results');
+  if (!anyVisible) {
+    noResults.textContent = q ? 'No snacks match "' + q + '" — try another search or choose All.' : 'No snacks in this category yet.';
+    noResults.hidden = false;
+  } else {
+    noResults.hidden = true;
+  }
+}
+[['All', PRODUCTS.length], ...CATS.map(c => [c.name, c.items.length])].forEach(([name, n]) => {
+  const b = document.createElement('button'); b.textContent = `${name} (${n})`; b.classList.toggle('active', name === 'All');
+  b.onclick = () => { activeCat = name; chipsEl.querySelectorAll('button').forEach(x => x.classList.toggle('active', x === b)); applyListFilter(); };
+  chipsEl.appendChild(b);
+});
+CATS.forEach(cat => {
+  const section = document.createElement('div'); section.dataset.cat = cat.name;
+  const h = document.createElement('h4'); const title = document.createElement('span'); title.textContent = `${cat.name} (${cat.items.length})`; h.appendChild(title);
+  const go = document.createElement('button'); go.textContent = 'Go to shelf'; go.onclick = () => goToShelf(cat);
+  h.appendChild(go); section.appendChild(h);
+  cat.items.forEach(p => {
+    const row = document.createElement('div'); row.className = 'row'; row.dataset.search = `${p.name} ${p.category} ${p.pack}`.toLowerCase();
+    const label = document.createElement('span'); label.textContent = `${p.name} — ${money(p.price)}`;
+    const b = document.createElement('button'); b.textContent = 'Add'; b.onclick = () => addToCart(p);
+    row.append(label, b); section.appendChild(row);
+  });
+  productList.appendChild(section);
+});
+document.getElementById('search').addEventListener('input', applyListFilter);
+renderCart();
+
+// ---------------------------------------------------------------------------
+// Main loop.
+// ---------------------------------------------------------------------------
+const blocked = (x, z) => obstacles.some(o => x > o.minX && x < o.maxX && z > o.minZ && z < o.maxZ);
+const clock = new THREE.Clock();
+let firstFrame = true;
+function animate() {
+  requestAnimationFrame(animate);
+  if (firstFrame) { firstFrame = false; window.__shopReady = true; const l = document.getElementById('loading'); if (l) l.style.display = 'none'; }
+  const dt = Math.min(clock.getDelta(), 0.05), speed = (fastWalk || keys['shift']) ? 7 : 4;
+  const f = (keys['w'] || keys['arrowup'] ? 1 : 0) - (keys['s'] || keys['arrowdown'] ? 1 : 0);
+  const r = (keys['d'] || keys['arrowright'] ? 1 : 0) - (keys['a'] || keys['arrowleft'] ? 1 : 0);
+  if (f || r) {
+    const lim = (v, m) => Math.max(-m, Math.min(m, v));
+    const nx = lim(camera.position.x + (Math.sin(yaw) * -f + Math.cos(yaw) * r) * speed * dt, HALF_W - 0.4);
+    const nz = lim(camera.position.z + (Math.cos(yaw) * -f + Math.sin(yaw) * -r) * speed * dt, HALF_D - 0.4);
+    // Move each axis separately so you slide along shelves instead of walking through them.
+    if (!blocked(nx, camera.position.z)) camera.position.x = nx;
+    if (!blocked(camera.position.x, nz)) camera.position.z = nz;
+  }
+  camera.rotation.order = 'YXZ'; camera.rotation.y = yaw; camera.rotation.x = pitch;
+  updateHover();
+  renderer.render(scene, camera);
+}
+animate();
+</script>
+</body>
+</html>
