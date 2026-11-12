@@ -155,6 +155,7 @@
   #paynow-qr svg { width: 180px; height: 180px; display: block; }
   .paynow-paid { display: flex; align-items: center; gap: 8px; font-weight: 700; margin-top: 10px; cursor: pointer; }
   .paynow-paid input { width: 20px; height: 20px; accent-color: var(--brand); }
+  #paynow-download { margin: 2px 0 8px; }
   dialog label { display: block; font-size: 13px; font-weight: 600; margin-top: 10px; }
   dialog input, dialog textarea { width: 100%; padding: 9px 11px; border: 1px solid #c5ccd0; border-radius: 10px; font-size: 16px; margin-top: 4px; resize: vertical; }
   .dialog-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
@@ -235,6 +236,7 @@
       <span class="stepper"><button type="button" id="card-minus" aria-label="One fewer">−</button><output id="card-qty">1</output><button type="button" id="card-plus" aria-label="One more">+</button></span>
       <button id="card-add" class="primary" type="button">Add to cart</button>
       <button id="card-inspect" class="needs3d" type="button" aria-label="Inspect this snack up close">Inspect</button>
+      <button id="card-find" class="needs3d" type="button" aria-label="Walk to this snack in the shop">Find</button>
     </div>
   </div>
 </section>
@@ -292,6 +294,7 @@
     <div id="paynow-box" hidden>
       <h3>Pay with PayNow</h3>
       <div id="paynow-qr">Loading QR…</div>
+      <button id="paynow-download" type="button" hidden>Download QR code</button>
       <p class="fine">Scan with your bank app to pay <b id="paynow-amount"></b> to <span id="paynow-name"></span>.</p>
       <p class="fine">PayNow: <b id="paynow-number"></b> <button id="paynow-copy" type="button">Copy number</button></p>
       <p id="paynow-fallback" class="fine" hidden>QR didn’t load — pay <b id="paynow-amount-2"></b> to PayNow <b id="paynow-number-2"></b> in your bank app, then send your order below.</p>
@@ -573,6 +576,7 @@ $('card-minus').onclick = () => { cardQty = Math.max(1, cardQty - 1); updateCard
 $('card-plus').onclick = () => { cardQty = Math.min(99, cardQty + 1); updateCard(); };
 $('card-add').onclick = () => { if (selected) { addToCart(selected, cardQty); cardQty = 1; updateCard(); } };
 $('card-inspect').onclick = () => { if (selected && world) world.inspect(selected); };
+$('card-find').onclick = () => { if (selected && world) { const p = selected; closeCard(); world.findProduct(p); } };
 
 // --- "All snacks" list, grouped by shelf, with search ---
 let activeCat = 'All';
@@ -680,11 +684,13 @@ function openCheckout() {
     $('paynow-amount-2').textContent = money(total);
     $('paynow-number-2').textContent = paynow;
     $('paynow-fallback').hidden = true;
+    $('paynow-download').hidden = true;
     const qrEl = $('paynow-qr'); qrEl.textContent = 'Loading QR…';
     loadQrLib().then(ok => {
       if (!ok || !window.qrcode) { $('paynow-fallback').hidden = false; qrEl.textContent = 'QR unavailable — pay with the number below.'; return; }
       const qr = qrcode(0, 'M'); qr.addData(paynowPayload(total, paynowRef)); qr.make();
       qrEl.innerHTML = qr.createSvgTag(4, 8);
+      $('paynow-download').hidden = false;
     });
   }
   $('checkout-info').textContent = paynow
@@ -705,6 +711,31 @@ $('order-copy').onclick = async () => {
 $('paynow-copy').onclick = async () => {
   try { await navigator.clipboard.writeText(String(SHOP.paynow || '').trim()); showToast('PayNow number copied'); }
   catch (e) { prompt('PayNow number:', String(SHOP.paynow || '').trim()); }
+};
+$('paynow-download').onclick = () => {
+  const svgEl = document.querySelector('#paynow-qr svg');
+  if (!svgEl) return;
+  const xml = new XMLSerializer().serializeToString(svgEl);
+  const img = new Image();
+  img.onload = () => {
+    const scale = 3;
+    const c = document.createElement('canvas');
+    c.width = (img.naturalWidth || 260) * scale; c.height = (img.naturalHeight || 260) * scale;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+    ctx.drawImage(img, 0, 0, c.width, c.height);
+    c.toBlob(b => {
+      if (!b) { showToast('Could not make the QR image'); return; }
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(b);
+      a.download = `paynow-qr-${paynowRef}.png`;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+      showToast('QR code downloaded');
+    }, 'image/png');
+  };
+  img.onerror = () => showToast('Could not make the QR image');
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(xml);
 };
 
 // --- Help / welcome ---

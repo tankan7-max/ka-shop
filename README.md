@@ -32,7 +32,7 @@ reading `products.json`.)
   mini map, to walk to that spot.
 - **Pick**: click a snack to see its price and add it to the cart.
 - **Inspect**: from a snack's card, open it on its own and drag to turn the pack around; scroll or pinch to zoom.
-- **Pay**: at checkout, scan the PayNow QR for the exact total, tick “I’ve paid”, then send the order on WhatsApp — the shop matches the payment by the order reference.
+- **Pay**: at checkout, scan the PayNow QR for the exact total, tick “I’ve paid”, then send the order on WhatsApp — the shop matches the payment by the order reference. You can also download the QR code to pay later.
 - **After-hours mood**: dark aisles with warm light over each shelf, so the snacks stand out.
 - **Browse**: the list has every snack with search and categories. *Add* puts
   it in the cart; *Find* walks the customer to the right shelf.
