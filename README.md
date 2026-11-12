@@ -31,6 +31,7 @@ reading `products.json`.)
   round pad on a phone. Drag to look around. Click or tap the floor, or the
   mini map, to walk to that spot.
 - **Pick**: click a snack to see its price and add it to the cart.
+- **Inspect**: from a snack's card, open it on its own and drag to turn the pack around; scroll or pinch to zoom.
 - **Browse**: the list has every snack with search and categories. *Add* puts
   it in the cart; *Find* walks the customer to the right shelf.
 - **Checkout**: shows the order and sends it to you as a ready-written

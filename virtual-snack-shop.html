@@ -120,6 +120,22 @@
   #joystick i { position: absolute; left: 50%; top: 50%; width: 54px; height: 54px; margin: -27px; border-radius: 50%; background: var(--brand); box-shadow: 0 2px 8px rgba(0,0,0,.3); }
   #toast { position: fixed; left: 50%; top: calc(var(--bar-h) + 12px); transform: translateX(-50%); z-index: 20; background: rgba(20,26,30,.92); color: #fff; padding: 8px 16px; border-radius: 999px; font-size: 14px; pointer-events: none; max-width: calc(100vw - 30px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+  /* Inspect view: one pack on its own, Resident Evil style — drag to turn it. */
+  #inspect { position: fixed; inset: 0; z-index: 26; display: grid; grid-template-rows: 1fr auto; background: radial-gradient(120% 90% at 50% 38%, #2e404a 0%, #162025 68%, #0d1215 100%); color: #fff; }
+  #inspect-view { position: relative; touch-action: none; cursor: grab; min-height: 0; }
+  #inspect-view.dragging { cursor: grabbing; }
+  #inspect-view canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+  #inspect-info { padding: 10px 16px calc(16px + var(--safe-b)); text-align: center; background: linear-gradient(transparent, rgba(0,0,0,.4)); }
+  #inspect-name { font-size: 19px; font-weight: 800; }
+  #inspect-meta { color: #cfd8dc; font-size: 14px; margin: 2px 0 4px; }
+  #inspect-price { font-size: 20px; font-weight: 800; color: #ffd54f; }
+  #inspect-hint { font-size: 13px; color: #9fb0b8; margin: 6px 0 10px; }
+  #inspect-info .acts { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  #inspect-info .acts button { min-width: 120px; }
+  #inspect-info .acts button:not(.primary) { color: var(--ink); } /* the overlay text is white; a plain button needs dark text */
+  #inspect-close { position: absolute; top: calc(10px + env(safe-area-inset-top, 0px)); right: 12px; background: rgba(255,255,255,.16); color: #fff; border-color: transparent; }
+  #inspect-close:hover { background: rgba(255,255,255,.3); }
+
   dialog { border: 0; border-radius: 18px; padding: 0; width: min(480px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); box-shadow: var(--shadow); color: var(--ink); }
   dialog::backdrop { background: rgba(20,30,35,.45); }
   dialog .pad { padding: 20px 22px; }
@@ -212,8 +228,24 @@
     <div class="acts">
       <span class="stepper"><button type="button" id="card-minus" aria-label="One fewer">−</button><output id="card-qty">1</output><button type="button" id="card-plus" aria-label="One more">+</button></span>
       <button id="card-add" class="primary" type="button">Add to cart</button>
+      <button id="card-inspect" class="needs3d" type="button" aria-label="Inspect this snack up close">Inspect</button>
     </div>
   </div>
+</section>
+
+<section id="inspect" aria-label="Inspect this snack" hidden>
+  <div id="inspect-view"></div>
+  <div id="inspect-info">
+    <div id="inspect-name"></div>
+    <div id="inspect-meta"></div>
+    <div id="inspect-price"></div>
+    <p id="inspect-hint">Drag to turn it around · Scroll or pinch to zoom</p>
+    <div class="acts">
+      <button id="inspect-add" class="primary" type="button">Add to cart</button>
+      <button id="inspect-close2" type="button">Back to shop</button>
+    </div>
+  </div>
+  <button id="inspect-close" class="icon quiet" type="button" aria-label="Close inspect view">×</button>
 </section>
 
 <nav id="minimap-wrap" class="needs3d" aria-label="Shop map" hidden>
@@ -231,13 +263,13 @@
       <dt><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd></dt><dd>Walk (hold <kbd>Shift</kbd> to go faster)</dd>
       <dt><kbd>←</kbd> <kbd>→</kbd> or drag</dt><dd>Look around</dd>
       <dt>Click the floor</dt><dd>Walk to that spot</dd>
-      <dt>Click a snack</dt><dd>See its price and add it to your cart</dd>
+      <dt>Click a snack</dt><dd>See it, turn it around with Inspect, and add it to your cart</dd>
     </dl>
     <dl class="keys touch-only">
       <dt>Round pad</dt><dd>Walk</dd>
       <dt>Drag the view</dt><dd>Look around</dd>
       <dt>Tap the floor</dt><dd>Walk to that spot</dd>
-      <dt>Tap a snack</dt><dd>See its price and add it to your cart</dd>
+      <dt>Tap a snack</dt><dd>See it, turn it around with Inspect, and add it to your cart</dd>
     </dl>
     <p class="fine">In a hurry? <b>Browse</b> lists every snack — search it, add straight to your cart, or press <b>Find</b> to be walked to the right shelf.</p>
     <div class="dialog-btns"><button class="primary" type="button" data-close-dialog>Start shopping</button></div>
@@ -525,6 +557,7 @@ $('card-close').onclick = closeCard;
 $('card-minus').onclick = () => { cardQty = Math.max(1, cardQty - 1); updateCard(); };
 $('card-plus').onclick = () => { cardQty = Math.min(99, cardQty + 1); updateCard(); };
 $('card-add').onclick = () => { if (selected) { addToCart(selected, cardQty); cardQty = 1; updateCard(); } };
+$('card-inspect').onclick = () => { if (selected && world) world.inspect(selected); };
 
 // --- "All snacks" list, grouped by shelf, with search ---
 let activeCat = 'All';
@@ -602,6 +635,7 @@ function welcomeOnce() {
 }
 window.addEventListener('keydown', e => {
   if (e.key !== 'Escape' || document.querySelector('dialog[open]')) return;
+  if (world && world.inspectOpen()) { world.closeInspect(); return; }
   if (selected) closeCard(); else Object.keys(drawers).forEach(o => setDrawer(o, false));
 });
 renderCart();
@@ -632,6 +666,7 @@ function startWorld(THREE) {
   // The picture is only redrawn when something changed (saves battery on phones).
   let dirty = 3;
   const redraw = () => { dirty = Math.max(dirty, 2); };
+  let inspectP = null;             // the snack open in the inspect view, if any
   function resize() {
     const w = canvas.clientWidth || 1, h = canvas.clientHeight || 1;
     renderer.setSize(w, h, false); camera.aspect = w / h; camera.fov = w < h ? 84 : 68; camera.updateProjectionMatrix(); redraw();
@@ -849,7 +884,8 @@ function startWorld(THREE) {
     const W = 320, H = Math.round(clamp(W * p.height / faceW, 96, 640));
     const tex = canvasTexture(p.round ? W * 2 : W, H, ctx => { drawPack(ctx, p, 0, 0, W, H); if (p.round) drawPack(ctx, p, W, 0, W, H); });
     if (p.round) { tex.wrapS = THREE.RepeatWrapping; tex.offset.x = 0.25; }
-    p.onPhoto = () => { const ctx = tex.image.getContext('2d'); drawPack(ctx, p, 0, 0, W, H); if (p.round) drawPack(ctx, p, W, 0, W, H); tex.needsUpdate = true; redraw(); };
+    const prevPhoto = p.onPhoto;           // keep earlier textures (e.g. the shelf packs) fresh too
+    p.onPhoto = () => { if (prevPhoto) prevPhoto(); const ctx = tex.image.getContext('2d'); drawPack(ctx, p, 0, 0, W, H); if (p.round) drawPack(ctx, p, W, 0, W, H); tex.needsUpdate = true; redraw(); };
     return tex;
   }
   function packMesh(p, w, d, count) {
@@ -1082,6 +1118,7 @@ function startWorld(THREE) {
   window.addEventListener('keydown', e => {
     const t = e.target;
     if (e.ctrlKey || e.metaKey || e.altKey || document.querySelector('dialog[open]')) return;
+    if (inspectP) return;                 // the inspect view has its own drag controls
     if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
     const k = e.key.toLowerCase(); keys[k] = true;
     if (k.startsWith('arrow')) e.preventDefault();
@@ -1194,6 +1231,136 @@ function startWorld(THREE) {
   });
 
   // -------------------------------------------------------------------------
+  // Inspect view: one pack on its own, Resident Evil style. Drag to turn it,
+  // scroll or pinch to zoom. Opened from the product card; the pack is the
+  // same model as on the shelves, built by packMesh.
+  // -------------------------------------------------------------------------
+  const inspectEl = $('inspect'), inspectView = $('inspect-view');
+  let inspectRenderer = null, inspectScene = null, inspectCamera = null, inspectPack = null, inspectRaf = 0, inspectPrevT = 0;
+  let inspectRotY = 0.5, inspectRotX = 0.15, inspectZoom = 1, inspectBase = 1, inspectLastTouch = 0;
+  const inspectPointers = new Map();
+  let inspectPinchD = 0;
+
+  function inspectSize() {
+    if (!inspectRenderer) return;
+    const w = inspectView.clientWidth || 1, h = inspectView.clientHeight || 1;
+    inspectRenderer.setSize(w, h, false);
+    inspectCamera.aspect = w / h; inspectCamera.updateProjectionMatrix();
+  }
+  function inspectDisposePack() {
+    if (!inspectPack) return;
+    inspectPack.traverse(o => {
+      if (o.geometry) o.geometry.dispose();
+      (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => { if (m && m.map) m.map.dispose(); if (m) m.dispose(); });
+    });
+    if (inspectPack.parent) inspectPack.parent.remove(inspectPack);
+    inspectPack = null;
+  }
+  function inspectTick(now) {
+    if (!inspectP) return;
+    const dt = inspectPrevT ? Math.min(0.05, (now - inspectPrevT) / 1000) : 0;
+    inspectPrevT = now;
+    if (!inspectPointers.size && now - inspectLastTouch > 2500) inspectRotY += dt * 0.45;
+    if (inspectPack) { inspectPack.rotation.y = inspectRotY; inspectPack.rotation.x = inspectRotX; }
+    inspectCamera.position.set(0, inspectBase * 0.25, inspectBase * inspectZoom);
+    inspectCamera.lookAt(0, 0, 0);
+    inspectRenderer.render(inspectScene, inspectCamera);
+    inspectRaf = requestAnimationFrame(inspectTick);
+  }
+  function inspectPointerDown(e) {
+    inspectView.setPointerCapture(e.pointerId);
+    inspectPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (inspectPointers.size === 2) {
+      const [a, b] = [...inspectPointers.values()];
+      inspectPinchD = Math.hypot(a.x - b.x, a.y - b.y);
+    }
+    inspectLastTouch = performance.now();
+    inspectView.classList.add('dragging');
+  }
+  function inspectPointerMove(e) {
+    if (!inspectPointers.has(e.pointerId)) return;
+    const prev = inspectPointers.get(e.pointerId);
+    const dx = e.clientX - prev.x, dy = e.clientY - prev.y;
+    inspectPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (inspectPointers.size === 1) {
+      inspectRotY += dx * 0.008;
+      inspectRotX = clamp(inspectRotX + dy * 0.006, -1.1, 1.1);
+    } else if (inspectPointers.size === 2) {
+      const [a, b] = [...inspectPointers.values()];
+      const d = Math.hypot(a.x - b.x, a.y - b.y);
+      if (inspectPinchD > 0) inspectZoom = clamp(inspectZoom * inspectPinchD / d, 0.6, 2.2);
+      inspectPinchD = d;
+    }
+    inspectLastTouch = performance.now();
+  }
+  function inspectPointerUp(e) {
+    inspectPointers.delete(e.pointerId);
+    if (!inspectPointers.size) inspectView.classList.remove('dragging');
+    inspectLastTouch = performance.now();
+  }
+  function inspectWheel(e) {
+    e.preventDefault();
+    inspectZoom = clamp(inspectZoom * (1 + e.deltaY * 0.001), 0.6, 2.2);
+    inspectLastTouch = performance.now();
+  }
+  function setInspectAdd() {
+    $('inspect-add').textContent = cardQty > 1 ? `Add ${cardQty} · ${money(cardQty * inspectP.price)}` : 'Add to cart';
+  }
+  function openInspect(p) {
+    inspectP = p;
+    if (!inspectRenderer) {
+      inspectRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      inspectRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      inspectRenderer.setClearColor(0x000000, 0);
+      inspectView.appendChild(inspectRenderer.domElement);
+      inspectScene = new THREE.Scene();
+      inspectScene.environment = scene.environment;
+      inspectScene.add(new THREE.HemisphereLight(0xffffff, 0x3a4a52, 1.0));
+      const key = new THREE.DirectionalLight(0xfff2df, 1.6); key.position.set(2, 3, 4); inspectScene.add(key);
+      const rim = new THREE.DirectionalLight(0xbfd9ff, 0.7); rim.position.set(-3, 1.5, -2); inspectScene.add(rim);
+      inspectCamera = new THREE.PerspectiveCamera(40, 1, 0.05, 20);
+      inspectView.addEventListener('pointerdown', inspectPointerDown);
+      inspectView.addEventListener('pointermove', inspectPointerMove);
+      inspectView.addEventListener('pointerup', inspectPointerUp);
+      inspectView.addEventListener('pointercancel', inspectPointerUp);
+      inspectView.addEventListener('wheel', inspectWheel, { passive: false });
+      inspectView.addEventListener('contextmenu', e => e.preventDefault());
+      window.addEventListener('resize', inspectSize);
+      $('inspect-close').onclick = closeInspect;
+      $('inspect-close2').onclick = closeInspect;
+      $('inspect-add').onclick = () => { if (inspectP) { addToCart(inspectP, cardQty); cardQty = 1; updateCard(); setInspectAdd(); } };
+    }
+    inspectDisposePack();
+    inspectPack = packMesh(p, p.width, p.depth, 1);
+    inspectPack.setMatrixAt(0, new THREE.Matrix4());
+    inspectPack.instanceMatrix.needsUpdate = true;
+    inspectScene.add(inspectPack);
+    const size = Math.max(p.width, p.height, p.depth);
+    inspectBase = (size * 0.62) / Math.tan(THREE.MathUtils.degToRad(20));
+    inspectRotY = 0.5; inspectRotX = 0.15; inspectZoom = 1;
+    $('inspect-name').textContent = p.name;
+    $('inspect-meta').textContent = `${p.category} · ${p.pack}`;
+    $('inspect-price').textContent = money(p.price);
+    setInspectAdd();
+    inspectEl.hidden = false;
+    inspectSize();
+    inspectPrevT = 0;
+    inspectLastTouch = performance.now();
+    cancelAnimationFrame(inspectRaf);
+    inspectRaf = requestAnimationFrame(inspectTick);
+  }
+  function closeInspect() {
+    if (!inspectP) return;
+    inspectP = null;
+    cancelAnimationFrame(inspectRaf);
+    inspectPrevT = 0;
+    inspectDisposePack();
+    inspectEl.hidden = true;
+    inspectPointers.clear();
+    inspectView.classList.remove('dragging');
+  }
+
+  // -------------------------------------------------------------------------
   // Main loop.
   // -------------------------------------------------------------------------
   const clock = new THREE.Clock();
@@ -1254,7 +1421,7 @@ function startWorld(THREE) {
     if (firstFrame) { firstFrame = false; window.__shopReady = true; $('splash').classList.add('done'); welcomeOnce(); }
   }
   frame();
-  return { findProduct, goToCategory, resetView, clearSelection: () => placeOutline(selectBox) };
+  return { findProduct, goToCategory, resetView, clearSelection: () => placeOutline(selectBox), inspect: openInspect, closeInspect, inspectOpen: () => inspectP !== null };
 }
 
 try {
