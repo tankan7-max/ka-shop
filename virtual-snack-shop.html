@@ -32,18 +32,18 @@
   svg.i { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 
   /* The 3D shop fills the whole window; everything else floats on top of it. */
-  #shop { position: fixed; inset: 0; background: #ece8df; }
+  #shop { position: fixed; inset: 0; background: #0b0e10; }
   #view { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; outline: none; }
   #view.dragging { cursor: grabbing; }
   #shop, #joystick, #minimap-wrap { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
   #hover-tip { position: absolute; pointer-events: none; background: rgba(20,26,30,.9); color: #fff; font-size: 13px; padding: 5px 9px; border-radius: 8px; white-space: nowrap; z-index: 2; }
   #hover-tip b { color: #ffd54f; margin-left: 6px; }
 
-  #splash { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; background: linear-gradient(160deg, #f6f4ef, #dfeeea); text-align: center; padding: 24px; transition: opacity .4s; }
+  #splash { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; background: linear-gradient(160deg, #1b2226, #0b0e10); color: #e8ecee; text-align: center; padding: 24px; transition: opacity .4s; }
   #splash.done { opacity: 0; pointer-events: none; }
   #splash h1 { margin: 14px 0 4px; font-size: 26px; }
-  #splash p { margin: 0 auto; color: var(--muted); max-width: 420px; }
-  .spinner { width: 44px; height: 44px; margin: 0 auto; border: 4px solid #cfe5e1; border-top-color: var(--brand); border-radius: 50%; animation: spin 1s linear infinite; }
+  #splash p { margin: 0 auto; color: #9aa5ab; max-width: 420px; }
+  .spinner { width: 44px; height: 44px; margin: 0 auto; border: 4px solid #2a3438; border-top-color: var(--brand); border-radius: 50%; animation: spin 1s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
   /* Top bar */
@@ -658,8 +658,8 @@ function startWorld(THREE) {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   const maxAniso = Math.min(8, renderer.capabilities.getMaxAnisotropy());
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xe9eef0);
-  scene.fog = new THREE.Fog(0xf0ece4, 24, 60);
+  scene.background = new THREE.Color(0x0b0e10);
+  scene.fog = new THREE.Fog(0x0b0e10, 14, 42);
   const camera = new THREE.PerspectiveCamera(68, 1, 0.1, 120);
   camera.rotation.order = 'YXZ';
 
@@ -690,13 +690,15 @@ function startWorld(THREE) {
     });
   }
 
-  // Lighting: soft all-round light plus gentle reflections, so cans and the floor have a little shine.
-  scene.add(new THREE.HemisphereLight(0xffffff, 0xd8cfbf, 1.15));
-  const sun = new THREE.DirectionalLight(0xfff6e8, 0.85); sun.position.set(3, 10, 7); scene.add(sun);
+  // Lighting: after-hours mood. The shop is mostly dark — a faint cool fill
+  // and a little moonlight through the front windows — and each aisle gets its
+  // own warm pool of light over the shelves, so the snacks stand out.
+  scene.add(new THREE.HemisphereLight(0x9aa3b5, 0x14100c, 0.28));
+  const sun = new THREE.DirectionalLight(0xcfd8ff, 0.18); sun.position.set(3, 10, 7); scene.add(sun);
   {
-    const env = new THREE.Scene(), box = new THREE.Mesh(new THREE.BoxGeometry(10, 6, 10), new THREE.MeshBasicMaterial({ color: 0x8f8c86, side: THREE.BackSide }));
+    const env = new THREE.Scene(), box = new THREE.Mesh(new THREE.BoxGeometry(10, 6, 10), new THREE.MeshBasicMaterial({ color: 0x2e2a26, side: THREE.BackSide }));
     env.add(box);
-    for (let i = -1; i <= 1; i++) { const l = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 6), new THREE.MeshBasicMaterial({ color: 0xffffff })); l.rotation.x = Math.PI / 2; l.position.set(i * 3, 2.95, 0); env.add(l); }
+    for (let i = -1; i <= 1; i++) { const l = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 6), new THREE.MeshBasicMaterial({ color: 0x6b5a38 })); l.rotation.x = Math.PI / 2; l.position.set(i * 3, 2.95, 0); env.add(l); }
     const pmrem = new THREE.PMREMGenerator(renderer);
     scene.environment = pmrem.fromScene(env, 0.03).texture; pmrem.dispose();
   }
@@ -717,6 +719,20 @@ function startWorld(THREE) {
   const G = Math.max(3, Math.ceil((unitsNeeded - 4) / 2));        // number of middle gondolas
   const HALF_W = Math.max(10, (G - 1) / 2 * AISLE + 5.8);         // room runs from x = -HALF_W to +HALF_W
   const SIDE_LEN = 11, SIDE_Z = -1.7, BACK_LEN = HALF_W - 1.4;
+
+  // Warm pools of light over the shelves: one low light per aisle, so it
+  // lights both shelf faces at once, plus the back wall and the counter.
+  const shelfGlow = (x, y, z, intensity = 18, distance = 10) => {
+    const l = new THREE.PointLight(0xffc98a, intensity, distance, 2); l.position.set(x, y, z); scene.add(l);
+  };
+  for (let g = 0; g < G - 1; g++) shelfGlow((g - (G - 2) / 2) * AISLE, 2.5, GONDOLA_Z);
+  { // side aisles: between each side wall and the nearest gondola
+    const gx0 = (0 - (G - 1) / 2) * AISLE, gxLast = ((G - 1) - (G - 1) / 2) * AISLE;
+    shelfGlow(((-HALF_W + UNIT_D / 2 + 0.06) + (gx0 - UNIT_D / 2)) / 2, 2.5, (SIDE_Z + GONDOLA_Z) / 2);
+    shelfGlow(((HALF_W - UNIT_D / 2 - 0.06) + (gxLast + UNIT_D / 2)) / 2, 2.5, (SIDE_Z + GONDOLA_Z) / 2);
+  }
+  shelfGlow(0, 2.5, -HALF_D + 2.4, 10, 12);            // back wall shelves
+  shelfGlow(HALF_W - 3.2, 2.6, HALF_D - 2.6, 14, 8);   // checkout counter
 
   // Every shelf face in the shop, in shopping order: left wall, middle aisles, right wall, back wall.
   const UNITS = [];
@@ -764,7 +780,7 @@ function startWorld(THREE) {
   floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping; floorTex.repeat.set(HALF_W, HALF_D);
   const floor = plane(HALF_W * 2, HALF_D * 2, std(0xffffff, { map: floorTex, roughness: 0.38 }));
   floor.rotation.x = -Math.PI / 2; floor.userData.floor = true; scene.add(floor);
-  const ceiling = plane(HALF_W * 2, HALF_D * 2, new THREE.MeshBasicMaterial({ color: 0xf1efe9 }));
+  const ceiling = plane(HALF_W * 2, HALF_D * 2, new THREE.MeshBasicMaterial({ color: 0x14171a }));
   ceiling.rotation.x = Math.PI / 2; ceiling.position.y = WALL_H; scene.add(ceiling);
 
   // Solid things a click or tap cannot pass through (walls, shelf units), so you can
@@ -801,21 +817,21 @@ function startWorld(THREE) {
   const doormat = plane(DOOR * 2, 1.2, std(0x3e4a4f, { roughness: 1 })); doormat.rotation.x = -Math.PI / 2; doormat.position.set(0, 0.005, HALF_D - 0.8); scene.add(doormat);
   // The street outside, seen through the windows.
   const street = plane(90, 26, flat(canvasTexture(1024, 296, (ctx, w, h) => {
-    const sky = ctx.createLinearGradient(0, 0, 0, h); sky.addColorStop(0, '#8ec9ee'); sky.addColorStop(0.62, '#e4f3fa'); ctx.fillStyle = sky; ctx.fillRect(0, 0, w, h);
+    const sky = ctx.createLinearGradient(0, 0, 0, h); sky.addColorStop(0, '#0a1220'); sky.addColorStop(0.62, '#1c2c47'); ctx.fillStyle = sky; ctx.fillRect(0, 0, w, h);
     for (let x = 0, i = 0; x < w; i++) {                   // far-away buildings
       const bw = 30 + (i * 37 % 50), bh = 50 + (i * 53 % 90);
-      ctx.fillStyle = ['#b9cdd8', '#c9d8df', '#a9c0cd'][i % 3]; ctx.fillRect(x, h * 0.62 - bh, bw, bh);
-      ctx.fillStyle = 'rgba(255,255,255,.45)'; for (let wy = h * 0.62 - bh + 8; wy < h * 0.62 - 8; wy += 12) ctx.fillRect(x + 5, wy, bw - 10, 3);
+      ctx.fillStyle = ['#141d29', '#1a2531', '#101823'][i % 3]; ctx.fillRect(x, h * 0.62 - bh, bw, bh);
+      ctx.fillStyle = 'rgba(255,205,120,.8)'; for (let wy = h * 0.62 - bh + 8; wy < h * 0.62 - 8; wy += 12) { if (((i * 13 + wy) % 36) > 11) continue; ctx.fillRect(x + 5, wy, bw - 10, 3); }
       x += bw + 6;
     }
-    ctx.fillStyle = '#7fb77e'; for (let x = 20; x < w; x += 90) { ctx.beginPath(); ctx.arc(x, h * 0.6, 20, 0, 7); ctx.fill(); }
-    ctx.fillStyle = '#c9c5bc'; ctx.fillRect(0, h * 0.62, w, h);
+    ctx.fillStyle = '#16241a'; for (let x = 20; x < w; x += 90) { ctx.beginPath(); ctx.arc(x, h * 0.6, 20, 0, 7); ctx.fill(); }
+    ctx.fillStyle = '#232628'; ctx.fillRect(0, h * 0.62, w, h);
   }), { fog: false }));
   street.rotation.y = Math.PI; street.position.set(0, 4.9, HALF_D + 16); scene.add(street);
-  const pavement = plane(90, 17, new THREE.MeshBasicMaterial({ color: 0xc9c5bc, fog: false })); pavement.rotation.x = -Math.PI / 2; pavement.position.set(0, -0.02, HALF_D + 8.4); scene.add(pavement);
+  const pavement = plane(90, 17, new THREE.MeshBasicMaterial({ color: 0x232628, fog: false })); pavement.rotation.x = -Math.PI / 2; pavement.position.set(0, -0.02, HALF_D + 8.4); scene.add(pavement);
 
-  // Ceiling light panels (glowing shapes only; the lights above do the lighting).
-  const panelMat = new THREE.MeshBasicMaterial({ color: 0xffffff }), panelRim = new THREE.MeshBasicMaterial({ color: 0xdcdad3 });
+  // Ceiling light panels (dim warm glow now; the shelf lights do the lighting).
+  const panelMat = new THREE.MeshBasicMaterial({ color: 0x6b5a38 }), panelRim = new THREE.MeshBasicMaterial({ color: 0x2a2620 });
   for (let x = -HALF_W + 2.5; x <= HALF_W - 2; x += 4.2)
     for (let z = -6; z <= 6; z += 4) {
       const rim = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.05, 0.62), panelRim); rim.position.set(x, WALL_H - 0.03, z); scene.add(rim);
@@ -838,6 +854,7 @@ function startWorld(THREE) {
   const frameMat = std(0xf4f4f1, { roughness: 0.55 });
   const boardMat = std(0xfafaf8, { roughness: 0.6 });
   const kickMat = std(0x4b5a62);
+  const stripMat = new THREE.MeshBasicMaterial({ color: 0xffc27d }); // warm light bar under each shelf board
   // Shelf back panel, darker just under each shelf board so the shelves look deep.
   const backMat = std(0xffffff, { map: canvasTexture(8, 256, (ctx, w, h) => {
     ctx.fillStyle = '#d5dcdf'; ctx.fillRect(0, 0, w, h);
@@ -889,7 +906,8 @@ function startWorld(THREE) {
     return tex;
   }
   function packMesh(p, w, d, count) {
-    const art = std(0xffffff, { map: packTexture(p), roughness: p.kind === 'can' ? 0.3 : 0.5, metalness: p.kind === 'can' ? 0.45 : 0 });
+    const tex = packTexture(p);
+    const art = std(0xffffff, { map: tex, emissive: 0xffffff, emissiveMap: tex, emissiveIntensity: 0.3, roughness: p.kind === 'can' ? 0.3 : 0.5, metalness: p.kind === 'can' ? 0.45 : 0 });
     const side = std(new THREE.Color(shade(p.color, -0.12)), { roughness: 0.6 });
     const metal = std(0xd9dde0, { metalness: 0.9, roughness: 0.3 }), lid = std(0xf4f4f2, { roughness: 0.5 });
     let geo, mats;
@@ -911,6 +929,7 @@ function startWorld(THREE) {
     add(new THREE.BoxGeometry(L, UNIT_H, 0.03), backMat, 0, UNIT_H / 2, -UNIT_D / 2 + 0.015);
     [-1, 1].forEach(s => add(new THREE.BoxGeometry(0.05, UNIT_H, UNIT_D), frameMat, s * (L / 2 - 0.025), UNIT_H / 2, 0));
     LEVELS.forEach(y => add(new THREE.BoxGeometry(L, 0.04, UNIT_D), boardMat, 0, y - 0.02, 0));
+    [...LEVELS.slice(1), UNIT_H].forEach(top => add(new THREE.BoxGeometry(L - 0.1, 0.03, 0.025), stripMat, 0, top - 0.055, UNIT_D / 2 - 0.02));
     add(new THREE.BoxGeometry(L, 0.05, UNIT_D + 0.04), frameMat, 0, UNIT_H, 0);
     add(new THREE.BoxGeometry(L, 0.1, 0.02), kickMat, 0, 0.05, UNIT_D / 2);
     g.updateMatrixWorld(true);
