@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inventory — Virtual Snack Shop</title>
+<style>
+  :root { --ink: #1d2327; --muted: #5f6b70; --line: #dfe5e4; --brand: #2a9d8f; --danger: #b3261e; --bg: #f4f7f6; --card: #fff; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--ink); }
+  header { background: var(--brand); color: #fff; padding: 16px 20px; }
+  header h1 { margin: 0; font-size: 20px; }
+  header p { margin: 4px 0 0; opacity: .9; font-size: 14px; }
+  header a { color: #fff; }
+  main { max-width: 760px; margin: 0 auto; padding: 16px 16px 60px; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 12px 0; }
+  .toolbar input[type="search"] { flex: 1 1 200px; padding: 10px 12px; font-size: 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); }
+  button { font: inherit; cursor: pointer; border: 1px solid var(--line); background: var(--card); border-radius: 10px; padding: 8px 14px; min-height: 40px; }
+  button.primary { background: var(--brand); border-color: var(--brand); color: #fff; font-weight: 700; }
+  button:disabled { opacity: .45; cursor: default; }
+  #summary { font-weight: 600; margin: 4px 0 12px; }
+  #summary .zero { color: var(--danger); }
+  .howto { background: #fff8e1; border: 1px solid #ffe082; border-radius: 12px; padding: 12px 14px; font-size: 14px; line-height: 1.5; margin: 12px 0; }
+  .howto b { display: block; margin-bottom: 4px; }
+  section.cat { margin-top: 20px; }
+  section.cat h2 { font-size: 16px; margin: 0 0 6px; color: var(--brand); }
+  .row { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: center; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; }
+  .row.out { opacity: .6; }
+  .row .name { font-weight: 600; }
+  .row .meta { font-size: 13px; color: var(--muted); }
+  .row .oos-tag { color: var(--danger); font-weight: 700; }
+  .stepper { display: flex; align-items: center; gap: 6px; grid-row: span 2; }
+  .stepper button { width: 44px; height: 44px; padding: 0; font-size: 22px; line-height: 1; border-radius: 10px; }
+  .stepper input { width: 64px; height: 44px; text-align: center; font-size: 18px; font-weight: 700; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+  #status { min-height: 22px; color: var(--muted); font-size: 14px; margin-top: 10px; }
+  #error { display: none; background: #fdecea; border: 1px solid #f5c6c2; color: #7a1f1a; border-radius: 12px; padding: 12px 14px; margin: 16px 0; line-height: 1.5; }
+  footer { text-align: center; color: var(--muted); font-size: 13px; padding: 20px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Inventory — Virtual Snack Shop</h1>
+  <p>Stock on hand for every snack. <a href="./virtual-snack-shop.html">← Back to the shop</a></p>
+</header>
+<main>
+  <div id="error"></div>
+
+  <div class="howto">
+    <b>How this goes live</b>
+    Change the numbers below, then press <b>Download inventory.json</b>.
+    Upload that file to the shop's repository (GitHub → ka-shop → Add file →
+    Upload files, replacing the old inventory.json), or send it to Muse to
+    push. The shop reads it when the page loads, so the new stock shows up
+    after the site rebuilds (about a minute). A snack at <b>0</b> shows as
+    “Out of stock”, cannot be added to the cart, and its shelf space stays empty.
+  </div>
+
+  <div class="toolbar">
+    <input id="search" type="search" placeholder="Search snacks…" aria-label="Search snacks">
+    <button id="all10" type="button">Set all to 10</button>
+    <button id="all0" type="button">Set all to 0</button>
+  </div>
+  <p id="summary"></p>
+
+  <div class="toolbar">
+    <button id="download" class="primary" type="button">Download inventory.json</button>
+    <button id="copy" type="button">Copy JSON</button>
+    <span id="status" role="status"></span>
+  </div>
+
+  <div id="list"></div>
+</main>
+<footer>Stock is kept in <code>inventory.json</code> next to the shop page. The shop treats a snack missing from that file as in stock.</footer>
+
+<script>
+const NOTE = "Stock on hand per product id. 0 = out of stock: the shelf stays empty and the snack can't be added to the cart. A product missing from this file counts as in stock. Starting counts are 10 each — set your real stock in inventory.html.";
+const $ = id => document.getElementById(id);
+let PRODUCTS = [], stock = {};
+
+function showError(msg) {
+  const e = $('error');
+  e.style.display = 'block';
+  e.innerHTML = msg;
+}
+function renderSummary() {
+  const inStock = PRODUCTS.filter(p => (stock[p.id] ?? 10) > 0).length;
+  const total = PRODUCTS.reduce((s, p) => s + (stock[p.id] ?? 10), 0);
+  $('summary').innerHTML = `${inStock} of ${PRODUCTS.length} in stock · ${total} units total` +
+    (inStock < PRODUCTS.length ? ` · <span class="zero">${PRODUCTS.length - inStock} out of stock</span>` : '');
+}
+function buildList() {
+  const q = ($('search').value || '').trim().toLowerCase();
+  const list = $('list');
+  list.textContent = '';
+  const groups = new Map();
+  PRODUCTS.forEach(p => {
+    if (q && !(p.name + ' ' + p.category + ' ' + (p.pack || '')).toLowerCase().includes(q)) return;
+    if (!groups.has(p.category)) groups.set(p.category, []);
+    groups.get(p.category).push(p);
+  });
+  if (!groups.size) { list.textContent = q ? `No snacks match "${q}".` : 'No snacks yet.'; return; }
+  groups.forEach((items, cat) => {
+    const section = document.createElement('section');
+    section.className = 'cat';
+    section.innerHTML = `<h2></h2>`;
+    section.querySelector('h2').textContent = cat;
+    items.forEach(p => {
+      const qty = stock[p.id] ?? 10;
+      const row = document.createElement('div');
+      row.className = 'row' + (qty > 0 ? '' : ' out');
+      row.dataset.pid = p.id;
+      const info = document.createElement('div');
+      const name = document.createElement('div');
+      name.className = 'name';
+      name.textContent = p.name;
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+      meta.textContent = `${p.pack || ''} · S$${Number(p.price_sgd).toFixed(2)}`;
+      if (qty <= 0) {
+        const tag = document.createElement('span');
+        tag.className = 'oos-tag';
+        tag.textContent = ' · Out of stock';
+        meta.appendChild(tag);
+      }
+      info.append(name, meta);
+      const stepper = document.createElement('div');
+      stepper.className = 'stepper';
+      const minus = document.createElement('button');
+      minus.type = 'button'; minus.textContent = '−'; minus.setAttribute('aria-label', `One fewer ${p.name}`);
+      const input = document.createElement('input');
+      input.type = 'number'; input.min = '0'; input.max = '9999'; input.step = '1'; input.value = qty;
+      input.setAttribute('aria-label', `Stock of ${p.name}`);
+      const plus = document.createElement('button');
+      plus.type = 'button'; plus.textContent = '+'; plus.setAttribute('aria-label', `One more ${p.name}`);
+      const setQty = v => {
+        v = Math.max(0, Math.min(9999, Math.floor(Number(v) || 0)));
+        stock[p.id] = v;
+        input.value = v;
+        row.classList.toggle('out', v <= 0);
+        const tag = meta.querySelector('.oos-tag');
+        if (v <= 0 && !tag) {
+          const t = document.createElement('span');
+          t.className = 'oos-tag'; t.textContent = ' · Out of stock';
+          meta.appendChild(t);
+        } else if (v > 0 && tag) tag.remove();
+        renderSummary();
+      };
+      minus.onclick = () => setQty((stock[p.id] ?? 10) - 1);
+      plus.onclick = () => setQty((stock[p.id] ?? 10) + 1);
+      input.onchange = () => setQty(input.value);
+      stepper.append(minus, input, plus);
+      row.append(info, stepper);
+      section.appendChild(row);
+    });
+    list.appendChild(section);
+  });
+  renderSummary();
+}
+function inventoryFile() {
+  return JSON.stringify({ note: NOTE, stock }, null, 2) + '\n';
+}
+$('download').onclick = () => {
+  const blob = new Blob([inventoryFile()], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'inventory.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  $('status').textContent = 'Downloaded — upload it to the repository to make it live.';
+};
+$('copy').onclick = async () => {
+  try { await navigator.clipboard.writeText(inventoryFile()); $('status').textContent = 'JSON copied.'; }
+  catch (e) { $('status').textContent = 'Copy failed — use Download instead.'; }
+};
+$('all10').onclick = () => { PRODUCTS.forEach(p => stock[p.id] = 10); buildList(); };
+$('all0').onclick = () => { PRODUCTS.forEach(p => stock[p.id] = 0); buildList(); };
+$('search').addEventListener('input', buildList);
+
+(async function load() {
+  try {
+    const [pres, ires] = await Promise.all([fetch('products.json'), fetch('inventory.json')]);
+    if (!pres.ok) throw new Error('products.json: HTTP ' + pres.status);
+    const db = await pres.json();
+    PRODUCTS = (db.products || []).slice();
+    if (ires.ok) {
+      const inv = await ires.json();
+      if (inv && typeof inv.stock === 'object') stock = inv.stock;
+    }
+    PRODUCTS.forEach(p => { if (stock[p.id] === undefined || stock[p.id] === null) stock[p.id] = 10; });
+    buildList();
+  } catch (e) {
+    showError('Could not load the shop data (' + e.message + '). Open this page from the live site — ' +
+      '<a href="https://tankan7-max.github.io/ka-shop/inventory.html">ka-shop/inventory.html</a> — or from a local web server, not straight from a file.');
+  }
+})();
+</script>
+</body>
+</html>

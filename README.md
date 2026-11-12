@@ -14,6 +14,8 @@ It is one web page (`virtual-snack-shop.html`) plus one product list
 | `products.json` | Everything the shop sells, plus the shop's name and order contact. **This is the file you edit.** |
 | `sync-products.py` | Checks `products.json` for mistakes and refreshes the backup copy stored inside the page. |
 | `index.html` | Sends visitors of the folder's web address on to the shop page. |
+| `inventory.json` | Stock on hand per product id. `0` means out of stock. |
+| `inventory.html` | Stock manager page: change quantities, download the updated `inventory.json`. |
 
 ## Try it on your computer
 
@@ -65,6 +67,11 @@ python sync-products.py
   draws the pack from the product's name and colour.
 - **Shelves**: the order of `"categories"` is the order of the shelves. The
   room adds aisles by itself when there are more products.
+- **Stock**: open `inventory.html` to change how many of each snack you
+  have. A product at `0` shows as “Out of stock”, cannot be added to the
+  cart, and its shelf space stays empty. Download the updated
+  `inventory.json` from that page and upload it to the site (or send it to
+  be pushed); the shop reads it when the page loads.
 
 Prices in the list are starting points; each product's `reference.note` says
 whether it came from a store listing or is an estimate. Set your own prices
@@ -72,7 +79,7 @@ before selling.
 
 ## Putting it online
 
-Upload the four files to any web host. On GitHub: repository **Settings →
+Upload the files to any web host. On GitHub: repository **Settings →
 Pages → Deploy from a branch**, pick the branch and the `/ (root)` folder.
 
 The 3D library (three.js) is loaded from a public CDN, so customers need an

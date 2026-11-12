@@ -82,6 +82,8 @@
   .item .price { color: var(--price); font-weight: 700; }
   .item .acts { display: flex; gap: 6px; }
   .item .acts button { padding: 4px 10px; min-height: 34px; font-size: 13px; }
+  .item.out { opacity: .55; }
+  .item .oos { color: #b3261e; font-weight: 700; }
   .thumb-box { width: 52px; height: 52px; display: grid; place-items: center; background: #f1f3f4; border-radius: 10px; }
   .thumb { max-width: 42px; max-height: 44px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,.25); display: block; }
   .thumb.round { border-radius: 6px / 10px; }
@@ -280,6 +282,7 @@
       <dt>Tap a snack</dt><dd>See it, turn it around with Inspect, and add it to your cart</dd>
     </dl>
     <p class="fine">In a hurry? <b>Browse</b> lists every snack — search it, add straight to your cart, or press <b>Find</b> to be walked to the right shelf.</p>
+    <p class="fine">Out-of-stock snacks show as “Out of stock” and their shelf space stays empty until you restock them.</p>
     <p class="fine">At checkout, scan the PayNow QR to pay, tick “I’ve paid”, then send your order on WhatsApp.</p>
     <div class="dialog-btns"><button class="primary" type="button" data-close-dialog>Start shopping</button></div>
   </div>
@@ -330,6 +333,24 @@ try {
   if (j && Array.isArray(j.products) && j.products.length) { db = j; usingFallback = false; }
 } catch (e) { console.warn('Could not read products.json, using the built-in list:', e); }
 if (!db) db = FALLBACK_DB || { products: [] };
+
+// Inventory: stock on hand per product id, from inventory.json. A product
+// missing from the file counts as in stock; 0 means out of stock — its
+// shelf space stays empty and it cannot be added to the cart. If the file
+// cannot be read (e.g. opened straight from disk), everything counts as
+// in stock. Manage it in inventory.html.
+let INVENTORY = {};
+try {
+  const invRes = await fetch('inventory.json', { cache: 'no-cache' });
+  if (invRes.ok) { const inv = await invRes.json(); if (inv && typeof inv.stock === 'object') INVENTORY = inv.stock; }
+} catch (e) { console.warn('Could not read inventory.json, treating everything as in stock:', e); }
+const stockOf = p => {
+  const v = INVENTORY[p.id];
+  if (v === undefined || v === null) return Infinity;
+  const n = Number(v);
+  return Number.isFinite(n) ? Math.max(0, Math.floor(n)) : Infinity;
+};
+const inStock = p => stockOf(p) > 0;
 if (usingFallback) {
   $('data-note').textContent = 'Showing the built-in product list because products.json could not be read. Changes to products.json will not appear until the shop is opened from a web server (not straight from a file).';
   $('data-note').hidden = false;
@@ -521,11 +542,12 @@ const cart = new Map();
 const CART_KEY = 'virtual-snack-shop-cart-v1';
 try {
   const saved = JSON.parse(localStorage.getItem(CART_KEY) || '{}');
-  PRODUCTS.forEach(p => { const q = saved[p.id]; if (Number.isInteger(q) && q > 0) cart.set(p, Math.min(q, 99)); });
+  PRODUCTS.forEach(p => { const q = saved[p.id]; if (Number.isInteger(q) && q > 0 && inStock(p)) cart.set(p, Math.min(q, 99)); });
 } catch (e) {}
 const cartTotals = () => { let total = 0, count = 0; cart.forEach((q, p) => { total += q * p.price; count += q; }); return { total, count }; };
 function setQty(p, q) { if (q <= 0) cart.delete(p); else cart.set(p, Math.min(q, 99)); renderCart(); }
 function addToCart(p, n = 1) {
+  if (!inStock(p)) return;
   setQty(p, (cart.get(p) || 0) + n);
   showToast(`Added ${n > 1 ? n + ' × ' : ''}${p.name}`);
   const b = $('cart-btn'); b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump');
@@ -562,11 +584,15 @@ function updateCard() {
   if (inCart) $('card-price').append(el('small', { textContent: `${inCart} in your cart` }));
   $('card-qty').textContent = cardQty;
   $('card-add').textContent = cardQty > 1 ? `Add ${cardQty} · ${money(cardQty * selected.price)}` : 'Add to cart';
+  const stocked = inStock(selected);
+  $('card-add').disabled = !stocked;
+  $('card-inspect').hidden = !stocked;
+  $('card-find').hidden = !stocked;
 }
 function selectProduct(p) {
   selected = p; cardQty = 1;
   $('card-thumb').replaceWith(Object.assign(thumbBox(p), { id: 'card-thumb' }));
-  $('card-cat').textContent = p.category; $('card-name').textContent = p.name; $('card-pack').textContent = p.pack;
+  $('card-cat').textContent = p.category; $('card-name').textContent = p.name; $('card-pack').textContent = p.pack + (inStock(p) ? '' : ' · Out of stock');
   updateCard();
   $('card').hidden = false; document.body.classList.add('has-card');
 }
@@ -601,10 +627,12 @@ CATS.forEach(cat => {
   const go = el('button', { type: 'button', className: 'needs3d', textContent: 'Walk to shelf', onclick: () => { closeDrawersOnSmallScreens(); world.goToCategory(cat); } });
   const section = el('section', {}, el('div', { className: 'cat-head' }, el('h3', {}, dot, cat.name), go)); section.dataset.cat = cat.name;
   cat.items.forEach(p => {
+    const stocked = inStock(p);
     const find = el('button', { type: 'button', className: 'needs3d', textContent: 'Find', onclick: () => { closeDrawersOnSmallScreens(); world.findProduct(p); } }); find.setAttribute('aria-label', `Find ${p.name} in the shop`);
     const add = el('button', { type: 'button', className: 'primary', textContent: 'Add', onclick: () => addToCart(p) }); add.setAttribute('aria-label', `Add ${p.name} to cart`);
-    const row = el('div', { className: 'item' }, thumbBox(p),
-      el('div', {}, el('div', { className: 'name', textContent: p.name }), el('div', { className: 'meta' }, el('span', { className: 'price', textContent: money(p.price) }), p.pack ? ` · ${p.pack}` : '')),
+    if (!stocked) { find.disabled = true; add.disabled = true; }
+    const row = el('div', { className: 'item' + (stocked ? '' : ' out') }, thumbBox(p),
+      el('div', {}, el('div', { className: 'name', textContent: p.name }), el('div', { className: 'meta' }, el('span', { className: 'price', textContent: money(p.price) }), p.pack ? ` · ${p.pack}` : '', stocked ? '' : el('span', { className: 'oos', textContent: ' · Out of stock' }))),
       el('div', { className: 'acts' }, find, add));
     row.dataset.search = p.search; section.appendChild(row);
   });
@@ -1060,6 +1088,7 @@ function startWorld(THREE) {
     const S = order.length, k = u.items.length;
     const maxH = l => (l === LEVELS.length - 1 ? UNIT_H : LEVELS[l + 1] - 0.04) - LEVELS[l] - 0.06;
     u.items.forEach((p, i) => {
+      if (!inStock(p)) return; // out of stock: leave this product's shelf space empty (no packs, no price tag)
       const slots = order.slice(Math.floor(i * S / k), Math.floor((i + 1) * S / k));
       // Fit the pack into a slot.
       const w = Math.min(p.width, SLOT_W - 0.08), d = Math.min(p.depth, UNIT_D - 0.08);
