@@ -15,7 +15,8 @@ It is one web page (`virtual-snack-shop.html`) plus one product list
 | `sync-products.py` | Checks `products.json` for mistakes and refreshes the backup copy stored inside the page. |
 | `index.html` | Sends visitors of the folder's web address on to the shop page. |
 | `inventory.json` | Stock on hand per product id. `0` means out of stock. |
-| `inventory.html` | Stock manager page: change quantities, download the updated `inventory.json`. |
+| `inventory.html` | Stock manager page: change quantities, record orders, download the updated `inventory.json`. |
+| `qrcode.js` | The QR code library used for the PayNow code at checkout (MIT licence, by Kazuhiko Arase). |
 
 ## Try it on your computer
 
@@ -68,10 +69,24 @@ python sync-products.py
 - **Shelves**: the order of `"categories"` is the order of the shelves. The
   room adds aisles by itself when there are more products.
 - **Stock**: open `inventory.html` to change how many of each snack you
-  have. A product at `0` shows as “Out of stock”, cannot be added to the
-  cart, and its shelf space stays empty. Download the updated
-  `inventory.json` from that page and upload it to the site (or send it to
-  be pushed); the shop reads it when the page loads.
+  have. Download the updated `inventory.json` from that page and upload it
+  to the site (or send it to be pushed); the shop reads it when the page
+  loads, and again when a customer presses Checkout.
+  - A product at `0` shows as “Out of stock”: it cannot be added to the
+    cart and its shelf space is empty apart from a grey tag.
+  - Customers cannot put more of a snack in the cart than you have. When
+    few are left the shop says “Only N left” and the shelf shows just those
+    packs (the level is `low_stock_at` in `inventory.json`, set on the
+    stock page).
+  - **Stock does not go down by itself** — the shop has no server. When an
+    order arrives, open `inventory.html` → *Record an order*, paste the
+    order message, and upload the new file. Until then the shop still
+    offers those packs, so two customers can order the last one.
+  - A product with no entry in `inventory.json` is sold without a limit.
+    `python sync-products.py` lists these and checks the file for mistakes.
+- **PayNow**: `"shop"` → `"paynow"` is your PayNow mobile number (8 digits
+  or with `+65`) or company UEN. Every order gets a reference (`VSS-…`)
+  that is in both the QR code and the order message.
 
 Prices in the list are starting points; each product's `reference.note` says
 whether it came from a store listing or is an estimate. Set your own prices
