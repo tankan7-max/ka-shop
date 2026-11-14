@@ -1,5 +1,6 @@
 {
-  "note": "Stock on hand per product id. 0 = out of stock: the shelf stays empty and the snack can't be added to the cart. A product missing from this file counts as in stock. Starting counts are 10 each \u2014 set your real stock in inventory.html.",
+  "note": "Stock on hand per product id. 0 = out of stock: the snack is marked out of stock and can't be added to the cart. Customers can't order more than the number here. A product missing from this file counts as in stock (no limit). 'low_stock_at': the shop shows 'Only N left' at this many or fewer. Manage this file in inventory.html.",
+  "low_stock_at": 3,
   "stock": {
     "mamee-chicken": 10,
     "mamee-bbq": 10,

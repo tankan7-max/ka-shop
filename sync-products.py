@@ -1,4 +1,5 @@
-"""Check products.json and copy it into the shop page as its backup product list.
+"""Check products.json and inventory.json, and copy the products into the shop
+page as its backup product list.
 
 The shop normally reads products.json. The backup copy inside the page is only
 used when that file cannot be read (for example, when the page is opened
@@ -54,12 +55,41 @@ for n, p in enumerate(products, 1):
         if isinstance(v, bool) or not isinstance(v, (int, float)) or v <= 0:
             warnings.append(f"{label}: model.{side} should be a number above 0; a default size is used.")
 
+# inventory.json (stock on hand) is checked too. The shop ignores a count it
+# cannot use and then sells that snack without a limit, so those are problems.
+inv_path = here / "inventory.json"
+if inv_path.exists():
+    try:
+        inv = json.loads(inv_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as e:
+        inv = None
+        errors.append(f"inventory.json is not valid JSON (line {e.lineno}, column {e.colno}): {e.msg}")
+    if inv is not None:
+        stock = inv.get("stock") if isinstance(inv, dict) else None
+        if not isinstance(stock, dict):
+            errors.append('inventory.json has no "stock" list.')
+        else:
+            for pid, qty in stock.items():
+                if isinstance(qty, bool) or not isinstance(qty, int) or qty < 0:
+                    errors.append(f'inventory.json: stock of "{pid}" must be a whole number, 0 or more (it is {qty!r}).')
+                if pid not in seen:
+                    warnings.append(f'inventory.json: "{pid}" is not a product in products.json (old or misspelt id?).')
+            missing = [p["id"] for p in products if p.get("id") and p["id"] not in stock]
+            if missing:
+                warnings.append("inventory.json has no count for: " + ", ".join(missing)
+                                + ". The shop sells these without a limit; open inventory.html to set them.")
+        low = inv.get("low_stock_at") if isinstance(inv, dict) else None
+        if low is not None and (isinstance(low, bool) or not isinstance(low, int) or low < 0):
+            warnings.append('inventory.json: "low_stock_at" should be a whole number, 0 or more; 3 is used.')
+else:
+    warnings.append("There is no inventory.json, so the shop treats every snack as in stock.")
+
 for w in warnings:
     print("Note:", w)
 if errors:
     for e in errors:
         print("Problem:", e)
-    raise SystemExit("Nothing was changed. Fix the problems above in products.json and run this again.")
+    raise SystemExit("Nothing was changed. Fix the problems above and run this again.")
 
 data = json.dumps(
     {"currency": db.get("currency", "SGD"), "shop": db.get("shop", {}),
