@@ -932,7 +932,7 @@ function startWorld(THREE) {
   const SIDE_LEN = 11, SIDE_Z = -1.7, BACK_LEN = HALF_W - 1.4;
 
   // Warm pools of light over the shelves: one low light per aisle, so it
-  // lights both shelf faces at once, plus the back wall and the counter.
+  // lights both shelf faces at once, plus the back wall, the counter and the entrance.
   const shelfGlow = (x, y, z, intensity = 18, distance = 10) => {
     const l = new THREE.PointLight(0xffc98a, intensity, distance, 2); l.position.set(x, y, z); scene.add(l);
   };
@@ -944,6 +944,7 @@ function startWorld(THREE) {
   }
   shelfGlow(0, 2.5, -HALF_D + 2.4, 10, 12);            // back wall shelves
   shelfGlow(HALF_W - 3.2, 2.6, HALF_D - 2.6, 14, 8);   // checkout counter
+  shelfGlow(0, 2.6, HALF_D - 1.6, 12, 8);               // entrance, so the door area is a little brighter
 
   // Every shelf face in the shop, in shopping order: left wall, middle aisles, right wall, back wall.
   const UNITS = [];
@@ -1041,8 +1042,9 @@ function startWorld(THREE) {
   street.rotation.y = Math.PI; street.position.set(0, 4.9, HALF_D + 16); scene.add(street);
   const pavement = plane(90, 17, new THREE.MeshBasicMaterial({ color: 0x232628, fog: false })); pavement.rotation.x = -Math.PI / 2; pavement.position.set(0, -0.02, HALF_D + 8.4); scene.add(pavement);
 
-  // Ceiling light panels (dim warm glow now; the shelf lights do the lighting).
-  const panelMat = new THREE.MeshBasicMaterial({ color: 0x6b5a38 }), panelRim = new THREE.MeshBasicMaterial({ color: 0x2a2620 });
+  // Ceiling light panels: light yellow, so they read as the light sources.
+  // They are unlit (MeshBasicMaterial), so the colour is what you see; the shelf lights still do the actual lighting.
+  const panelMat = new THREE.MeshBasicMaterial({ color: 0xffe9a8 }), panelRim = new THREE.MeshBasicMaterial({ color: 0x2a2620 });
   for (let x = -HALF_W + 2.5; x <= HALF_W - 2; x += 4.2)
     for (let z = -6; z <= 6; z += 4) {
       const rim = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.05, 0.62), panelRim); rim.position.set(x, WALL_H - 0.03, z); scene.add(rim);
