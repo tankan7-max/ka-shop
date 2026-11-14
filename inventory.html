@@ -51,6 +51,19 @@
   #savebar > div { max-width: 760px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
   #status { flex: 1 1 180px; font-size: 14px; color: var(--muted); }
   #status.dirty { color: var(--ink); font-weight: 700; }
+  /* Live mode (stock kept in the shop's database) and file mode show slightly different things. */
+  body:not(.live) .live-only, body.live .file-only { display: none !important; }
+  body.locked main > :not(#signin):not(#notice), body.locked #savebar { display: none !important; }
+  #signin label { display: block; font-weight: 600; margin-top: 8px; }
+  #signin input { display: block; width: 100%; max-width: 340px; height: 42px; padding: 0 10px; margin-top: 4px; font-size: 16px; border: 1px solid var(--line); border-radius: 10px; }
+  #signin-error { color: var(--danger); font-weight: 600; min-height: 20px; margin: 8px 0 0; }
+  #live-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; background: #e3f4f1; border-color: #b6e0d9; }
+  #orders h2 { font-size: 16px; margin: 0 0 4px; }
+  .order { border-top: 1px solid var(--line); padding: 10px 0; }
+  .order:first-of-type { border-top: 0; }
+  .order .ref { font-weight: 700; }
+  .order .paid { color: var(--brand-dark); font-weight: 700; }
+  .order ul { margin: 4px 0 8px; }
   code { background: rgba(0,0,0,.06); padding: 1px 5px; border-radius: 5px; }
 </style>
 </head>
@@ -62,7 +75,39 @@
 <main>
   <div id="notice" class="panel" role="alert" hidden></div>
 
-  <details class="panel howto">
+  <form id="signin" class="panel" hidden>
+    <b>Sign in to manage the stock</b>
+    <label>Email<input id="signin-email" type="email" autocomplete="username" required></label>
+    <label>Password<input id="signin-password" type="password" autocomplete="current-password" required></label>
+    <p id="signin-error" role="alert"></p>
+    <button class="primary" type="submit">Sign in</button>
+  </form>
+
+  <div id="live-bar" class="panel live-only">
+    <span><b>Live.</b> Signed in as <span id="who"></span>. Changes you save show in the shop within 20 seconds.</span>
+    <button id="signout" type="button">Sign out</button>
+  </div>
+
+  <section id="orders" class="panel live-only">
+    <h2>Orders waiting for you</h2>
+    <div id="orders-list">Loading…</div>
+  </section>
+
+  <details class="panel howto live-only">
+    <summary>How live stock works</summary>
+    The shop reads its stock from the database, so anything you <b>Save to the shop</b> here shows
+    for customers within 20 seconds — no file to upload.<br>
+    When a customer presses Checkout, their snacks are set aside for them while they pay. If they
+    never send the order, the snacks go back on sale by themselves. Once they send the order it
+    appears under <i>Orders waiting for you</i> and stays set aside until you decide:
+    <b>Paid — take off stock</b> when you see the payment (match the reference), or
+    <b>Release</b> to put the snacks back on sale.<br>
+    “I’ve paid” is only the customer’s word — check your bank before packing.<br>
+    <b>Download backup</b> saves the numbers as inventory.json. The shop falls back to that file if
+    the database cannot be reached, so upload a fresh copy to the repository now and then.
+  </details>
+
+  <details class="panel howto file-only">
     <summary>How this goes live</summary>
     Change the numbers below, then press <b>Download inventory.json</b>.
     Upload that file to the shop's repository (GitHub → ka-shop → Add file →
@@ -78,8 +123,8 @@
   </details>
 
   <details class="panel" id="sale">
-    <summary>Record an order (take its items off the stock)</summary>
-    Paste the order message a customer sent you. Every “2 × Snack name” line is taken off the stock.
+    <summary>Record an order by hand (take its items off the stock)</summary>
+    <span class="live-only">For orders that did not come through the shop's checkout. </span>Paste the order message a customer sent you. Every “2 × Snack name” line is taken off the stock.
     <textarea id="sale-text" placeholder="Paste the WhatsApp order message here…" aria-label="Order message"></textarea>
     <div id="sale-preview"></div>
     <div class="toolbar">
@@ -111,8 +156,9 @@
 <div id="savebar"><div>
   <span id="status" role="status"></span>
   <button id="undo" type="button" disabled>Undo changes</button>
-  <button id="copy" type="button">Copy JSON</button>
+  <button id="copy" class="file-only" type="button">Copy JSON</button>
   <button id="download" class="primary" type="button">Download inventory.json</button>
+  <button id="save" class="primary live-only" type="button">Save to the shop</button>
 </div></div>
 
 <script>
@@ -126,6 +172,10 @@ let PRODUCTS = [], CATEGORIES = [];
 let stock = {}, loaded = {};          // current numbers, and the numbers as they are on the site
 let lowAt = 3, loadedLowAt = 3, show = 'all', needsSave = false;
 const rows = new Map();               // product id -> its row on the page
+// Live mode: the stock is kept in the shop's database (set under "shop" in products.json).
+let LIVE = false, DB_URL = '', DB_KEY = '', session = null, liveTimer = 0, goneIds = [];
+let held = {};                        // product id -> how many are set aside for orders right now
+const WHERE = () => (LIVE ? 'the database' : 'inventory.json');
 
 function notice(...parts) { const n = $('notice'); n.textContent = ''; n.append(...parts); n.hidden = false; }
 const isChanged = id => stock[id] !== loaded[id];
@@ -141,7 +191,9 @@ function renderSummary() {
   if (out) s.append(' · ', el('span', { className: 'zero', textContent: `${out} out of stock` }));
   const n = changedCount(), st = $('status');
   st.className = n || needsSave ? 'dirty' : '';
-  st.textContent = n ? `${n} change${n === 1 ? '' : 's'} not downloaded yet` : needsSave ? 'The file needs updating — download it and upload it to the site.' : 'No changes — this matches the file on the site.';
+  st.textContent = LIVE
+    ? (n ? `${n} change${n === 1 ? '' : 's'} not saved yet` : needsSave ? 'Old snacks need clearing out — press Save to the shop.' : 'No changes — this matches the shop.')
+    : (n ? `${n} change${n === 1 ? '' : 's'} not downloaded yet` : needsSave ? 'The file needs updating — download it and upload it to the site.' : 'No changes — this matches the file on the site.');
   $('undo').disabled = !n;
 }
 function paintRow(p) {
@@ -152,7 +204,8 @@ function paintRow(p) {
   r.minus.disabled = qty <= 0; r.plus.disabled = qty >= MAX_QTY;
   r.tag.className = 'tag ' + (qty <= 0 ? 'zero' : 'low');
   r.tag.textContent = qty <= 0 ? ' · Out of stock' : qty <= lowAt ? ' · Low' : '';
-  r.was.textContent = isChanged(p.id) ? ` · was ${loaded[p.id] === undefined ? 'not in the file' : loaded[p.id]}` : '';
+  r.was.textContent = isChanged(p.id) ? ` · was ${loaded[p.id] === undefined ? 'not in ' + WHERE() : loaded[p.id]}` : '';
+  r.hold.textContent = held[p.id] > 0 ? ` · ${held[p.id]} set aside for orders` : '';
 }
 function setQty(p, v) { stock[p.id] = clean(v); paintRow(p); renderSummary(); }
 function applyFilter() {
@@ -171,23 +224,23 @@ function applyFilter() {
   $('empty').hidden = any;
 }
 function buildList() {
-  const list = $('list'); list.textContent = '';
+  const list = $('list'); list.textContent = ''; rows.clear();
   const groups = new Map(CATEGORIES.map(c => [c, []]));
   PRODUCTS.forEach(p => { const c = p.category || 'Other snacks'; if (!groups.has(c)) groups.set(c, []); groups.get(c).push(p); });
   groups.forEach((items, cat) => {
     if (!items.length) return;
     const section = el('section', { className: 'cat' }, el('h2', { textContent: cat }));
     items.forEach(p => {
-      const tag = el('span'), was = el('span');
+      const tag = el('span'), was = el('span'), hold = el('span');
       const minus = el('button', { type: 'button', textContent: '−', onclick: () => setQty(p, stock[p.id] - 1) }); minus.setAttribute('aria-label', `One fewer ${p.name}`);
       const plus = el('button', { type: 'button', textContent: '+', onclick: () => setQty(p, stock[p.id] + 1) }); plus.setAttribute('aria-label', `One more ${p.name}`);
       const input = el('input', { type: 'number', min: '0', max: String(MAX_QTY), step: '1', inputMode: 'numeric', onchange: () => setQty(p, input.value), onfocus: () => input.select() });
       input.setAttribute('aria-label', `Stock of ${p.name}`);
       const row = el('div', { className: 'row' },
-        el('div', {}, el('div', { className: 'name', textContent: p.name }), el('div', { className: 'meta' }, `${p.pack ? p.pack + ' · ' : ''}S$${(Number(p.price_sgd) || 0).toFixed(2)}`, tag, was)),
+        el('div', {}, el('div', { className: 'name', textContent: p.name }), el('div', { className: 'meta' }, `${p.pack ? p.pack + ' · ' : ''}S$${(Number(p.price_sgd) || 0).toFixed(2)}`, tag, hold, was)),
         el('div', { className: 'stepper' }, minus, input, plus));
       row.dataset.pid = p.id; row.dataset.search = `${p.name} ${p.category} ${p.pack || ''} ${p.id}`.toLowerCase();
-      rows.set(p.id, { row, input, minus, plus, tag, was });
+      rows.set(p.id, { row, input, minus, plus, tag, was, hold });
       section.appendChild(row); paintRow(p);
     });
     list.appendChild(section);
@@ -212,7 +265,8 @@ $('download').onclick = () => {
   const a = el('a', { href: URL.createObjectURL(new Blob([inventoryFile()], { type: 'application/json' })), download: 'inventory.json' });
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 5000);
-  markSaved('Downloaded — now upload it to the repository to make it live.');
+  if (LIVE) $('status').textContent = 'Backup downloaded — upload it to the repository so the shop has a fallback.';
+  else markSaved('Downloaded — now upload it to the repository to make it live.');
 };
 $('copy').onclick = async () => {
   try { await navigator.clipboard.writeText(inventoryFile()); markSaved('JSON copied — paste it over inventory.json in the repository to make it live.'); }
@@ -280,36 +334,161 @@ $('sale-apply').onclick = () => {
   $('sale-preview').append(el('p', { textContent: `Taken off: ${n} item${n === 1 ? '' : 's'}. Download the file when you are done.` }));
 };
 
+// --- Loading. `file` is the stock as stored ({ product id: number }), from inventory.json or the database. ---
+function adopt(file, problems) {
+  stock = {}; loaded = {};
+  const ids = new Set(PRODUCTS.map(p => p.id)), fresh = [], odd = [];
+  PRODUCTS.forEach(p => {
+    const v = file[p.id], n = Number(v);
+    if (v === undefined || v === null) { fresh.push(p.name); stock[p.id] = DEFAULT_QTY; }           // loaded[p.id] stays undefined: "not stored yet"
+    else if (typeof v === 'boolean' || v === '' || !Number.isFinite(n) || n < 0 || !Number.isInteger(n)) { odd.push(p.name); stock[p.id] = clean(v); }
+    else stock[p.id] = loaded[p.id] = clean(n);
+  });
+  goneIds = Object.keys(file).filter(id => !ids.has(id));
+  if (fresh.length && !problems.length) problems.push(`Not in ${WHERE()} yet (the shop sells these without a limit until you save): ${fresh.join(', ')}. They start at ${DEFAULT_QTY} here.`);
+  if (odd.length) problems.push(`These had a number the shop cannot use and were corrected: ${odd.join(', ')}.`);
+  if (goneIds.length) { needsSave = true; problems.push(`No longer in products.json, so they will be left out of the next ${LIVE ? 'save' : 'download'}: ${goneIds.join(', ')}.`); }
+  if (problems.length) notice(...problems.map(t => el('div', { textContent: t }))); else $('notice').hidden = true;
+  $('low-at').value = lowAt;
+  buildList();
+}
+async function loadFile() {
+  const ires = await fetch('inventory.json', { cache: 'no-cache' });
+  let file = {}, problems = [];
+  if (ires.ok) {
+    try {
+      const inv = await ires.json();
+      if (inv && inv.stock && typeof inv.stock === 'object' && !Array.isArray(inv.stock)) file = inv.stock;
+      else problems.push('inventory.json has no "stock" list, so every snack starts at ' + DEFAULT_QTY + '.');
+      if (inv && Number.isInteger(inv.low_stock_at) && inv.low_stock_at >= 0) lowAt = loadedLowAt = Math.min(99, inv.low_stock_at);
+    } catch (e) { problems.push('inventory.json could not be read (it is not valid JSON), so every snack starts at ' + DEFAULT_QTY + '.'); }
+  } else problems.push('inventory.json was not found, so every snack starts at ' + DEFAULT_QTY + '.');
+  adopt(file, problems);
+}
+
+// --- Live mode: sign in, then read and write the shop's database directly. ---
+const SESSION_KEY = 'virtual-snack-shop-owner-session';
+function keepSession(s) { session = s; try { if (s) localStorage.setItem(SESSION_KEY, JSON.stringify(s)); else localStorage.removeItem(SESSION_KEY); } catch (e) {} }
+async function authCall(grant, body) {
+  const res = await fetch(`${DB_URL}/auth/v1/token?grant_type=${grant}`, { method: 'POST', headers: { apikey: DB_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const d = await res.json().catch(() => ({}));
+  if (!res.ok || !d.access_token) throw new Error(d.msg || d.error_description || d.message || 'Sign-in failed.');
+  keepSession({ access_token: d.access_token, refresh_token: d.refresh_token, expires_at: Date.now() + (d.expires_in || 3600) * 1000, email: (d.user && d.user.email) || '' });
+}
+async function accessToken() {
+  if (!session) throw new Error('Please sign in.');
+  if (session.expires_at - Date.now() < 60000) {
+    try { await authCall('refresh_token', { refresh_token: session.refresh_token }); }
+    catch (e) { showSignIn('Please sign in again.'); throw new Error('Please sign in again.'); }
+  }
+  return session.access_token;
+}
+async function api(path, { method = 'GET', body, prefer } = {}) {
+  const token = await accessToken();
+  const res = await fetch(`${DB_URL}/rest/v1/${path}`, { method, headers: { apikey: DB_KEY, Authorization: 'Bearer ' + token, 'Content-Type': 'application/json', ...(prefer ? { Prefer: prefer } : {}) }, body: body === undefined ? undefined : JSON.stringify(body) });
+  if (res.status === 401) { showSignIn('Please sign in again.'); throw new Error('Please sign in again.'); }
+  const text = await res.text(); let data = null; try { data = text ? JSON.parse(text) : null; } catch (e) {}
+  if (!res.ok) throw new Error((data && (data.message || data.msg)) || 'HTTP ' + res.status);
+  return data;
+}
+function showSignIn(message = '') {
+  clearInterval(liveTimer); keepSession(null);
+  document.body.classList.add('locked'); $('signin').hidden = false; $('signin-error').textContent = message;
+}
+$('signin').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = $('signin').querySelector('button'); btn.disabled = true; $('signin-error').textContent = '';
+  try { await authCall('password', { email: $('signin-email').value.trim(), password: $('signin-password').value }); $('signin-password').value = ''; await startLive(); }
+  catch (err) { showSignIn(err.message); }
+  btn.disabled = false;
+});
+$('signout').onclick = async () => {
+  if (changedCount() && !confirm('You have changes that are not saved. Sign out anyway?')) return;
+  try { await fetch(`${DB_URL}/auth/v1/logout`, { method: 'POST', headers: { apikey: DB_KEY, Authorization: 'Bearer ' + session.access_token } }); } catch (e) {}
+  stock = {}; loaded = {}; showSignIn();
+};
+async function startLive() {
+  const mine = await api('admins?select=user_id');
+  if (!mine || !mine.length) throw new Error('This login works, but it is not set up as the shop owner yet.');
+  const [stored, settings] = await Promise.all([api('stock?select=product_id,qty'), api('settings?select=low_stock_at')]);
+  if (settings && settings[0]) lowAt = loadedLowAt = settings[0].low_stock_at;
+  document.body.classList.remove('locked'); $('signin').hidden = true; $('who').textContent = session.email;
+  needsSave = false;
+  adopt(Object.fromEntries(stored.map(r => [r.product_id, r.qty])), []);
+  await refreshLive();
+  clearInterval(liveTimer);
+  liveTimer = setInterval(() => { if (!document.hidden && session) refreshLive().catch(e => console.warn(e)); }, 20000);
+}
+// Fetch the latest stock and orders. Numbers you are in the middle of changing are left alone.
+async function refreshLive() {
+  const [stored, onSale, orders] = await Promise.all([
+    api('stock?select=product_id,qty'),
+    api('rpc/inventory', { method: 'POST', body: {} }),
+    api('orders?select=ref,status,paid_claimed,total,created_at,expires_at,order_items(product_id,name,qty)&status=in.(held,sent)&order=created_at.desc'),
+  ]);
+  const now = new Map(stored.map(r => [r.product_id, r.qty])), free = (onSale && onSale.stock) || {};
+  held = {};
+  PRODUCTS.forEach(p => {
+    const v = now.get(p.id), untouched = !isChanged(p.id);
+    if (v === undefined) { delete loaded[p.id]; } else { loaded[p.id] = v; if (untouched) stock[p.id] = v; held[p.id] = Math.max(0, v - (free[p.id] === undefined ? v : free[p.id])); }
+    paintRow(p);
+  });
+  applyFilter(); renderSummary(); renderOrders(orders || []);
+}
+const ago = t => { const m = Math.max(0, Math.round((Date.now() - new Date(t)) / 60000)); return m < 1 ? 'just now' : m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} days ago`; };
+function renderOrders(orders) {
+  const live = orders.filter(o => o.status === 'sent' || new Date(o.expires_at) > new Date());
+  live.sort((a, b) => (a.status === 'sent' ? 0 : 1) - (b.status === 'sent' ? 0 : 1));
+  const sent = live.filter(o => o.status === 'sent').length;
+  document.title = (sent ? `(${sent}) ` : '') + 'Inventory — Virtual Snack Shop';
+  const box = $('orders-list'); box.textContent = '';
+  if (!live.length) { box.textContent = 'None right now. Orders appear here when a customer checks out.'; return; }
+  live.forEach(o => {
+    const decide = (action, question) => async () => {
+      if (!confirm(question)) return;
+      try { const r = await api('rpc/decide_order', { method: 'POST', body: { p_ref: o.ref, p_action: action } }); if (r && !r.ok) alert('That order has already been dealt with.'); }
+      catch (e) { alert('Could not do that: ' + e.message); }
+      refreshLive().catch(e => console.warn(e));
+    };
+    const state = o.status === 'sent'
+      ? el('span', {}, ` · sent ${ago(o.created_at)}`, o.paid_claimed ? el('span', { className: 'paid', textContent: ' · customer says paid' }) : ' · not marked as paid')
+      : el('span', { className: 'meta', textContent: ` · at checkout now, not sent yet (set aside until ${new Date(o.expires_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })})` });
+    box.append(el('div', { className: 'order' },
+      el('div', {}, el('span', { className: 'ref', textContent: o.ref }), state, ` · S$${Number(o.total).toFixed(2)}`),
+      el('ul', {}, ...(o.order_items || []).map(i => el('li', { textContent: `${i.qty} × ${i.name || i.product_id}` }))),
+      el('div', { className: 'toolbar', style: 'margin:0' },
+        el('button', { type: 'button', className: 'primary', textContent: 'Paid — take off stock', onclick: decide('confirm', `Take the snacks in ${o.ref} off the stock? Do this once you have seen the payment.`) }),
+        el('button', { type: 'button', textContent: 'Release', onclick: decide('release', `Put the snacks in ${o.ref} back on sale?`) }))));
+  });
+}
+$('save').onclick = async () => {
+  const btn = $('save'); btn.disabled = true;
+  try {
+    const changed = PRODUCTS.filter(p => isChanged(p.id)).map(p => ({ product_id: p.id, qty: stock[p.id] }));
+    if (changed.length) await api('stock?on_conflict=product_id', { method: 'POST', prefer: 'resolution=merge-duplicates,return=minimal', body: changed });
+    if (lowAt !== loadedLowAt) await api('settings?id=eq.true', { method: 'PATCH', prefer: 'return=minimal', body: { low_stock_at: lowAt } });
+    if (goneIds.length) { await api(`stock?product_id=in.(${goneIds.map(id => encodeURIComponent('"' + id.replace(/"/g, '\\"') + '"')).join(',')})`, { method: 'DELETE', prefer: 'return=minimal' }); goneIds = []; }
+    markSaved('Saved — the shop shows the new stock within 20 seconds.');
+    $('notice').hidden = true;
+  } catch (e) { $('status').className = 'dirty'; $('status').textContent = 'Could not save: ' + e.message; }
+  btn.disabled = false;
+};
+
 (async function load() {
   try {
-    const [pres, ires] = await Promise.all([fetch('products.json', { cache: 'no-cache' }), fetch('inventory.json', { cache: 'no-cache' })]);
+    const pres = await fetch('products.json', { cache: 'no-cache' });
     if (!pres.ok) throw new Error('products.json: HTTP ' + pres.status);
-    const db = await pres.json();
+    const db = await pres.json(), shop = db.shop || {};
     PRODUCTS = (db.products || []).filter(p => p && p.id && p.name);
     CATEGORIES = Array.isArray(db.categories) ? db.categories : [];
-    let file = {}, problems = [];
-    if (ires.ok) {
-      try {
-        const inv = await ires.json();
-        if (inv && inv.stock && typeof inv.stock === 'object' && !Array.isArray(inv.stock)) file = inv.stock;
-        else problems.push('inventory.json has no "stock" list, so every snack starts at ' + DEFAULT_QTY + '.');
-        if (inv && Number.isInteger(inv.low_stock_at) && inv.low_stock_at >= 0) lowAt = loadedLowAt = Math.min(99, inv.low_stock_at);
-      } catch (e) { problems.push('inventory.json could not be read (it is not valid JSON), so every snack starts at ' + DEFAULT_QTY + '.'); }
-    } else problems.push('inventory.json was not found, so every snack starts at ' + DEFAULT_QTY + '.');
-    const ids = new Set(PRODUCTS.map(p => p.id)), fresh = [], odd = [];
-    PRODUCTS.forEach(p => {
-      const v = file[p.id], n = Number(v);
-      if (v === undefined || v === null) { fresh.push(p.name); stock[p.id] = DEFAULT_QTY; }           // loaded[p.id] stays undefined: "not in the file"
-      else if (typeof v === 'boolean' || v === '' || !Number.isFinite(n) || n < 0 || !Number.isInteger(n)) { odd.push(p.name); stock[p.id] = clean(v); }
-      else stock[p.id] = loaded[p.id] = clean(n);
-    });
-    const gone = Object.keys(file).filter(id => !ids.has(id));
-    if (fresh.length && !problems.length) problems.push(`Not in inventory.json yet (the shop sells these without a limit until you save): ${fresh.join(', ')}. They start at ${DEFAULT_QTY} here.`);
-    if (odd.length) problems.push(`These had a number the shop cannot use and were corrected: ${odd.join(', ')}.`);
-    if (gone.length) { needsSave = true; problems.push(`No longer in products.json, so they will be left out of the next download: ${gone.join(', ')}.`); }
-    if (problems.length) notice(...problems.map(t => el('div', { textContent: t })));
-    $('low-at').value = lowAt;
-    buildList();
+    DB_URL = String(shop.supabase_url || '').trim().replace(/\/+$/, ''); DB_KEY = String(shop.supabase_key || '').trim();
+    LIVE = !!(DB_URL && DB_KEY);
+    if (!LIVE) { await loadFile(); return; }
+    document.body.classList.add('live', 'locked');
+    $('download').classList.remove('primary'); $('download').textContent = 'Download backup';
+    try { session = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); } catch (e) { session = null; }
+    if (session && session.refresh_token) { try { await startLive(); } catch (e) { showSignIn(e.message); } }
+    else showSignIn();
   } catch (e) {
     notice('Could not load the shop data (' + e.message + '). Open this page from the live site — ',
       el('a', { href: 'https://tankan7-max.github.io/ka-shop/inventory.html', textContent: 'ka-shop/inventory.html' }),
