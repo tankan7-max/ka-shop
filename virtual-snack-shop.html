@@ -163,6 +163,7 @@
   dialog input, dialog textarea { width: 100%; padding: 9px 11px; border: 1px solid #c5ccd0; border-radius: 10px; font-size: 16px; margin-top: 4px; resize: vertical; }
   .dialog-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
   .dialog-btns .primary { flex: 1 1 180px; }
+  #checkout.sent #checkout-form > :not(#order-done) { display: none; }
   .fine { font-size: 13px; color: var(--muted); }
 
   @media (pointer: coarse) { #joystick { display: block; } #minimap-wrap { left: auto; right: 12px; } .desktop-only { display: none !important; } }
@@ -311,6 +312,16 @@
       <button id="order-email" type="button" hidden>Send order by email</button>
       <button id="order-copy" type="button">Copy order</button>
       <button type="button" class="quiet" data-close-dialog>Back to shop</button>
+    </div>
+    <!-- Shown in place of the order once the customer has pressed a send button. -->
+    <div id="order-done" hidden>
+      <h2>Has your order gone to the shop?</h2>
+      <p>Your order reference is <b id="order-done-ref"></b>.</p>
+      <p class="fine">Press <b>Done</b> once your message has been sent, and your cart is emptied ready for next time. If it did not send, go back and try again — your cart is kept.</p>
+      <div class="dialog-btns">
+        <button id="order-done-yes" class="primary" type="button">Done — empty my cart</button>
+        <button id="order-done-no" type="button">Back to my order</button>
+      </div>
     </div>
   </form>
 </dialog>
@@ -775,6 +786,7 @@ function orderText() {
 }
 function openCheckout() {
   if (!cart.size) return;
+  showOrder();
   const ul = $('order-lines'); ul.textContent = '';
   cart.forEach((q, p) => ul.append(el('li', {}, el('span', { textContent: `${q} × ${p.name}` }), el('span', { textContent: money(q * p.price) }))));
   const { total, count } = cartTotals();
@@ -849,7 +861,21 @@ $('checkout-btn').onclick = async () => {
   openCheckout();
 };
 // Once the customer sends the order, the shop keeps the snacks aside until the owner confirms or releases it.
-function orderSent() { if (LIVE && paynowRef) callDb('mark_sent', { p_token: BROWSER_ID, p_ref: paynowRef, p_paid: !!(PAYNOW && $('paynow-paid').checked) }, true).catch(e => console.warn('Could not mark the order as sent:', e)); }
+function orderSent() {
+  // Ask whether the message really went, and only then empty the cart (see "order-done" below).
+  $('order-done-ref').textContent = paynowRef; $('order-done').hidden = false; $('checkout').classList.add('sent');
+  if (LIVE && paynowRef) callDb('mark_sent', { p_token: BROWSER_ID, p_ref: paynowRef, p_paid: !!(PAYNOW && $('paynow-paid').checked) }, true).catch(e => console.warn('Could not mark the order as sent:', e));
+}
+function showOrder() { $('order-done').hidden = true; $('checkout').classList.remove('sent'); }
+$('order-done-no').onclick = showOrder;
+// The order is with the shop: empty the cart, and forget its reference so the next order gets a new one.
+$('order-done-yes').onclick = () => {
+  cart.clear(); showCartNote([]); renderCart();
+  try { localStorage.removeItem(REF_KEY); } catch (e) {}
+  paynowRef = ''; heldUntil = null; $('paynow-paid').checked = false; $('order-note').value = '';
+  $('checkout').close(); setDrawer('cart', false);
+  showToast('Thank you — your order is with the shop');
+};
 if (LIVE) {
   // Live stock: look again every 20 seconds while the page is on screen.
   const tick = async () => { if (document.hidden || $('checkout').open) return; const notes = await refreshStock(); if (notes.length) { STOCK_CHANGED(notes); showToast('Stock changed — please check your cart'); } };
@@ -857,8 +883,8 @@ if (LIVE) {
   document.addEventListener('visibilitychange', tick);
 }
 $('checkout-form').addEventListener('submit', e => e.preventDefault());
-$('order-whatsapp').onclick = () => { orderSent(); window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(orderText())}`, '_blank', 'noopener'); };
-$('order-email').onclick = () => { orderSent(); location.href = `mailto:${SHOP.email}?subject=${encodeURIComponent('Order from ' + SHOP.name)}&body=${encodeURIComponent(orderText())}`; };
+$('order-whatsapp').onclick = () => { const text = orderText(); orderSent(); window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`, '_blank', 'noopener'); };
+$('order-email').onclick = () => { const text = orderText(); orderSent(); location.href = `mailto:${SHOP.email}?subject=${encodeURIComponent('Order from ' + SHOP.name)}&body=${encodeURIComponent(text)}`; };
 $('order-copy').onclick = async () => {
   orderSent();
   try { await navigator.clipboard.writeText(orderText()); showToast('Order copied'); }
