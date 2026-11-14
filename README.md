@@ -68,7 +68,24 @@ python sync-products.py
   draws the pack from the product's name and colour.
 - **Shelves**: the order of `"categories"` is the order of the shelves. The
   room adds aisles by itself when there are more products.
-- **Stock**: open `inventory.html` to change how many of each snack you
+- **Live stock (Supabase)**: with `"supabase_url"` and `"supabase_key"`
+  set under `"shop"` in `products.json`, stock lives in the shop's Supabase
+  database instead of a file.
+  - Open `inventory.html` and sign in. **Save to the shop** changes the
+    stock for customers within 20 seconds — list, cart and shelves update
+    without a reload.
+  - When a customer presses Checkout their snacks are set aside while they
+    pay (30 minutes), so two customers cannot both get the last pack. If
+    they never send the order, the snacks go back on sale by themselves.
+  - A sent order appears under *Orders waiting for you* and stays set
+    aside until you press **Paid — take off stock** or **Release**.
+  - The key in `products.json` is the public "publishable" key and is safe
+    to show. Never put a "secret" or "service_role" key in this repository.
+  - `inventory.json` is the fallback when the database cannot be reached:
+    use **Download backup** on the stock page now and then and upload it.
+  - Remove the two settings and the shop goes back to the file-only way
+    described next.
+- **Stock by file**: open `inventory.html` to change how many of each snack you
   have. Download the updated `inventory.json` from that page and upload it
   to the site (or send it to be pushed); the shop reads it when the page
   loads, and again when a customer presses Checkout.
@@ -78,7 +95,7 @@ python sync-products.py
     few are left the shop says “Only N left” and the shelf shows just those
     packs (the level is `low_stock_at` in `inventory.json`, set on the
     stock page).
-  - **Stock does not go down by itself** — the shop has no server. When an
+  - In file mode **stock does not go down by itself**. When an
     order arrives, open `inventory.html` → *Record an order*, paste the
     order message, and upload the new file. Until then the shop still
     offers those packs, so two customers can order the last one.
