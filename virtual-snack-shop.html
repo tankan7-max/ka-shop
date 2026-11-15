@@ -592,7 +592,7 @@ PRODUCTS.filter(p => p.photoUrl).forEach(p => {
   img.onload = () => { p.photo = img; p.thumb = null; refreshThumbs(p); if (p.onPhoto) p.onPhoto(); };
   img.onerror = () => {
     const plain = new Image();
-    plain.onload = () => { p.thumbDirect = p.photoUrl; refreshThumbs(p); };
+    plain.onload = () => { p.thumbDirect = p.photoUrl; refreshThumbs(p); console.warn(`The photo for "${p.name}" shows in the list, but its website does not allow it on the 3D pack, so the pack shows drawn art. Upload your own copy on products.html (Edit the product, then Copy it into my shop or Choose file).`); };
     plain.onerror = () => console.info(`Photo for "${p.name}" could not be loaded; showing drawn pack art instead.`);
     plain.src = p.photoUrl;
   };

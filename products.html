@@ -57,6 +57,10 @@
   .check { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-weight: 600; }
   .check input { width: 20px; height: 20px; accent-color: var(--brand); }
   .file-line { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 6px; }
+  .warn { margin-top: 10px; padding: 10px 12px; border: 1px solid #f0c27a; background: #fff8e8; border-radius: 10px; color: #5f4300; font-size: 13.5px; font-weight: 400; line-height: 1.45; }
+  .warn b { font-weight: 700; }
+  .warn .row-btns { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
+  .badge.ext { background: #fff1d6; color: #7a5200; }
   #photo-preview { width: 84px; height: 84px; border-radius: 10px; border: 1px solid var(--line); background: #eef1f2 center / contain no-repeat; }
   .dialog-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; align-items: center; }
   .dialog-btns .spacer { flex: 1; }
@@ -155,6 +159,12 @@
             <button id="photo-remove" class="small" type="button" hidden>Remove photo</button>
           </div>
         </div>
+      </div>
+      <div id="photo-warn" class="warn" role="status" hidden>
+        <b>This photo is only a link to <span id="photo-host">another website</span>, not a file in your shop.</b>
+        The small preview above works for any link, but the 3D pack needs that website’s permission to use its picture, and most websites do not give it. When that happens the pack shows the plain drawn pack instead.
+        <div class="row-btns"><button id="photo-copy" class="small" type="button">Copy it into my shop</button><span id="photo-copy-msg" aria-live="polite"></span></div>
+        <small>If copying is refused, save the picture to your computer and upload it with “Choose file” above.</small>
       </div>
       <label class="check"><input id="f-cover" type="checkbox"> The photo is the flat artwork — wrap it across the whole pack front</label>
 
@@ -273,7 +283,7 @@ function render() {
       if ((p.texture || {}).image_url) sw.style.backgroundImage = `url("${String(p.texture.image_url).replace(/["\\\n]/g, '')}")`;
       const edit = el('button', { type: 'button', textContent: 'Edit', onclick: () => openEditor(p) }); edit.setAttribute('aria-label', `Edit ${p.name}`);
       section.append(el('div', { className: 'row' + (p.active ? '' : ' off') }, sw,
-        el('div', {}, el('div', { className: 'name' }, p.name, p.active ? '' : el('span', { className: 'badge off', textContent: 'Hidden' }), (p.model || {}).glb_url ? el('span', { className: 'badge', textContent: '3D model' }) : ''),
+        el('div', {}, el('div', { className: 'name' }, p.name, p.active ? '' : el('span', { className: 'badge off', textContent: 'Hidden' }), (p.model || {}).glb_url ? el('span', { className: 'badge', textContent: '3D model' }) : '', isLink((p.texture || {}).image_url) ? el('span', { className: 'badge ext', textContent: 'photo is a link', title: 'This photo is a link to another website, so the 3D pack may show the plain drawing. Edit the product to copy it into your shop.' }) : ''),
           el('div', { className: 'meta', textContent: `S$${Number(p.price_sgd).toFixed(2)}${p.pack ? ' · ' + p.pack : ''}` })),
         edit));
     });
@@ -306,6 +316,8 @@ $('f-shape').onchange = () => { const s = SIZES[$('f-shape').value]; if (s) [$('
 function showFiles() {
   $('photo-preview').style.backgroundImage = draft.photoPreview ? `url("${draft.photoPreview}")` : '';
   $('photo-remove').hidden = !draft.photoPreview;
+  const linked = !draft.photoBlob && draft.photoPreview && isLink(draft.photoUrl);   // still just a link: the 3D pack will probably not use it
+  $('photo-warn').hidden = !linked; if (linked) { $('photo-host').textContent = hostOf(draft.photoUrl); $('photo-copy-msg').textContent = ''; }
   $('model-remove').hidden = !(draft.modelUrl || draft.modelFile);
   $('model-info').textContent = draft.modelFile ? `Chosen: ${draft.modelFile.name} (${(draft.modelFile.size / 1048576).toFixed(1)} MB) — uploaded when you save.` : draft.modelUrl ? 'This product has a 3D model. Choose a file to replace it.' : 'A .glb file up to 8 MB, without Draco compression. Keep it low-poly: every pack on the shelf is a copy.';
 }
@@ -331,20 +343,36 @@ $('add').onclick = () => openEditor(null);
 $('cancel').onclick = () => $('editor').close();
 
 // A chosen photo is made smaller (longest side 1024) right away, so uploads are quick and shops load fast.
+// Make any picture (a chosen file, or one copied from a link) smaller and ready to upload.
+async function usePhoto(file) {
+  const img = await new Promise((ok, bad) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => bad(new Error('That is not a picture this browser can read.')); i.src = URL.createObjectURL(file); });
+  const k = Math.min(1, 1024 / Math.max(img.naturalWidth, img.naturalHeight)), c = document.createElement('canvas');
+  c.width = Math.max(1, Math.round(img.naturalWidth * k)); c.height = Math.max(1, Math.round(img.naturalHeight * k));
+  c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(img.src);
+  const png = file.type === 'image/png';   // PNGs may have see-through parts, so they stay PNG
+  draft.photoBlob = await new Promise(ok => c.toBlob(ok, png ? 'image/png' : 'image/jpeg', 0.9));
+  if (!draft.photoBlob) throw new Error('The picture could not be prepared.');
+  draft.photoPreview = c.toDataURL(png ? 'image/png' : 'image/jpeg', 0.6);
+}
 $('f-photo').onchange = async () => {
   const file = $('f-photo').files[0]; if (!file) return;
-  try {
-    const img = await new Promise((ok, bad) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => bad(new Error('That file is not a picture this browser can read.')); i.src = URL.createObjectURL(file); });
-    const k = Math.min(1, 1024 / Math.max(img.naturalWidth, img.naturalHeight)), c = document.createElement('canvas');
-    c.width = Math.max(1, Math.round(img.naturalWidth * k)); c.height = Math.max(1, Math.round(img.naturalHeight * k));
-    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(img.src);
-    const png = file.type === 'image/png';   // PNGs may have see-through parts, so they stay PNG
-    draft.photoBlob = await new Promise(ok => c.toBlob(ok, png ? 'image/png' : 'image/jpeg', 0.9));
-    if (!draft.photoBlob) throw new Error('The picture could not be prepared.');
-    draft.photoPreview = c.toDataURL(png ? 'image/png' : 'image/jpeg', 0.6);
-    $('editor-error').textContent = '';
-  } catch (e) { $('editor-error').textContent = e.message; $('f-photo').value = ''; }
+  try { await usePhoto(file); $('editor-error').textContent = ''; }
+  catch (e) { $('editor-error').textContent = e.message; $('f-photo').value = ''; }
   showFiles();
+};
+// A photo that is a link to somebody else's website (rather than a file in this shop's own storage).
+const isOwnFile = u => !!u && u.startsWith(`${DB_URL}/storage/v1/object/public/${BUCKET}/`);
+const isLink = u => !!u && !isOwnFile(u);
+const hostOf = u => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch (e) { return 'another website'; } };
+$('photo-copy').onclick = async () => {
+  const btn = $('photo-copy'), msg = $('photo-copy-msg'); btn.disabled = true; msg.textContent = 'Copying…';
+  try {
+    const res = await fetch(draft.photoUrl, { mode: 'cors', referrerPolicy: 'no-referrer' });   // refused by most websites, which is exactly what we are checking
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const blob = await res.blob(); if (!/^image\//.test(blob.type)) throw new Error('not a picture');
+    await usePhoto(blob); showFiles(); $('photo-copy-msg').textContent = 'Copied. Press Save to keep it.';
+  } catch (e) { msg.textContent = `${hostOf(draft.photoUrl)} does not allow that.`; }
+  btn.disabled = false;
 };
 $('photo-remove').onclick = () => { draft.photoBlob = null; draft.photoPreview = ''; $('f-photo').value = ''; showFiles(); };
 $('f-model').onchange = async () => {
