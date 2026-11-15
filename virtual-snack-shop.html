@@ -21,6 +21,7 @@
   * { box-sizing: border-box; }
   html, body { height: 100%; margin: 0; }
   html { touch-action: manipulation; }   /* phones: tapping a button twice quickly must not zoom the page */
+  #card, #inspect, .drawer, dialog, button { touch-action: manipulation; }   /* the page rule alone is not enough on iPhones: the card, panels and buttons need it on themselves, or a double-tap there still zooms */
   body { font: 15px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--ink); background: var(--bg); overflow: hidden; }
   [hidden] { display: none !important; }
   button, input, textarea { font: inherit; color: inherit; }

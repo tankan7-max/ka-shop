@@ -10,6 +10,7 @@
   * { box-sizing: border-box; }
   [hidden] { display: none !important; }
   html { touch-action: manipulation; }   /* phones: tapping + or − quickly must not zoom the page */
+  button { touch-action: manipulation; }   /* the page rule alone is not enough on iPhones: buttons need it on themselves */
   body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--ink); }
   header { background: var(--brand); color: #fff; padding: 16px 20px; }
   header h1 { margin: 0; font-size: 20px; }
