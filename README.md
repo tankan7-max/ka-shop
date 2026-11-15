@@ -16,6 +16,7 @@ It is one web page (`virtual-snack-shop.html`) plus one product list
 | `index.html` | Sends visitors of the folder's web address on to the shop page. |
 | `inventory.json` | Stock on hand per product id. `0` means out of stock. |
 | `inventory.html` | Stock manager page: change quantities, record orders, download the updated `inventory.json`. |
+| `products.html` | Product manager page (needs the Supabase database): add, edit, hide or delete products, upload pack photos and 3D models. |
 | `qrcode.js` | The QR code library used for the PayNow code at checkout (MIT licence, by Kazuhiko Arase). |
 
 ## Try it on your computer
@@ -62,12 +63,28 @@ python sync-products.py
   on the back wall and in order messages.
 - **Products**: each has an `id` (unique, never change it), `name`,
   `category`, `price_sgd`, `pack` and a `model` (size and colour of the pack).
-  The pack shape (bag, box, bar, carton, can, tube, cup) is worked out from
+  The pack shape (bag, box, bar, carton, can, tube, cup, bottle) is worked out from
   the `pack` text; add `"shape"` to `model` to choose it yourself.
 - **Photos**: set `texture.image_url` to a pack photo. Without one, the shop
   draws the pack from the product's name and colour.
 - **Shelves**: the order of `"categories"` is the order of the shelves. The
   room adds aisles by itself when there are more products.
+- **Products page (Supabase)**: open `products.html` and sign in with the
+  owner login.
+  - The first time, press **Copy the products from products.json**. From
+    then on the shop reads its products from the database and
+    `products.json` is only the fallback (use **Download backup** now and
+    then, upload the file and run `python sync-products.py`).
+  - **Add a product**: name, price, pack, shelf, starting stock, pack shape
+    (bag, box, bar, drink packet, can, bottle, tube, cup), size and colour.
+  - **Photo of the pack front**: uploaded to the database's file storage and
+    shown on the 3D pack. Tick "the photo is the flat artwork" to wrap it
+    across the whole front.
+  - **3D model**: upload a `.glb` file (up to 8 MB, no Draco compression) to
+    replace the built-in shape for that product. It is sized to the width,
+    height and depth you enter; it should stand upright (+Y) and face
+    forward (+Z). Keep it low-poly — every pack on the shelf is a copy.
+  - Untick **On sale** to hide a product without losing it.
 - **Live stock (Supabase)**: with `"supabase_url"` and `"supabase_key"`
   set under `"shop"` in `products.json`, stock lives in the shop's Supabase
   database instead of a file.
