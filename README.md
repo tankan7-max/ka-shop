@@ -18,6 +18,9 @@ It is one web page (`virtual-snack-shop.html`) plus one product list
 | `inventory.html` | Stock manager page: change quantities, record orders, download the updated `inventory.json`. |
 | `products.html` | Product manager page (needs the Supabase database): add, edit, hide or delete products, upload pack photos and 3D models. |
 | `qrcode.js` | The QR code library used for the PayNow code at checkout (MIT licence, by Kazuhiko Arase). |
+| `ka.html` | Tan Kwan Ann's personal page: dark, with a spinning 3D ring, photos and a print-to-PDF resume (print it from the browser for a two-page paper version). |
+| `ka-*.jpg`, `Tan_Kwan_Ann_Resume.pdf` | Photos and the resume download used by `ka.html`. `ka-og.jpg` is the picture shown when the page's link is shared. |
+| `fonts/` | The page's fonts, hosted here so it loads nothing from other websites (open licence, see `fonts/LICENSES.txt`). |
 
 ## Try it on your computer
 
