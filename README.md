@@ -67,8 +67,17 @@ python sync-products.py
   the `pack` text; add `"shape"` to `model` to choose it yourself.
 - **Photos**: set `texture.image_url` to a pack photo. Without one, the shop
   draws the pack from the product's name and colour.
-- **Shelves**: the order of `"categories"` is the order of the shelves. The
-  room adds aisles by itself when there are more products.
+- **Shelves**: like a supermarket, every product has one space on a shelf
+  with its packs queued up behind the front one, and each category has its
+  own stretch of shelf with a sign. The shop is sized to what you sell: it
+  starts small and grows longer shelves, then extra aisles, as you add
+  products. Categories are placed in the order of `"categories"` where
+  they fit.
+- **Other shoppers**: with the Supabase database connected, customers see
+  each other as little figures walking around, and as dots on the map. Only
+  a position, an optional nickname and a colour are shared — never the cart.
+  Each customer can switch it off from the people button in the top bar; set
+  `"multiplayer": false` under `"shop"` to turn it off for everyone.
 - **Products page (Supabase)**: open `products.html` and sign in with the
   owner login.
   - The first time, press **Copy the products from products.json**. From

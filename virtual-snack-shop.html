@@ -126,6 +126,15 @@
   #minimap-wrap button { font-size: 13px; padding: 4px 8px; min-height: 30px; }
   #joystick { position: fixed; left: 18px; bottom: calc(22px + var(--safe-b)); width: 124px; height: 124px; border-radius: 50%; z-index: 7; background: rgba(255,255,255,.45); border: 2px solid rgba(255,255,255,.9); box-shadow: 0 2px 12px rgba(0,0,0,.2); touch-action: none; display: none; }
   #joystick i { position: absolute; left: 50%; top: 50%; width: 54px; height: 54px; margin: -27px; border-radius: 50%; background: var(--brand); box-shadow: 0 2px 8px rgba(0,0,0,.3); }
+  /* Other shoppers: small panel under the top bar */
+  #people { position: fixed; right: 12px; top: calc(var(--bar-h) + 8px); z-index: 11; width: min(300px, calc(100vw - 24px)); background: var(--panel); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px; }
+  #people label { display: block; font-size: 13px; font-weight: 600; margin-top: 8px; }
+  #people input:not([type="checkbox"]) { width: 100%; padding: 8px 10px; border: 1px solid #c5ccd0; border-radius: 10px; font-size: 16px; margin-top: 4px; }
+  #people .check { display: flex; align-items: center; gap: 8px; }
+  #people .check input { width: 20px; height: 20px; accent-color: var(--brand); }
+  #people-colors { display: flex; gap: 8px; margin-top: 10px; }
+  #people-colors button { width: 32px; min-height: 32px; padding: 0; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 1px #c5ccd0; }
+  #people-colors button[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--ink); }
   #toast { position: fixed; left: 50%; top: calc(var(--bar-h) + 12px); transform: translateX(-50%); z-index: 20; background: rgba(20,26,30,.92); color: #fff; padding: 8px 16px; border-radius: 999px; font-size: 14px; pointer-events: none; max-width: calc(100vw - 30px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
   /* Inspect view: one pack on its own, Resident Evil style — drag to turn it. */
@@ -206,9 +215,18 @@
     <span id="brand-name">Virtual Snack Shop</span>
   </div>
   <button id="browse-btn" type="button" aria-expanded="false" aria-controls="catalogue"><svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span class="label">Browse</span></button>
+  <button id="people-btn" type="button" aria-expanded="false" aria-controls="people" aria-label="Other shoppers" hidden><svg class="i" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5M16 5.2a3.2 3.2 0 0 1 0 5.6M17.5 14.8c2.1.6 3.5 2.4 3.5 5.2"/></svg><span id="people-count">1</span></button>
   <button id="help-btn" type="button" aria-label="How to use the shop"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.3a2.6 2.6 0 1 1 3.6 2.4c-.7.4-1.1.9-1.1 1.8M12 17h.01"/></svg><span class="label">Help</span></button>
   <button id="cart-btn" type="button" class="primary" aria-expanded="false" aria-controls="cart"><svg class="i" viewBox="0 0 24 24"><path d="M5 9h14l-1.4 11H6.4zM9 9a3 3 0 0 1 6 0"/></svg><span class="label">Cart</span><span id="cart-count">0</span><span id="cart-sum" class="label"></span></button>
 </header>
+
+<section id="people" aria-label="Other shoppers" hidden>
+  <b id="people-title">Just you in the shop</b>
+  <p class="fine">Other people shopping right now appear as little figures. They see where you walk, never your cart.</p>
+  <label>Your nickname (optional)<input id="people-name" maxlength="14" autocomplete="off" placeholder="Shopper"></label>
+  <div id="people-colors" role="group" aria-label="Your colour"></div>
+  <label class="check"><input id="people-on" type="checkbox" checked> Show me to others, and others to me</label>
+</section>
 
 <aside id="catalogue" class="drawer left" aria-label="All snacks" inert>
   <header><h2>All snacks</h2><button class="icon quiet" type="button" data-close aria-label="Close list">×</button></header>
@@ -461,7 +479,7 @@ const groups = new Map();
 PRODUCTS.forEach(p => { if (!groups.has(p.category)) groups.set(p.category, []); groups.get(p.category).push(p); });
 const SIGN_COLORS = ['#c0392b', '#d35400', '#8e5a2b', '#6c3483', '#c2185b', '#b7950b', '#1f7a8c', '#2e7d32', '#455a64', '#5d4037'];
 const CATS = [...groups.entries()].filter(([, items]) => items.length)
-  .map(([name, items], i) => ({ name, items, sign: SIGN_COLORS[i % SIGN_COLORS.length], units: [] }));
+  .map(([name, items], i) => ({ name, items, sign: SIGN_COLORS[i % SIGN_COLORS.length], bays: [] }));
 
 // ===========================================================================
 // 2. PACK ART
@@ -959,6 +977,40 @@ $('paynow-download').onclick = () => {
   img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(xml);
 };
 
+// --- Other shoppers (multiplayer). Everyone in the shop shares where they are standing through the
+// database's live channel, so customers can see each other walking around. Only a position, a
+// nickname and a colour are shared — never the cart. Turn the whole thing off with
+// "multiplayer": false under "shop" in products.json. ---
+const SHOPPERS_ON = LIVE && SHOP.multiplayer !== false && 'WebSocket' in window;
+const ME_KEY = 'virtual-snack-shop-me', SHOPPER_COLORS = ['#e4572e', '#f2a541', '#2a9d8f', '#3d7fd9', '#8e5bd0', '#d6457f'];
+const cleanName = v => String(v == null ? '' : v).replace(/[^\p{L}\p{N} _.'-]/gu, '').trim().slice(0, 14);
+const me = (() => {
+  let saved = {}; try { saved = JSON.parse(localStorage.getItem(ME_KEY) || '{}') || {}; } catch (e) {}
+  return { id: Array.from(crypto.getRandomValues(new Uint8Array(6)), b => b.toString(16).padStart(2, '0')).join(''),   // new on every visit; not the id used for orders
+           name: cleanName(saved.name), color: SHOPPER_COLORS.includes(saved.color) ? saved.color : SHOPPER_COLORS[Math.floor(Math.random() * SHOPPER_COLORS.length)], on: saved.on !== false };
+})();
+const saveMe = () => { try { localStorage.setItem(ME_KEY, JSON.stringify({ name: me.name, color: me.color, on: me.on })); } catch (e) {} };
+// The live channel: a plain WebSocket speaking the database's "broadcast" messages. It reconnects by itself.
+function shopperChannel(onMessage, onReady) {
+  const topic = 'realtime:shoppers'; let ws = null, ref = 0, beat = 0, retry = 0, wanted = true, joined = false;
+  const post = (t, event, payload) => { if (ws && ws.readyState === 1) ws.send(JSON.stringify({ topic: t, event, payload, ref: String(++ref) })); };
+  function connect() {
+    if (!wanted) return;
+    ws = new WebSocket(`${DB_URL.replace(/^http/, 'ws')}/realtime/v1/websocket?apikey=${encodeURIComponent(DB_KEY)}&vsn=1.0.0`);
+    ws.onopen = () => { post(topic, 'phx_join', { config: { broadcast: { ack: false, self: false }, presence: { key: '' }, postgres_changes: [], private: false } }); beat = setInterval(() => post('phoenix', 'heartbeat', {}), 25000); };
+    ws.onmessage = e => {
+      let m; try { m = JSON.parse(e.data); } catch (err) { return; }
+      if (m.topic !== topic) return;
+      if (m.event === 'phx_reply' && !joined && m.payload && m.payload.status === 'ok') { joined = true; retry = 0; onReady(); }
+      else if (m.event === 'broadcast' && m.payload && m.payload.payload) onMessage(m.payload.event, m.payload.payload);
+    };
+    ws.onclose = () => { clearInterval(beat); joined = false; if (wanted) setTimeout(connect, Math.min(30000, 2000 * 2 ** retry++)); };
+    ws.onerror = () => { try { ws.close(); } catch (e) {} };
+  }
+  connect();
+  return { send: (event, payload) => { if (joined) post(topic, 'broadcast', { type: 'broadcast', event, payload }); }, close: () => { wanted = false; try { ws.close(); } catch (e) {} } };
+}
+
 // --- Help / welcome ---
 const HELP_KEY = 'virtual-snack-shop-welcomed';
 $('help-btn').onclick = () => $('help').showModal();
@@ -1042,18 +1094,64 @@ function startWorld(THREE) {
   // Room size. Middle aisles ("gondolas", shelves with two faces) are added as
   // needed, and the room widens to fit them.
   // -------------------------------------------------------------------------
-  const SLOT_W = 0.85;                 // width of one product column
+  const SLOT_W = 0.85;                 // width of one product's space on a shelf
   const LEVELS = [0.12, 0.77, 1.42];   // height of each shelf board's top
-  const UNIT_H = 2.1, UNIT_D = 0.55;   // shelf unit height and depth
-  const GONDOLA_LEN = 7, GONDOLA_Z = -2, AISLE = 4.2;
-  const HALF_D = 8, WALL_H = 3.4;      // room runs from z = -8 (back) to z = 8 (entrance)
-  const EYE = 1.6, BODY = 0.42;         // eye height, and how close you can get to things
+  const UNIT_H = 2.1, UNIT_D = 0.8;    // shelf unit height and depth (deep, so packs queue up front to back)
+  const AISLE = 4.4, WALL_H = 3.4;     // distance between the middles of two neighbouring gondolas; wall height
+  const EYE = 1.6, BODY = 0.42;        // eye height, and how close you can get to things
   const colsFor = len => Math.floor((len - 0.1) / SLOT_W);
-  const MIN_UNIT_SLOTS = colsFor(GONDOLA_LEN) * LEVELS.length;
-  const unitsNeeded = CATS.reduce((s, c) => s + Math.ceil(c.items.length / MIN_UNIT_SLOTS), 0);
-  const G = Math.max(3, Math.ceil((unitsNeeded - 4) / 2));        // number of middle gondolas
-  const HALF_W = Math.max(10, (G - 1) / 2 * AISLE + 5.8);         // room runs from x = -HALF_W to +HALF_W
-  const SIDE_LEN = 11, SIDE_Z = -1.7, BACK_LEN = HALF_W - 1.4;
+  const lenFor = cols => cols * SLOT_W + 0.1;
+
+  // Like a real supermarket, every product has ONE space on a shelf, with its packs queued up behind
+  // the front one. Each category gets a "bay": enough side-by-side columns for all its products.
+  const BAYS = CATS.map(cat => ({ cat, cols: Math.ceil(cat.items.length / LEVELS.length) }));
+  // A shop of a given size: G middle gondolas (two faces each) and wall shelves `sideCols` columns long.
+  // Shelf faces are listed in shopping order: left wall, middle aisles, right wall, back wall.
+  function plan(G, sideCols) {
+    const halfW = Math.max(5.6, (G - 1) / 2 * AISLE + 4.4), sideLen = lenFor(sideCols), gondolaLen = lenFor(Math.max(2, sideCols - 2)), backLen = halfW - 0.6;
+    const halfD = (UNIT_D + 0.3 + sideLen + 4.6) / 2;                        // back shelves + wall shelves + room at the front for the door and counter
+    const sideZ0 = -halfD + UNIT_D + 0.3, gondolaZ0 = -halfD + UNIT_D + 2.2;  // where the wall shelves and the gondolas start (their back ends)
+    const units = [{ x: -halfW + UNIT_D / 2 + 0.06, z0: sideZ0, rotY: Math.PI / 2, length: sideLen }];
+    for (let g = 0; g < G; g++) {
+      const gx = (g - (G - 1) / 2) * AISLE;
+      units.push({ x: gx - UNIT_D / 2, z0: gondolaZ0, rotY: -Math.PI / 2, length: gondolaLen, gondola: g, face: 'west' });
+      units.push({ x: gx + UNIT_D / 2, z0: gondolaZ0, rotY: Math.PI / 2, length: gondolaLen, gondola: g, face: 'east' });
+    }
+    units.push({ x: halfW - UNIT_D / 2 - 0.06, z0: sideZ0, rotY: -Math.PI / 2, length: sideLen });
+    [-1, 1].forEach(side => units.push({ x: side * (0.25 + backLen / 2), z: -halfD + UNIT_D / 2 + 0.06, rotY: 0, length: backLen, back: true }));
+    return { G, halfW, halfD, units };
+  }
+  // Put each bay on the first shelf face with room for it. False when the shop is too small.
+  function stock(units) {
+    units.forEach(u => { u.bays = []; u.used = 0; });
+    for (const bay of BAYS) {
+      let left = bay.cols, done = 0;
+      while (left > 0) {
+        // A bay stays in one piece when it can; one bigger than a whole face carries on along the next empty face.
+        const u = units.find(u => colsFor(u.length) - u.used >= left) || units.find(u => u.used === 0);
+        if (!u) return false;
+        const take = Math.min(left, colsFor(u.length));
+        u.bays.push({ cat: bay.cat, col: u.used, cols: take, items: bay.cat.items.slice(done * LEVELS.length, (done + take) * LEVELS.length) });
+        u.used += take; left -= take; done += take;
+      }
+    }
+    return true;
+  }
+  // Start with a small shop and grow it (longer shelves first, then another middle aisle) until everything fits.
+  let layout = null;
+  for (let G = 1, sideCols = 4; !layout;) {
+    const p = plan(G, sideCols);
+    if (stock(p.units) || G > 12) layout = p; else if (sideCols < 4 + 3 * G) sideCols++; else G++;
+  }
+  const { G, halfW: HALF_W, halfD: HALF_D } = layout;   // the room runs from x = -HALF_W to +HALF_W and z = -HALF_D (back) to +HALF_D (entrance)
+  // Shelves are only as long as what is on them, so there are no empty stretches.
+  for (let g = 0; g < G; g++) { const faces = layout.units.filter(u => u.gondola === g), cols = Math.max(...faces.map(u => u.used), 2); faces.forEach(u => { u.length = lenFor(cols); }); }
+  layout.units.forEach(u => { if (u.gondola === undefined && u.used) u.length = lenFor(u.used); if (u.z0 !== undefined) u.z = u.z0 + u.length / 2; });
+  const UNITS = layout.units.filter(u => u.used || u.gondola !== undefined);
+  { const backs = UNITS.filter(u => u.back); if (backs.length === 1) backs[0].x = 0; }   // a single back shelf sits in the middle of the wall
+  const gondolaOf = g => UNITS.find(u => u.gondola === g);
+  const SIDE_Z = layout.units[0].z, GONDOLA_Z = gondolaOf(0).z;
+  UNITS.forEach(u => u.bays.forEach(bay => bay.cat.bays.push(bay)));
 
   // Warm pools of light over the shelves: one low light per aisle, so it
   // lights both shelf faces at once, plus the back wall, the counter and the entrance.
@@ -1067,40 +1165,8 @@ function startWorld(THREE) {
     shelfGlow(((HALF_W - UNIT_D / 2 - 0.06) + (gxLast + UNIT_D / 2)) / 2, 2.5, (SIDE_Z + GONDOLA_Z) / 2);
   }
   shelfGlow(0, 2.5, -HALF_D + 2.4, 10, 12);            // back wall shelves
-  shelfGlow(HALF_W - 3.2, 2.6, HALF_D - 2.6, 14, 8);   // checkout counter
+  shelfGlow(HALF_W - 2.6, 2.6, HALF_D - 2.6, 14, 8);   // checkout counter
   shelfGlow(0, 2.6, HALF_D - 1.6, 12, 8);               // entrance, so the door area is a little brighter
-
-  // Every shelf face in the shop, in shopping order: left wall, middle aisles, right wall, back wall.
-  const UNITS = [];
-  UNITS.push({ x: -HALF_W + UNIT_D / 2 + 0.06, z: SIDE_Z, rotY: Math.PI / 2, length: SIDE_LEN });
-  for (let g = 0; g < G; g++) {
-    const gx = (g - (G - 1) / 2) * AISLE;
-    UNITS.push({ x: gx - UNIT_D / 2, z: GONDOLA_Z, rotY: -Math.PI / 2, length: GONDOLA_LEN, gondola: g, face: 'west' });
-    UNITS.push({ x: gx + UNIT_D / 2, z: GONDOLA_Z, rotY: Math.PI / 2, length: GONDOLA_LEN, gondola: g, face: 'east' });
-  }
-  UNITS.push({ x: HALF_W - UNIT_D / 2 - 0.06, z: SIDE_Z, rotY: -Math.PI / 2, length: SIDE_LEN });
-  UNITS.push({ x: -HALF_W / 2, z: -HALF_D + UNIT_D / 2 + 0.06, rotY: 0, length: BACK_LEN });
-  UNITS.push({ x: HALF_W / 2, z: -HALF_D + UNIT_D / 2 + 0.06, rotY: 0, length: BACK_LEN });
-
-  // Give each category at least the shelf faces it needs, then hand spare faces to the
-  // fullest categories so every face is stocked.
-  const alloc = CATS.map(c => Math.ceil(c.items.length / MIN_UNIT_SLOTS));
-  let spare = UNITS.length - alloc.reduce((a, b) => a + b, 0);
-  while (spare > 0) {
-    let best = -1, bestRatio = 1;
-    CATS.forEach((c, i) => { const r = c.items.length / alloc[i]; if (c.items.length > alloc[i] && r > bestRatio) { best = i; bestRatio = r; } });
-    if (best < 0) break;
-    alloc[best]++; spare--;
-  }
-  let cursor = 0;
-  CATS.forEach((c, i) => {
-    const n = c.items.length, a = alloc[i];
-    for (let j = 0; j < a; j++) {
-      const u = UNITS[cursor++];
-      u.cat = c; u.items = c.items.slice(Math.floor(j * n / a), Math.floor((j + 1) * n / a));
-      c.units.push(u);
-    }
-  });
 
   // -------------------------------------------------------------------------
   // Room: floor, ceiling, walls, shop front with windows, lights, store sign.
@@ -1170,7 +1236,7 @@ function startWorld(THREE) {
   // They are unlit (MeshBasicMaterial), so the colour is what you see; the shelf lights still do the actual lighting.
   const panelMat = new THREE.MeshBasicMaterial({ color: 0xffe9a8 }), panelRim = new THREE.MeshBasicMaterial({ color: 0x2a2620 });
   for (let x = -HALF_W + 2.5; x <= HALF_W - 2; x += 4.2)
-    for (let z = -6; z <= 6; z += 4) {
+    for (let z = -HALF_D + 2; z <= HALF_D - 1.5; z += 4) {
       const rim = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.05, 0.62), panelRim); rim.position.set(x, WALL_H - 0.03, z); scene.add(rim);
       const p = new THREE.Mesh(new THREE.BoxGeometry(1.66, 0.05, 0.48), panelMat); p.position.set(x, WALL_H - 0.04, z); scene.add(p);
     }
@@ -1361,22 +1427,19 @@ function startWorld(THREE) {
     add(new THREE.BoxGeometry(L, 0.1, 0.02), kickMat, 0, 0.05, UNIT_D / 2);
     g.updateMatrixWorld(true);
     addObstacle(g);
-    if (u.cat) {
-      const sign = plane(Math.min(L - 0.4, 3.6), 0.44, flat(signTexture(u.cat.name, u.cat.sign)));
-      sign.position.set(0, UNIT_H + 0.3, -UNIT_D / 2 + 0.06); g.add(sign);
-    }
-    if (!u.items || !u.items.length) return;
-
-    // Slots in column order (top to bottom, then next column), so each product
-    // gets a neat vertical block of "facings", like a real shop.
     const cols = colsFor(L), x0 = -(cols * SLOT_W) / 2 + SLOT_W / 2;
-    const order = [];
-    for (let c = 0; c < cols; c++) for (let l = LEVELS.length - 1; l >= 0; l--) order.push({ c, l });
-    const S = order.length, k = u.items.length;
+    u.bays.forEach(bay => {
+      // A sign over each category's bay, and where the bay is in the shop (for "Walk to shelf" and the map).
+      const mid = x0 + (bay.col + (bay.cols - 1) / 2) * SLOT_W, width = bay.cols * SLOT_W;
+      const sign = plane(Math.min(width - 0.12, 3.6), 0.44, flat(signTexture(bay.cat.name, bay.cat.sign, Math.round(1024 * Math.min(1, (width - 0.12) / 3.6)), 150)));
+      sign.position.set(mid, UNIT_H + 0.3, -UNIT_D / 2 + 0.06); g.add(sign);
+      const at = g.localToWorld(new THREE.Vector3(mid, 0, 0));
+      Object.assign(bay, { x: at.x, z: at.z, width, unit: u });
+    });
     const maxH = l => (l === LEVELS.length - 1 ? UNIT_H : LEVELS[l + 1] - 0.04) - LEVELS[l] - 0.06;
-    u.items.forEach((p, i) => {
-      const slots = order.slice(Math.floor(i * S / k), Math.floor((i + 1) * S / k));
-      if (!slots.length) return;
+    // Spaces in a bay are filled column by column, top shelf first; each product gets exactly one.
+    u.bays.forEach(bay => bay.items.forEach((p, i) => {
+      const slots = [{ c: bay.col + Math.floor(i / LEVELS.length), l: LEVELS.length - 1 - (i % LEVELS.length) }];
       // Every product gets its full set of packs and price tags, plus a grey "Out of stock" tag.
       // applyStock() then shows what matches the stock, and can do so again whenever stock changes.
       const soldTag = plane(SLOT_W - 0.06, 0.12, flat(tagTexture(p, '#9aa3a7', true)));
@@ -1386,9 +1449,9 @@ function startWorld(THREE) {
       // Fit the pack into a slot.
       const w = Math.min(p.width, SLOT_W - 0.08), d = Math.min(p.depth, UNIT_D - 0.08);
       const across = Math.max(1, Math.min(3, Math.floor((SLOT_W - 0.06) / (w + 0.03))));
-      const rows = Math.max(1, Math.min(3, Math.floor((UNIT_D - 0.08) / (d + 0.03))));
+      const rows = Math.max(1, Math.min(6, Math.floor((UNIT_D - 0.08) / (d + 0.03))));
       const list = [];
-      const tagMat = flat(tagTexture(p, u.cat.sign));
+      const tagMat = flat(tagTexture(p, bay.cat.sign));
       const tagged = new Set();
       let rand = p.hash;                 // small repeatable wobble so bags don't stand in perfect rows
       const wobble = () => { rand = Math.imul(rand ^ rand >>> 15, 2246822507) >>> 0; return rand / 2 ** 32 - 0.5; };
@@ -1400,7 +1463,7 @@ function startWorld(THREE) {
           const local = new THREE.Matrix4().compose(
             new THREE.Vector3(sx + (a - (across - 1) / 2) * (w + 0.03) + soft * wobble() * 0.012, LEVELS[l] + h / 2, (r - (rows - 1) / 2) * (d + 0.03)),
             new THREE.Quaternion().setFromEuler(new THREE.Euler(0, soft * wobble() * 0.1, soft * wobble() * 0.03)), new THREE.Vector3(1, h / p.height, 1));
-          const it = { m: new THREE.Matrix4().multiplyMatrices(g.matrixWorld, local), w, d, unit: u, front: rows - 1 - r, slotIndex };
+          const it = { m: new THREE.Matrix4().multiplyMatrices(g.matrixWorld, local), w, d, unit: u, front: rows - 1 - r, slotIndex: a };
           // The pack you get walked to by "Find": front row of the product's first (highest) slot.
           if (slotIndex === 0 && r === rows - 1 && a === Math.floor((across - 1) / 2)) { p.hero = it; it.front = -1; }
           list.push(it);
@@ -1416,12 +1479,12 @@ function startWorld(THREE) {
       // Front rows first, so that when stock is low the packs that are left are the ones at the front.
       list.sort((a, b) => a.front - b.front || a.slotIndex - b.slotIndex);
       productInstances.set(p, list);
-    });
+    }));
   }
   UNITS.forEach(buildUnit);
   // Floor shadows: one per wall unit, one per gondola (two faces back to back).
   UNITS.filter(u => u.gondola === undefined).forEach(u => floorShadow(u.x, u.z, u.length + 0.9, UNIT_D + 1.3, u.rotY));
-  for (let g = 0; g < G; g++) floorShadow((g - (G - 1) / 2) * AISLE, GONDOLA_Z, GONDOLA_LEN + 1.2, UNIT_D * 2 + 1.5, Math.PI / 2);
+  for (let g = 0; g < G; g++) floorShadow((g - (G - 1) / 2) * AISLE, gondolaOf(g).z, gondolaOf(g).length + 1.2, UNIT_D * 2 + 1.5, Math.PI / 2);
 
   // Gondola end signs, readable from the entrance: which categories are down each side.
   for (let g = 0; g < G; g++) {
@@ -1431,12 +1494,12 @@ function startWorld(THREE) {
       ctx.fillStyle = '#ffd54f'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.font = `800 44px ${FONT}`; ctx.fillText(`Aisle ${g + 1}`, w / 2, 56);
       [[west, '◀ '], [east, '▶ ']].forEach(([u, arrow], i) => {
-        const t = u && u.cat ? u.cat.name : '—';
-        ctx.fillStyle = u && u.cat ? u.cat.sign : '#555'; roundRect(ctx, 24, 120 + i * 135, w - 48, 115, 16); ctx.fill();
+        const cats = [...new Set(u.bays.map(b => b.cat))], t = cats.map(c => c.name).join(' · ') || '—';
+        ctx.fillStyle = cats.length ? cats[0].sign : '#555'; roundRect(ctx, 24, 120 + i * 135, w - 48, 115, 16); ctx.fill();
         ctx.fillStyle = '#fff'; fitOneLine(ctx, arrow + t, w - 80, 40, '800'); ctx.fillText(arrow + t, w / 2, 178 + i * 135);
       });
     });
-    const gx = (g - (G - 1) / 2) * AISLE, endZ = GONDOLA_Z + GONDOLA_LEN / 2;
+    const gx = (g - (G - 1) / 2) * AISLE, endZ = west.z + west.length / 2;
     const cap = new THREE.Mesh(new THREE.BoxGeometry(UNIT_D * 2, UNIT_H, 0.04), frameMat); cap.position.set(gx, UNIT_H / 2, endZ + 0.02); scene.add(cap);
     const s = plane(1.05, 0.82, flat(tex)); s.position.set(gx, 1.55, endZ + 0.045); scene.add(s);
   }
@@ -1488,7 +1551,7 @@ function startWorld(THREE) {
   }
 
   // Checkout counter by the entrance; clicking it opens the cart.
-  const counter = new THREE.Group(); counter.position.set(HALF_W - 3.2, 0, HALF_D - 2.6); scene.add(counter);
+  const counter = new THREE.Group(); counter.position.set(HALF_W - 2.6, 0, HALF_D - 2.6); scene.add(counter);
   [[new THREE.BoxGeometry(2.6, 0.95, 0.8), std(0x2f6f68), 0, 0.475], [new THREE.BoxGeometry(2.8, 0.06, 0.95), std(0xcaa776, { roughness: 0.5 }), 0, 0.98],
    [new THREE.BoxGeometry(0.5, 0.36, 0.06), std(0x1d2327, { roughness: 0.3 }), 0.7, 1.3], [new THREE.BoxGeometry(0.06, 0.2, 0.06), std(0x1d2327), 0.7, 1.1],
    [new THREE.BoxGeometry(0.44, 0.3, 0.01), new THREE.MeshBasicMaterial({ color: 0x7fe0d2 }), 0.7, 1.3]]
@@ -1570,7 +1633,7 @@ function startWorld(THREE) {
   // -------------------------------------------------------------------------
   // Moving and looking.
   // -------------------------------------------------------------------------
-  const START = { x: 0, z: HALF_D - 1.6 };
+  const START = { x: SHOPPERS_ON ? (Math.random() - 0.5) * 2 : 0, z: HALF_D - 1.6 };   // with other shoppers about, not everyone starts on exactly the same spot
   const pos = camera.position; pos.set(START.x, EYE, START.z);
   let yaw = 0, pitch = -0.05, nav = null, walked = 0;
   const vel = { x: 0, z: 0 };
@@ -1593,10 +1656,10 @@ function startWorld(THREE) {
   $('entrance-btn').onclick = () => { resetView(); canvas.focus({ preventScroll: true }); };
 
   function goToCategory(cat) {
-    const u = cat.units[0]; if (!u) return;
+    const bay = cat.bays[0]; if (!bay) return;
     closeCard();
-    const spot = nearestFree(u.x + Math.sin(u.rotY) * 2.2, u.z + Math.cos(u.rotY) * 2.2);
-    walkTo(spot, lookAtFrom(spot, { x: u.x, y: 1.25, z: u.z }));
+    const spot = nearestFree(bay.x + Math.sin(bay.unit.rotY) * 2.2, bay.z + Math.cos(bay.unit.rotY) * 2.2);
+    walkTo(spot, lookAtFrom(spot, { x: bay.x, y: 1.25, z: bay.z }));
   }
   function showSelection(p, it) { placeOutline(selectBox, p, it); selectProduct(p); }
   // Walk to a snack: to the very pack that was clicked when there is one, otherwise to its first pack.
@@ -1706,7 +1769,11 @@ function startWorld(THREE) {
     mctx.fillStyle = '#f3efe6'; mctx.fillRect(0, 0, MAP_W, MAP_H);
     UNITS.forEach(u => {
       const along = Math.abs(Math.sin(u.rotY)) > 0.5, w = along ? UNIT_D : u.length, d = along ? u.length : UNIT_D;
-      mctx.fillStyle = u.cat ? u.cat.sign : '#b0b6b9'; mctx.fillRect(mx(u.x - w / 2), mz(u.z - d / 2), Math.max(2.5, w * MS), Math.max(2.5, d * MS));
+      mctx.fillStyle = '#b0b6b9'; mctx.fillRect(mx(u.x - w / 2), mz(u.z - d / 2), Math.max(2.5, w * MS), Math.max(2.5, d * MS));
+      u.bays.forEach(bay => {             // each category's stretch of the shelf, in its sign colour
+        const bw = along ? UNIT_D : bay.width, bd = along ? bay.width : UNIT_D;
+        mctx.fillStyle = bay.cat.sign; mctx.fillRect(mx(bay.x - bw / 2), mz(bay.z - bd / 2), Math.max(2.5, bw * MS), Math.max(2.5, bd * MS) - 0.5);
+      });
     });
     mctx.fillStyle = '#2f6f68'; mctx.fillRect(mx(counter.position.x - 1.3), mz(counter.position.z - 0.4), 2.6 * MS, 0.8 * MS);
     mctx.fillStyle = '#2a9d8f'; mctx.fillRect(mx(-DOOR), MAP_H - 3, DOOR * 2 * MS, 3);
@@ -1715,6 +1782,7 @@ function startWorld(THREE) {
       for (let i = nav.i; i < nav.path.length; i++) mctx.lineTo(mx(nav.path[i].x), mz(nav.path[i].z));
       mctx.stroke(); mctx.setLineDash([]);
     }
+    shoppers.forEach(s => { mctx.fillStyle = s.color || '#888'; mctx.strokeStyle = '#fff'; mctx.lineWidth = 1; mctx.beginPath(); mctx.arc(mx(s.group.position.x), mz(s.group.position.z), 3.2, 0, 7); mctx.fill(); mctx.stroke(); });
     // You: an arrow pointing the way you are looking.
     mctx.save(); mctx.translate(mx(pos.x), mz(pos.z)); mctx.rotate(-yaw);
     mctx.fillStyle = '#1c2428'; mctx.strokeStyle = '#fff'; mctx.lineWidth = 1.5;
@@ -1915,6 +1983,7 @@ function startWorld(THREE) {
     }
     if (moving || turn) dirty = Math.max(dirty, 1);
     updateHover();
+    tickShoppers(dt);
     if (dirty > 0 || firstFrame) {
       dirty--;
       pos.y = EYE + (reduceMotion ? 0 : Math.sin(walked * 3.4) * 0.022);
@@ -1923,6 +1992,99 @@ function startWorld(THREE) {
     }
     if (firstFrame) { firstFrame = false; window.__shopReady = true; $('splash').classList.add('done'); welcomeOnce(); }
   }
+  // -------------------------------------------------------------------------
+  // Other shoppers: a little figure for everyone else in the shop right now.
+  // -------------------------------------------------------------------------
+  const shoppers = new Map();          // their id -> figure and where it is heading
+  let channel = null, lastSent = 0, sentX = NaN, sentZ = NaN, sentYaw = NaN;
+  const faceTexture = () => canvasTexture(256, 128, (ctx, w, h) => {   // a simple friendly face; the front of a ball is a quarter of the way along its picture
+    ctx.fillStyle = '#f1c9a5'; ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = '#2b2b2b'; [-15, 15].forEach(dx => { ctx.beginPath(); ctx.arc(w / 4 + dx, h * 0.46, 5, 0, 7); ctx.fill(); });
+    ctx.strokeStyle = '#2b2b2b'; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.beginPath(); ctx.arc(w / 4, h * 0.56, 13, 0.25, Math.PI - 0.25); ctx.stroke();
+  });
+  const headMat = std(0xffffff, { map: faceTexture(), roughness: 0.7, emissive: 0xf1c9a5, emissiveIntensity: 0.25 }), legMat = std(0x37474f, { roughness: 0.8, emissive: 0x37474f, emissiveIntensity: 0.2 });
+  const bodyGeo = new THREE.CylinderGeometry(0.2, 0.27, 0.78, 16).translate(0, 0.99, 0), legGeo = new THREE.CylinderGeometry(0.24, 0.2, 0.6, 14).translate(0, 0.3, 0), headGeo = new THREE.SphereGeometry(0.19, 20, 14).translate(0, 1.6, 0);
+  function nameSprite(name) {
+    const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: canvasTexture(256, 64, (ctx, w, h) => {
+      ctx.font = `700 30px ${FONT}`; const tw = Math.min(w - 8, ctx.measureText(name).width + 28);
+      ctx.fillStyle = 'rgba(20,26,30,.78)'; roundRect(ctx, (w - tw) / 2, 8, tw, h - 16, 22); ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; fitOneLine(ctx, name, w - 30, 30, '700'); ctx.fillText(name, w / 2, h / 2 + 2);
+    }) }));
+    sprite.scale.set(0.9, 0.225, 1); sprite.position.y = 2.0; return sprite;
+  }
+  function dressShopper(s, name, color) {
+    if (s.color !== color) { s.color = color; s.body.material.color.set(color); s.body.material.emissive.set(color); }
+    if (s.name !== name) { s.name = name; if (s.label) { s.group.remove(s.label); s.label.material.map.dispose(); s.label.material.dispose(); } s.label = name ? nameSprite(name) : null; if (s.label) s.group.add(s.label); }
+  }
+  function removeShopper(id) { const s = shoppers.get(id); if (!s) return; scene.remove(s.group); s.body.material.dispose(); dressShopper(s, '', s.color); shoppers.delete(id); showPeople(); redraw(); }
+  // Someone said where they are. Nothing they send is trusted: positions are kept inside the room, names are cleaned.
+  function hearShopper(event, d) {
+    if (!d || typeof d.id !== 'string' || !/^[0-9a-f]{12}$/.test(d.id) || d.id === me.id) return;
+    if (event === 'bye') { removeShopper(d.id); return; }
+    if (event === 'hi') { setTimeout(() => sayHere(true), Math.random() * 600); return; }
+    if (event !== 'here' || !Number.isFinite(d.x) || !Number.isFinite(d.z) || !Number.isFinite(d.yaw)) return;
+    const now = performance.now(); let s = shoppers.get(d.id);
+    if (!s) {
+      if (shoppers.size >= 24) return;
+      const group = new THREE.Group(), body = new THREE.Mesh(bodyGeo, std(0xffffff, { roughness: 0.7, emissiveIntensity: 0.3 }));
+      group.add(body, new THREE.Mesh(legGeo, legMat), new THREE.Mesh(headGeo, headMat)); scene.add(group);
+      s = { group, body, label: null, name: null, color: null, x: 0, z: 0, yaw: 0, heard: 0, fresh: true }; shoppers.set(d.id, s); showPeople();
+    } else if (now - s.heard < 100) return;      // nobody needs to speak more than ten times a second
+    s.heard = now;
+    s.x = clamp(d.x, -HALF_W + 0.4, HALF_W - 0.4); s.z = clamp(d.z, -HALF_D + 0.4, HALF_D - 0.4); s.yaw = d.yaw;
+    dressShopper(s, cleanName(d.name), SHOPPER_COLORS.includes(d.color) ? d.color : SHOPPER_COLORS[2]);
+    if (s.fresh) { s.fresh = false; s.group.position.set(s.x, 0, s.z); s.group.rotation.y = s.yaw + Math.PI; }
+    redraw();
+  }
+  function sayHere(force = false) {
+    if (!channel || document.hidden) return;
+    const now = performance.now(), moved = Math.abs(pos.x - sentX) > 0.03 || Math.abs(pos.z - sentZ) > 0.03 || Math.abs(yaw - sentYaw) > 0.05;
+    if (!force && (!moved || now - lastSent < 250)) return;
+    lastSent = now; sentX = pos.x; sentZ = pos.z; sentYaw = yaw;
+    channel.send('here', { id: me.id, x: Math.round(pos.x * 100) / 100, z: Math.round(pos.z * 100) / 100, yaw: Math.round(yaw * 100) / 100, name: me.name, color: me.color });
+  }
+  // Each frame: glide every figure towards where it was last heard, and forget anyone silent for a while.
+  function tickShoppers(dt) {
+    if (!channel) return;
+    sayHere();
+    const now = performance.now(), k = 1 - Math.exp(-dt * 7);
+    shoppers.forEach((s, id) => {
+      if (now - s.heard > 14000) { removeShopper(id); return; }
+      const g = s.group, dx = s.x - g.position.x, dz = s.z - g.position.z, turn = Math.atan2(Math.sin(s.yaw + Math.PI - g.rotation.y), Math.cos(s.yaw + Math.PI - g.rotation.y));
+      if (Math.abs(dx) + Math.abs(dz) > 0.004 || Math.abs(turn) > 0.01) { g.position.x += dx * k; g.position.z += dz * k; g.rotation.y += turn * k; dirty = Math.max(dirty, 1); }
+      // Someone standing right where you are would fill the whole view, so they are not drawn until one of you steps away.
+      const near = Math.hypot(g.position.x - pos.x, g.position.z - pos.z) < 0.9;
+      if (g.visible === near) { g.visible = !near; dirty = Math.max(dirty, 1); }
+    });
+  }
+  function showPeople() {
+    const n = shoppers.size + 1;
+    $('people-count').textContent = n; $('people-title').textContent = !me.on ? 'Other shoppers are switched off' : n === 1 ? 'Just you in the shop' : `${n} people in the shop`;
+    $('people-btn').setAttribute('aria-label', `Other shoppers: ${n} in the shop`);
+  }
+  function setShoppers(on) {
+    if (on && !channel) { channel = shopperChannel(hearShopper, () => { channel.send('hi', { id: me.id }); sayHere(true); }); }
+    if (!on && channel) { channel.send('bye', { id: me.id }); channel.close(); channel = null; [...shoppers.keys()].forEach(removeShopper); }
+    showPeople();
+  }
+  if (SHOPPERS_ON) {
+    $('people-btn').hidden = false;
+    $('people-name').value = me.name; $('people-on').checked = me.on;
+    SHOPPER_COLORS.forEach(c => {
+      const b = el('button', { type: 'button', onclick: () => { me.color = c; saveMe(); paintColors(); sayHere(true); } }); b.style.background = c; b.dataset.color = c; b.setAttribute('aria-label', 'Colour ' + c); $('people-colors').append(b);
+    });
+    const paintColors = () => $('people-colors').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.color === me.color)));
+    paintColors();
+    $('people-btn').onclick = () => { const open = $('people').hidden; $('people').hidden = !open; $('people-btn').setAttribute('aria-expanded', String(open)); };
+    $('people-name').addEventListener('change', () => { me.name = cleanName($('people-name').value); $('people-name').value = me.name; saveMe(); sayHere(true); });
+    $('people-on').onchange = () => { me.on = $('people-on').checked; saveMe(); setShoppers(me.on); };
+    canvas.addEventListener('pointerdown', () => { if (!$('people').hidden) { $('people').hidden = true; $('people-btn').setAttribute('aria-expanded', 'false'); } });
+    setInterval(() => sayHere(true), 4000);                    // so people who just arrived see those standing still
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) sayHere(true); });
+    window.addEventListener('pagehide', () => { if (channel) channel.send('bye', { id: me.id }); });
+    setShoppers(me.on);
+  }
+
   applyStock();
   loadModels();
   frame();
