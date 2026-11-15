@@ -63,11 +63,16 @@
   .portrait { position: relative; width: 248px; height: 248px; flex: none; }
   .portrait::after { content: ""; position: absolute; inset: -28px; border-radius: 50%; background: radial-gradient(circle, rgba(94,234,212,.14), transparent 65%); pointer-events: none; }
   .portrait img { position: relative; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; border: 1px solid var(--line-strong); display: block; }
+  .aka { margin: 14px 0 0; font: 500 13px/1.5 var(--mono); letter-spacing: .04em; color: var(--muted); }
+  .aka b { color: var(--accent); font-weight: 600; }
 
-  /* ---------- Stats: flat, divided by hairlines ---------- */
-  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; padding: 36px 0 8px; border-top: 1px solid var(--line); }
-  .stat b { display: block; font-size: clamp(30px, 3.6vw, 42px); font-weight: 600; line-height: 1.05; letter-spacing: -.03em; }
-  .stat span { display: block; margin-top: 10px; font-size: 13.5px; line-height: 1.5; color: var(--muted); max-width: 22em; }
+  /* ---------- Photo strip: life, lately ---------- */
+  .strip-hint { margin: 30px 0 0; font: 500 11px/1 var(--mono); letter-spacing: .18em; text-transform: uppercase; color: var(--faint); }
+  .strip { display: flex; gap: 14px; overflow-x: auto; margin-top: 14px; padding-bottom: 10px; scroll-snap-type: x mandatory; scrollbar-width: thin; }
+  .strip figure { flex: 0 0 232px; margin: 0; scroll-snap-align: start; }
+  .strip img { width: 100%; height: 290px; object-fit: cover; border-radius: 14px; border: 1px solid var(--line); display: block; }
+  .strip figcaption { margin-top: 10px; font-size: 13.5px; line-height: 1.5; color: var(--muted); }
+  .strip figcaption b { color: var(--ink); font-weight: 600; }
 
   /* ---------- Sections ---------- */
   main { padding-bottom: 8px; }
@@ -109,7 +114,6 @@
   .role ul { margin: 0; padding-left: 18px; color: var(--muted); }
   .role li { margin-bottom: 9px; }
   .role li::marker { color: var(--faint); }
-  mark { background: var(--accent-dim); color: #99f6e4; font-weight: 500; padding: 1px 4px; border-radius: 4px; }
 
   /* Expertise: flat areas, hairline tops, ghost chips */
   .skills { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 32px 28px; }
@@ -168,7 +172,7 @@
     nav ul { display: none; }
     .hero .wrap { grid-template-columns: 1fr; padding-top: 64px; padding-bottom: 64px; gap: 32px; }
     .portrait { width: 164px; height: 164px; order: -1; }
-    .stats { grid-template-columns: 1fr 1fr; gap: 24px 20px; }
+    .strip figure { flex-basis: 200px; } .strip img { height: 240px; }
     .two { grid-template-columns: 1fr; gap: 0; }
     .two > div + div { margin-top: 72px; }
     .feature, .project { grid-template-columns: 1fr; padding: 22px; gap: 24px; }
@@ -184,7 +188,7 @@
     @page { size: A4; margin: 11mm 13mm; }
     body { font-size: 9pt; line-height: 1.38; }
     .wrap { max-width: none; padding: 0; }
-    nav, .cage, .portrait::after, .open, #structure, #collab, .shot, .feature-art, footer, .project .chips, .invite { display: none !important; }
+    nav, .cage, .portrait::after, .open, #structure, #collab, .shot, .feature-art, footer, .project .chips, .invite, .aka, .strip-hint, .strip { display: none !important; }
     .hero .wrap { padding: 0 0 7pt; gap: 14pt; }
     .hero::before { display: none; }
     .eyebrow { margin-bottom: 4pt; color: #333; } .eyebrow::before { display: none; }
@@ -193,14 +197,12 @@
     .contact { gap: 0 12pt; } .contact a, .contact span, .contact a.primary { background: none; border: 0; color: #111; padding: 0; font-size: 8.5pt; gap: 3pt; }
     .contact a[download] { display: none; } svg.i { width: 9pt; height: 9pt; }
     .portrait { width: 62pt; height: 62pt; } .portrait img { border: 1pt solid #999; }
-    .stats { margin-top: 0; gap: 5pt; padding-top: 7pt; } .stat b { font-size: 13pt; } .stat span { font-size: 7pt; margin-top: 1pt; line-height: 1.3; }
     section { padding-top: 9pt; } .label { margin-bottom: 5pt; font-size: 7pt; gap: 8pt; }
     .summary-text { font-size: 9.5pt !important; line-height: 1.4 !important; max-width: none !important; }
     h2 { font-size: 12pt; } h3 { font-size: 10.5pt; }
     .timeline { padding-left: 14pt; } .timeline::before { left: 3pt; width: 1pt; } .role::before { left: -14pt; top: 4pt; width: 6pt; height: 6pt; box-shadow: none !important; }
     .role { padding-bottom: 6pt; break-inside: avoid; } .where { margin: 0 0 2pt; font-size: 8.5pt; } .when { font-size: 8pt; }
     .role ul { padding-left: 11pt; } .role li { margin-bottom: 1pt; }
-    mark { background: none; color: #111; }
     .skills { display: block; } .skill { border: 0; padding: 0 0 2pt; } .skill h3 { font: 700 8.5pt/1.35 var(--sans); margin: 0; } .skill h3 svg { display: none; } .skill h3::after { content: ":"; }
     .chips { gap: 0; } .chips li { border: 0; padding: 0; font-size: 8.5pt; border-radius: 0; color: #111; } .chips li:not(:last-child)::after { content: ",\00a0"; }
     .pubs { gap: 4pt; } .pub { padding: 0 0 0 7pt; border: 0; border-top: 0; border-left: 2pt solid #7a5a1c; border-radius: 0; break-inside: avoid; }
@@ -210,7 +212,6 @@
     .outside { display: block; } .outside li { display: inline; padding: 0; border: 0; } .outside svg, .outside span { display: none; } .outside b { display: inline; font: 400 9pt/1.4 var(--sans); } .outside li:not(:last-child) b::after { content: " · "; }
     .js .reveal { opacity: 1 !important; transform: none !important; }
     .hero .wrap { grid-template-columns: 1fr auto !important; align-items: start; } .portrait { order: 0 !important; }
-    .stats { grid-template-columns: repeat(4, 1fr) !important; }
     .two { grid-template-columns: 1fr 1fr !important; } .two > div + div { margin-top: 0 !important; }
   }
 </style>
@@ -237,6 +238,7 @@
     <div>
       <p class="eyebrow">R&amp;D Scientist · Singapore</p>
       <h1>Tan Kwan Ann</h1>
+      <p class="aka">also known as <b>鲍鱼王</b> · the Abalone King</p>
       <p class="lede">I engineer enzymes for industry and solve protein structures — from <b>variant design and cloning</b> through <b>high-throughput screening</b> to <b>formulation and lyophilization</b>. PhD in structural biology, based in Singapore.</p>
       <p class="open"><i></i>Open to collaborations</p>
       <ul class="contact">
@@ -252,16 +254,9 @@
 </header>
 
 <main class="wrap">
-  <div class="stats reveal" aria-label="Highlights">
-    <div class="stat"><b>1,100+</b><span>enzyme variants constructed and screened</span></div>
-    <div class="stat"><b>300–400</b><span>variants per week through high-throughput screening</span></div>
-    <div class="stat"><b>60%</b><span>activity kept at 60% DMSO by the lead GDH mutant (wild type: &lt;10%)</span></div>
-    <div class="stat"><b>2.9 Å</b><span>Cryo-EM structure of the QmcA–YbbJ complex</span></div>
-  </div>
-
   <section id="summary" class="reveal">
     <p class="label">Summary</p>
-    <p class="summary-text">R&amp;D scientist (PhD, structural biology) with industrial experience in enzyme engineering, biocatalyst development and protein process development. At Allozymes, core driver of two industrial enzyme-engineering projects, engineering a DMSO-tolerant glucose dehydrogenase that keeps working where the wild type fails. Covers the full loop from variant design and cloning to screening, expression, formulation and lyophilization, backed by a 2.9 Å Cryo-EM structure and peer-reviewed publications.</p>
+    <p class="summary-text">R&amp;D scientist (PhD, structural biology) with industrial experience in enzyme engineering, biocatalyst development and protein process development. At Allozymes, on the two-person core team behind two industrial enzyme-engineering projects, engineering a DMSO-tolerant glucose dehydrogenase that keeps working where the wild type fails. Covers the full loop from variant design and cloning to screening, expression, formulation and lyophilization, backed by a 2.9 Å Cryo-EM structure and peer-reviewed publications.</p>
   </section>
 
   <section id="structure" class="reveal">
@@ -287,11 +282,11 @@
         <header><h3>Scientist I</h3><span class="when">Nov 2025 – Present</span></header>
         <p class="where">Allozymes Pte Ltd · Singapore</p>
         <ul>
-          <li>Core driver of two confidential industrial enzyme-engineering projects, each with a core team of two: one improving glucose dehydrogenase (GDH) activity and solvent tolerance for cofactor recycling, the other targeting a separate industrial application.</li>
-          <li>Developed and validated high-throughput screening workflows (UV-Vis plate reader, GC, HPLC) supporting <mark>300–400 variants per week</mark>, and characterized activity, stability, solvent tolerance and cofactor specificity under industrially relevant conditions.</li>
-          <li>Constructed and screened <mark>1,100+ enzyme variants</mark> to engineer DMSO-tolerant GDH; the lead mutant retained <mark>60% activity at 60% DMSO</mark>, versus &lt;10% for wild type.</li>
+          <li>On the core team (of two) for two confidential industrial enzyme-engineering projects: one improving glucose dehydrogenase (GDH) activity and solvent tolerance for cofactor recycling, the other targeting a separate industrial application.</li>
+          <li>Developed and validated high-throughput screening workflows (UV-Vis plate reader, GC, HPLC), and characterized activity, stability, solvent tolerance and cofactor specificity under industrially relevant conditions.</li>
+          <li>Built and screened large variant libraries to engineer DMSO-tolerant GDH; the lead mutant kept working where the wild type gave up (60% activity at 60% DMSO, versus &lt;10%).</li>
           <li>Designed cloning workflows (Golden Gate, Gibson, site-directed mutagenesis) and optimized recombinant expression, induction and cultivation conditions.</li>
-          <li>Developed and transferred a lyophilized-protein stability assay (reconstituted GDH activity via NADH formation) to track week-by-week activity retention; lyophilized powder retained <mark>at least 75% activity after 22 days</mark> at both 4&nbsp;°C and −20&nbsp;°C.</li>
+          <li>Developed and transferred a lyophilized-protein stability assay (reconstituted GDH activity via NADH formation) to track week-by-week activity retention; lyophilized powder kept at least 75% activity after 22 days at both 4&nbsp;°C and −20&nbsp;°C.</li>
           <li>Contributed to downstream process development (lysis optimization, formulation, lyophilization workflows) and authored SOPs to support reproducibility and knowledge transfer.</li>
         </ul>
       </li>
@@ -299,9 +294,9 @@
         <header><h3>Postgraduate Researcher</h3><span class="when">Aug 2021 – Aug 2025</span></header>
         <p class="where">Nanyang Technological University (NTU) · Singapore</p>
         <ul>
-          <li>Led a multi-year structural biology project on membrane protein complexes, solving a <mark>2.9 Å Cryo-EM structure</mark> of the QmcA–YbbJ complex, a 26-heterodimer cage (co-first author, <i>Structure</i>, 2024).</li>
+          <li>Led a multi-year structural biology project on membrane protein complexes, solving a 2.9 Å Cryo-EM structure of the QmcA–YbbJ complex, a 26-heterodimer cage (co-first author, <i>Structure</i>, 2024).</li>
           <li>Optimized recombinant expression and purification workflows to improve throughput and sample quality; applied Cryo-EM and MALDI-TOF/TOF for structural characterization.</li>
-          <li>Planned experiments, delegated work and guided <mark>4 junior researchers</mark> through execution and troubleshooting; presented findings to scientific stakeholders.</li>
+          <li>Planned experiments, delegated work and guided 4 junior researchers through execution and troubleshooting; presented findings to scientific stakeholders.</li>
           <li>Supported 2 classes of 30+ students, training them in Python.</li>
         </ul>
       </li>
@@ -403,6 +398,16 @@
       <li><svg class="i" viewBox="0 0 24 24"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M13.500 5l-3 14"/></svg><div><b>Apprentice vibe-coder</b><span>Learning to build software by describing it, one small shop at a time.</span></div></li>
       <li><svg class="i" viewBox="0 0 24 24"><path d="m3 19 6-11 4 7 2-3 6 7z"/><circle cx="17" cy="6" r="2"/></svg><div><b>Hiking</b><span>Happiest on a trail.</span></div></li>
     </ul>
+    <p class="strip-hint">Life, lately · scroll →</p>
+    <div class="strip">
+      <figure><img src="ka-abalone.jpg" alt="A braised abalone on a plate" loading="lazy"><figcaption><b>鲍鱼王</b> in action. The abalone never stood a chance.</figcaption></figure>
+      <figure><img src="ka-lab.jpg" alt="Three sample tubes in a rack, held by a gloved hand" loading="lazy"><figcaption>At the bench. Three tubes, two of them doing something.</figcaption></figure>
+      <figure><img src="ka-wedding.jpg" alt="Kwan Ann with friends at a wedding" loading="lazy"><figcaption>Professional wedding guest. Thumbs up included.</figcaption></figure>
+      <figure><img src="ka-walk.jpg" alt="Map of a 7.86 km outdoor walk" loading="lazy"><figcaption>7.86 km walk. Mostly circles, apparently.</figcaption></figure>
+      <figure><img src="ka-chips.jpg" alt="A packet of Oishi potato chips in a supermarket" loading="lazy"><figcaption>Snack research. Very serious work.</figcaption></figure>
+      <figure><img src="ka-tesla.jpg" alt="Kwan Ann in a Tesla cap and polo at the Tesla store" loading="lazy"><figcaption>Sells Teslas on the side.</figcaption></figure>
+      <figure><img src="ka-sauna.jpg" alt="Kwan Ann relaxing in a sauna" loading="lazy"><figcaption>Sauna mode: off.</figcaption></figure>
+    </div>
   </section>
 
   <section id="collab" class="reveal">
