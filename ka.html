@@ -149,17 +149,25 @@
   .wink { display: inline-block; margin-top: 9px; padding: 3px 8px; border-radius: 999px; background: rgba(245,194,107,.12); color: var(--a3); font: 500 10.5px/1.2 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
 
   /* Feature panels: featured structure and the side project */
-  .feature { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 44px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 26px; padding: 30px; }
+  .feature { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr); gap: 44px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 26px; padding: 30px; }
   .feature p { margin: 10px 0 0; color: var(--muted); max-width: 40em; }
   .feature .chips { margin-top: 18px; }
-  .feature-art { position: relative; aspect-ratio: 1; border-radius: 20px; overflow: hidden; background: radial-gradient(circle at 50% 42%, #17172a, #0a0a10 70%); border: 1px solid var(--line); cursor: grab; touch-action: pan-y; }
+  .feature-art { position: relative; aspect-ratio: 1; border-radius: 20px; overflow: hidden; background: radial-gradient(circle at 50% 46%, #1a1a32, #0a0a10 72%); border: 1px solid var(--line); cursor: grab; touch-action: pan-y; }
   .feature-art.drag { cursor: grabbing; }
-  .feature-art canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
-  .art-note { position: absolute; left: 12px; bottom: 10px; right: 12px; display: flex; justify-content: space-between; gap: 8px; font: 500 10.5px/1.3 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); pointer-events: none; }
-  .real { position: absolute; right: 10px; top: 10px; text-decoration: none; width: 74px; border-radius: 12px; overflow: hidden; background: #fff; border: 1px solid var(--line-strong); box-shadow: 0 8px 24px rgba(0,0,0,.5); transition: transform .25s; display: block; }
-  .real:hover { transform: scale(1.06) rotate(2deg); }
-  .real img { display: block; width: 100%; height: auto; }
-  .real span { display: block; padding: 3px 0 4px; background: #0d0d11; color: var(--muted); font: 500 8.5px/1.2 var(--mono); letter-spacing: .08em; text-align: center; text-transform: uppercase; }
+  .feature-art canvas { position: absolute; inset: 0; width: 100%; height: 100%; outline-offset: -4px; }
+  .art-legend { position: absolute; left: 14px; top: 12px; right: 14px; display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 0; font: 500 11.5px/1.3 var(--mono); letter-spacing: .04em; color: var(--muted); pointer-events: none; }
+  .art-legend i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 7px; vertical-align: -1px; }
+  .art-ui { position: absolute; left: 12px; right: 12px; bottom: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+  .seg { display: inline-flex; padding: 3px; border-radius: 999px; background: rgba(6,6,8,.72); border: 1px solid var(--line-strong); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+  .seg button, .art-reset { padding: 8px 13px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font: 500 12px/1 var(--sans); cursor: pointer; transition: color .2s, background .2s; }
+  .seg button:hover, .art-reset:hover { color: var(--ink); }
+  .seg button[aria-pressed="true"] { background: var(--ink); color: #060608; font-weight: 600; }
+  .art-reset { border: 1px solid var(--line-strong); background: rgba(6,6,8,.72); }
+  @media (pointer: coarse) { .seg button, .art-reset { padding: 11px 15px; } }
+  .art-status { position: absolute; inset: 0; display: grid; place-content: center; gap: 10px; margin: 0; padding: 24px; text-align: center; color: var(--muted); font-size: 14px; }
+  .art-status a { color: var(--a1); font-weight: 500; }
+  .art-credit { position: absolute; left: 14px; bottom: 58px; margin: 0; font: 500 10px/1.3 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--faint); pointer-events: none; }
+  .feature .how { font-size: 14px; color: var(--faint); max-width: 36em; }
   .tag { display: inline-block; font: 500 11.5px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--a1); margin-bottom: 12px; }
   .links { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 20px !important; }
   .links a { color: var(--ink); font-weight: 500; text-decoration: none; border-bottom: 1px solid var(--line-strong); padding-bottom: 1px; transition: border-color .2s, color .2s; }
@@ -277,7 +285,7 @@
   .js .reveal.in { opacity: 1; transform: none; }
 
   @media (max-width: 960px) {
-    .feature { grid-template-columns: 280px minmax(0, 1fr); gap: 30px; }
+    .feature { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 30px; }
     .gallery { column-count: 2; }
   }
   @media (max-width: 820px) {
@@ -293,10 +301,10 @@
     .about, .two, .feature, .project { grid-template-columns: 1fr; }
     .about { gap: 36px; } .two { gap: 0; } .two > div + div { margin-top: 76px; }
     .feature, .project { padding: 20px; gap: 24px; }
-    .feature-art { max-width: 340px; width: 100%; margin: 0 auto; }
+    .feature-art { max-width: 460px; width: 100%; margin: 0 auto; aspect-ratio: 4 / 5; }
     .invite { padding: 52px 22px; border-radius: 24px; }
   }
-  @media (max-width: 480px) { .king small { display: none; } .king { padding-right: 14px; } }
+  @media (max-width: 480px) { .king small { display: none; } .king { padding-right: 14px; } .art-credit { display: none; } }
   @media (max-width: 420px) { .nums { grid-template-columns: 1fr 1fr; gap: 10px; } .num { padding: 16px 14px; } .gallery { column-gap: 12px; } .gallery li { margin-bottom: 12px; } .gallery figure { padding: 6px 6px 10px; } .gallery figcaption { font-size: 12.5px; margin: 9px 3px 0; } }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
@@ -385,7 +393,7 @@
       <p class="status"><i></i>Open to collaborations <span>· Singapore Citizen</span></p>
       <p class="print-only">Singapore · Singapore Citizen</p>
     </div>
-    <div class="orbit" id="orbit" role="img" aria-label="Portrait of Tan Kwan Ann with a ring of 26 glowing pairs of dots orbiting it, like the protein cage solved during the PhD. Drag to spin.">
+    <div class="orbit" id="orbit" role="img" aria-label="Portrait of Tan Kwan Ann with a ring of 26 glowing pairs of dots orbiting it, echoing the 26 protein pairs of the structure solved during the PhD. Drag to spin.">
       <canvas class="back" aria-hidden="true"></canvas>
       <div class="portrait"><img src="ka-photo.jpg" alt="" width="230" height="230" fetchpriority="high"></div>
       <canvas class="front" aria-hidden="true"></canvas>
@@ -422,15 +430,22 @@
   <section id="structure" aria-labelledby="h-structure">
     <h2 class="label reveal" id="h-structure">Featured structure</h2>
     <div class="feature reveal">
-      <div class="feature-art" id="art" role="img" aria-label="A stylised, spinning cage of 26 pairs of dots. Drag to rotate it.">
-        <canvas aria-hidden="true"></canvas>
-        <a class="real" href="https://www.rcsb.org/structure/8Z5G" rel="noopener" aria-label="See the real structure, PDB 8Z5G, on the Protein Data Bank"><img src="https://cdn.rcsb.org/images/structures/8z5g_assembly-1.jpeg" alt="" loading="lazy" onerror="this.parentNode.remove()"><span>The real one</span></a>
-        <p class="art-note" aria-hidden="true"><span>Stylised, not to scale</span><span>drag to spin</span></p>
+      <div class="feature-art" id="art" role="group" aria-label="Interactive 3D model of the structure, PDB 8Z5G">
+        <canvas id="struct" tabindex="0" role="img" aria-label="The protein backbone of PDB 8Z5G: a wheel-shaped ring of 26 QmcA and 26 YbbJ proteins. Drag to turn it; arrow keys also turn it." aria-describedby="struct-help"></canvas>
+        <p class="sr" id="struct-help">Drag to turn the model, or use the arrow keys when it is focused. Press Home to reset. The buttons below change the colouring.</p>
+        <p class="art-legend" id="legend" aria-hidden="true"><span><i style="background:#5eead4"></i>QmcA ×26</span><span><i style="background:#a78bfa"></i>YbbJ ×26</span></p>
+        <p class="art-status" id="art-status" role="status">Loading the structure…<noscript> This model needs JavaScript. <a href="https://www.rcsb.org/3d-view/8Z5G" rel="noopener">See it on the Protein Data Bank</a>.</noscript></p>
+        <p class="art-credit" aria-hidden="true">Backbone drawn from the deposited coordinates · PDB 8Z5G</p>
+        <div class="art-ui">
+          <span class="seg" role="group" aria-label="Colouring"><button type="button" data-mode="0" aria-pressed="true">Two proteins</button><button type="button" data-mode="1" aria-pressed="false">Each pair</button></span>
+          <button class="art-reset" type="button" id="art-reset" aria-label="Reset view">Reset</button>
+        </div>
       </div>
       <div>
         <span class="tag">PDB 8Z5G · Cryo-EM · 2.9 Å</span>
         <h3 style="font-size:clamp(26px,3.2vw,36px);letter-spacing:-.035em">The QmcA–YbbJ complex</h3>
         <p>A membrane protein cage built from 26 heterodimers of the SPFH-family protein QmcA and its NfeD partner YbbJ, from <i>E. coli</i>. Solved during my PhD at NTU and published in <i>Structure</i> (2024) as co-first author.</p>
+        <p class="how">How to read it: every line is a protein chain with one point per amino acid, and the little coils are helices. 52 chains, 11,024 amino acids, 26 identical pairs round a ring about 26&nbsp;nm across.</p>
         <p class="links"><a href="https://www.rcsb.org/structure/8Z5G" rel="noopener">View on the Protein Data Bank →</a><a href="https://www.rcsb.org/3d-view/8Z5G" rel="noopener">Turn it around in 3D →</a><a href="https://doi.org/10.1016/j.str.2024.07.022" rel="noopener">Read the paper →</a></p>
       </div>
     </div>
@@ -643,58 +658,112 @@
   const wordEl = $('#word');
   if (!reduce) { let i = 0; setInterval(() => { if (document.hidden) return; wordEl.classList.add('out'); setTimeout(() => { i = (i + 1) % words.length; wordEl.textContent = words[i]; wordEl.classList.remove('out'); }, 320); }, 2700); }
 
-  // ----- The cage: 26 pairs of dots on a sphere, drawn in 3D -----
-  function makeCage(root, opts = {}) {
-    const canvases = $$('canvas', root), back = canvases[0], front = canvases[1] || null, cb = back.getContext('2d'), cf = front ? front.getContext('2d') : cb;
-    const N = 26, GA = Math.PI * (3 - Math.sqrt(5)), len = v => Math.hypot(v[0], v[1], v[2]), unit = v => { const l = len(v); return [v[0] / l, v[1] / l, v[2] / l]; };
-    const P = Array.from({ length: N }, (_, i) => { const y = 1 - (i + .5) * 2 / N, r = Math.sqrt(1 - y * y), t = i * GA; return [Math.cos(t) * r, y, Math.sin(t) * r]; });
-    const edges = [], seen = new Set();
-    P.forEach((p, i) => P.map((q, j) => [j, (p[0] - q[0]) ** 2 + (p[1] - q[1]) ** 2 + (p[2] - q[2]) ** 2]).filter(([j]) => j !== i).sort((a, b) => a[1] - b[1]).slice(0, 3).forEach(([j]) => { const k = i < j ? i + '-' + j : j + '-' + i; if (!seen.has(k)) { seen.add(k); edges.push([i, j]); } }));
-    const dimers = P.map(p => { let t = [-p[2], 0, p[0]]; if (len(t) < .25) t = [0, p[2], -p[1]]; t = unit(t).map(v => v * .09); return [unit([p[0] + t[0], p[1] + t[1], p[2] + t[2]]), unit([p[0] - t[0], p[1] - t[1], p[2] - t[2]])]; });
-    let ay = opts.ay ?? .6, ax = opts.ax ?? .4, vy = 0, vx = 0, drag = null, idle = 9, raf = 0, last = 0, visible = true, W = 1, H = 1;
-    const auto = reduce ? 0 : (opts.speed ?? .28);
-    function size() { const dpr = Math.min(devicePixelRatio || 1, 2); W = back.clientWidth || 1; H = back.clientHeight || 1; canvases.forEach(c => { c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); }); [cb, cf].forEach(c => c.setTransform(dpr, 0, 0, dpr, 0, 0)); kick(); }
-    function project(v) { const ca = Math.cos(ay), sa = Math.sin(ay), cx = Math.cos(ax), sx = Math.sin(ax); const x1 = v[0] * ca + v[2] * sa, z1 = -v[0] * sa + v[2] * ca, y2 = v[1] * cx - z1 * sx, z2 = v[1] * sx + z1 * cx; const s = 3.6 / (3.6 - z2); return { x: W / 2 + x1 * R * s, y: H / 2 + y2 * R * s, z: z2, s }; }
-    let R = 100;
-    function draw() {
-      R = Math.min(W, H) / 2 * (opts.fill ?? .8);
-      cb.clearRect(0, 0, W, H); if (front) cf.clearRect(0, 0, W, H);
-      const pr = P.map(project), items = [];
-      edges.forEach(([i, j]) => { const a = pr[i], b = pr[j], z = (a.z + b.z) / 2; items.push({ z, edge: [a, b] }); });
-      dimers.forEach((d, i) => { const a = project(d[0]), b = project(d[1]); items.push({ z: pr[i].z, dimer: [a, b], node: pr[i] }); });
-      items.sort((p, q) => p.z - q.z);
-      for (const it of items) {
-        const ctx = front && it.z >= 0 ? cf : cb; let depth = clamp((it.z + 1.15) / 2.3, 0, 1);
-        // Dots drifting in front of the portrait fade out, so they never cover the face.
-        const fade = opts.avoid && front && it.z >= 0 && it.node ? clamp((Math.hypot(it.node.x - W / 2, it.node.y - H / 2) - W * opts.avoid) / (W * .07), .12, 1) : 1;
-        if (fade < 1) depth *= fade;
-        if (it.edge) { const [a, b] = it.edge; ctx.strokeStyle = `rgba(255,255,255,${.04 + depth * .2})`; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); }
-        else {
-          const [a, b] = it.dimer, rr = R * .036 * it.node.s;
-          ctx.strokeStyle = `rgba(255,255,255,${.12 + depth * .45})`; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
-          [[a, '94,234,212'], [b, '167,139,250']].forEach(([q, col]) => { ctx.shadowColor = `rgba(${col},${depth})`; ctx.shadowBlur = it.z > 0 ? 14 * depth : 0; ctx.fillStyle = `rgba(${col},${.3 + depth * .7})`; ctx.beginPath(); ctx.arc(q.x, q.y, rr * (.8 + depth * .5), 0, 7); ctx.fill(); });
-          ctx.shadowBlur = 0;
-        }
-      }
-    }
+  // ----- Shared by the halo and the structure: a drag-to-turn 3D view that only draws while it is on screen -----
+  function turner(root, opts) {
+    // opts: { yaw, tilt, tiltSwing, auto, pitchSign, minGap, draw(yaw, pitch) }
+    let yaw = opts.yaw ?? 0, pitch = opts.tilt, vy = 0, vx = 0, drag = null, idle = 9, raf = 0, last = 0, visible = true, clock = 0, since = 0;
+    const auto = reduce ? 0 : opts.auto, gap = opts.minGap || 0, sign = opts.pitchSign || 1;
     function frame(t) {
-      raf = 0; const dt = Math.min(.05, (t - last) / 1000 || .016); last = t;
-      if (!drag) { idle += dt; ay += (vy + (idle > 1.4 ? auto : 0)) * dt; ax += vx * dt; const k = Math.exp(-dt * 2.2); vy *= k; vx *= k; if (idle > 1.4) ax += ((opts.ax ?? .4) - ax) * Math.min(1, dt * .8); }
-      draw();
-      if (visible && !document.hidden && (auto || drag || Math.abs(vy) > .02 || Math.abs(vx) > .02 || Math.abs((opts.ax ?? .4) - ax) > .01)) raf = requestAnimationFrame(frame);
+      raf = 0; since += Math.min(.05, (t - last) / 1000 || .016); last = t;
+      if (since * 1000 < gap && !drag) { raf = requestAnimationFrame(frame); return; }
+      const step = since; since = 0; clock += step;
+      if (!drag) { idle += step; yaw += (vy + (idle > 1.4 ? auto : 0)) * step; pitch += vx * step; const k = Math.exp(-step * 2.2); vy *= k; vx *= k; if (idle > 1.4) pitch += (opts.tilt + (reduce ? 0 : (opts.tiltSwing || 0) * Math.sin(clock * .45)) - pitch) * Math.min(1, step * .8); }
+      opts.draw(yaw, pitch);
+      if (visible && !document.hidden && (auto || drag || Math.abs(vy) > .02 || Math.abs(vx) > .02 || Math.abs(opts.tilt - pitch) > .01)) raf = requestAnimationFrame(frame);
     }
-    function kick() { if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); } }
-    root.addEventListener('pointerdown', e => { if (e.button) return; drag = { x: e.clientX, y: e.clientY, t: performance.now() }; idle = 0; vy = vx = 0; root.classList.add('drag'); try { root.setPointerCapture(e.pointerId); } catch (err) {} kick(); });
-    root.addEventListener('pointermove', e => { if (!drag) return; const now = performance.now(), dx = e.clientX - drag.x, dy = e.clientY - drag.y, dt = Math.max(8, now - drag.t); ay += dx * .009; ax = clamp(ax + dy * .009, -1.25, 1.25); vy = clamp(dx / dt * 9, -6, 6); vx = clamp(dy / dt * 9, -4, 4); drag = { x: e.clientX, y: e.clientY, t: now }; });
+    const kick = () => { if (!raf) { last = performance.now(); since = 0; raf = requestAnimationFrame(frame); } };
+    root.addEventListener('pointerdown', e => { if (e.button || (e.target.closest && e.target.closest('button, a'))) return; drag = { x: e.clientX, y: e.clientY, t: performance.now() }; idle = 0; vy = vx = 0; root.classList.add('drag'); try { root.setPointerCapture(e.pointerId); } catch (err) {} kick(); });
+    root.addEventListener('pointermove', e => { if (!drag) return; const now = performance.now(), dx = e.clientX - drag.x, dy = e.clientY - drag.y, dt = Math.max(8, now - drag.t); yaw += dx * .009; pitch = clamp(pitch + dy * .009 * sign, -1.5, 1.5); vy = clamp(dx / dt * 9, -6, 6); vx = clamp(dy / dt * 9 * sign, -4, 4); drag = { x: e.clientX, y: e.clientY, t: now }; });
     const release = () => { if (!drag) return; drag = null; idle = 0; root.classList.remove('drag'); kick(); };
     root.addEventListener('pointerup', release); root.addEventListener('pointercancel', release);
-    new ResizeObserver(size).observe(back);
     new IntersectionObserver(es => { visible = es[0].isIntersecting; if (visible) kick(); }).observe(root);
     document.addEventListener('visibilitychange', () => { if (!document.hidden) kick(); });
-    size();
+    return { kick, turn(dy, dp) { yaw += dy; pitch = clamp(pitch + dp, -1.5, 1.5); idle = 0; kick(); }, reset() { yaw = opts.yaw ?? 0; pitch = opts.tilt; vy = vx = 0; idle = 0; kick(); }, now: () => [yaw, pitch] };
   }
-  makeCage($('#orbit'), { fill: .92, ay: .5, ax: .38, avoid: .27 });
-  makeCage($('#art'), { fill: .68, ay: 2.2, ax: .5, speed: .34 });
+  function fitCanvases(canvases, redraw, maxDpr = 2) {
+    const size = () => { const dpr = Math.min(devicePixelRatio || 1, maxDpr); canvases.forEach(c => { c.width = Math.max(1, Math.round(c.clientWidth * dpr)); c.height = Math.max(1, Math.round(c.clientHeight * dpr)); }); redraw(); };
+    new ResizeObserver(size).observe(canvases[0]); size();
+  }
+
+  // ----- The halo around the portrait: 26 pairs in a ring, like the 26 QmcA–YbbJ pairs of the real structure -----
+  function makeRing(root) {
+    const [back, front] = $$('canvas', root), cb = back.getContext('2d'), cf = front.getContext('2d'), N = 26, TAU = Math.PI * 2;
+    // Proportions follow the real structure (ring axis up): QmcA sits inside and lower, YbbJ outside and higher. Opened up a little to leave room for the portrait.
+    const R1 = .66, R2 = 1, H1 = -.11, H2 = .2, A = [], B = [];
+    for (let k = 0; k < N; k++) { const t = k / N * TAU, c = Math.cos(t), s = Math.sin(t); A.push([c * R1, H1, s * R1]); B.push([c * R2, H2, s * R2]); }
+    function draw(ay, ax) {
+      const W = back.width, H = back.height, d = W / (back.clientWidth || 1), R = Math.min(W, H) / 2 * .9, ca = Math.cos(ay), sa = Math.sin(ay), cx = Math.cos(ax), sx = Math.sin(ax);
+      const pr = v => { const x1 = v[0] * ca + v[2] * sa, z1 = -v[0] * sa + v[2] * ca, y2 = v[1] * cx - z1 * sx, z2 = v[1] * sx + z1 * cx, s = 3.6 / (3.6 - z2); return { x: W / 2 + x1 * R * s, y: H / 2 - y2 * R * s, z: z2, s }; };
+      cb.clearRect(0, 0, W, H); cf.clearRect(0, 0, W, H);
+      const a = A.map(pr), b = B.map(pr), items = [];
+      for (let k = 0; k < N; k++) { const n = (k + 1) % N; items.push({ z: (a[k].z + b[k].z) / 2, e: [a[k], b[k]], link: true }, { z: (a[k].z + a[n].z) / 2, e: [a[k], a[n]] }, { z: (b[k].z + b[n].z) / 2, e: [b[k], b[n]] }, { z: Math.max(a[k].z, b[k].z), dot: [a[k], b[k]] }); }
+      items.sort((p, q) => p.z - q.z);
+      for (const it of items) {
+        const ctx = it.z >= 0 ? cf : cb; let depth = clamp((it.z + 1.1) / 2.2, 0, 1);
+        const pt = it.e ? it.e[0] : it.dot[0], fade = it.z >= 0 ? clamp((Math.hypot(pt.x - W / 2, pt.y - H / 2) - W * .27) / (W * .07), .12, 1) : 1;   // anything in front of the portrait fades, so it never covers the face
+        depth *= fade;
+        if (it.e) { ctx.strokeStyle = `rgba(255,255,255,${(it.link ? .14 : .05) + depth * (it.link ? .5 : .2)})`; ctx.lineWidth = d * (it.link ? 1.3 : 1); ctx.beginPath(); ctx.moveTo(it.e[0].x, it.e[0].y); ctx.lineTo(it.e[1].x, it.e[1].y); ctx.stroke(); }
+        else [[it.dot[0], '94,234,212', .8], [it.dot[1], '167,139,250', 1]].forEach(([q, col, size]) => { ctx.shadowColor = `rgba(${col},${depth})`; ctx.shadowBlur = it.z > 0 ? 14 * d * depth : 0; ctx.fillStyle = `rgba(${col},${.3 + depth * .7})`; ctx.beginPath(); ctx.arc(q.x, q.y, R * .034 * size * q.s * (.8 + depth * .5), 0, 7); ctx.fill(); ctx.shadowBlur = 0; });
+      }
+    }
+    const ring = turner(root, { yaw: .3, tilt: .95, tiltSwing: .1, auto: .32, draw });
+    fitCanvases([back, front], () => { const [y, p] = ring.now(); draw(y, p); ring.kick(); });
+  }
+
+  // ----- The real structure: the protein backbone (one point per amino acid) of PDB 8Z5G -----
+  function parseStructure(buf) {
+    const v = new DataView(buf); if (String.fromCharCode(v.getUint8(0), v.getUint8(1), v.getUint8(2), v.getUint8(3)) !== '8Z5G') throw new Error('not the structure file');
+    const nCh = v.getUint16(5, true), total = v.getUint16(7, true), scale = v.getFloat32(9, true), k = scale / 135;   // 135 Å: the ring's outer radius (130 Å) becomes about 1
+    let o = 13; const ent = [], pair = [], cnt = [];
+    for (let i = 0; i < nCh; i++) { ent.push(v.getUint8(o)); pair.push(v.getUint8(o + 1)); cnt.push(v.getUint16(o + 2, true)); o += 4; }
+    const X = new Float32Array(total), Y = new Float32Array(total), Z = new Float32Array(total);
+    for (let i = 0; i < total; i++, o += 6) { X[i] = v.getInt16(o, true) * k; Y[i] = v.getInt16(o + 2, true) * k; Z[i] = v.getInt16(o + 4, true) * k; }
+    const flag = new Uint8Array(buf, o, total), from = [], to = [], se = [], sp = [], sc = []; let idx = 0;
+    for (let c = 0; c < nCh; c++) for (let j = 0; j < cnt[c]; j++, idx++) {
+      if (j === 0 || (flag[idx] & 8)) continue;
+      const a = flag[idx - 1] & 3, b = flag[idx] & 3; from.push(idx - 1); to.push(idx); se.push(ent[c] - 1); sp.push(pair[c]); sc.push(a === 1 && b === 1 ? 1 : a === 2 && b === 2 ? 2 : 0);
+    }
+    return { total, X, Y, Z, nSeg: from.length, from: Int32Array.from(from), to: Int32Array.from(to), ent: Uint8Array.from(se), pair: Uint8Array.from(sp), cls: Uint8Array.from(sc) };
+  }
+  async function showStructure(root) {
+    const cv = $('#struct'), ctx = cv.getContext('2d'), status = $('#art-status'), legend = $('#legend'), coarse = matchMedia('(pointer: coarse)').matches;
+    if ('IntersectionObserver' in window) await new Promise(go => { const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); go(); } }, { rootMargin: '900px 0px' }); io.observe(root); });
+    let M;
+    try { const res = await fetch('ka-8z5g.bin'); if (!res.ok) throw new Error('HTTP ' + res.status); M = parseStructure(await res.arrayBuffer()); }
+    catch (e) { console.warn('Could not load the structure:', e); status.innerHTML = 'The 3D model could not load here.<a href="https://www.rcsb.org/3d-view/8Z5G" rel="noopener">See it on the Protein Data Bank →</a>'; return; }
+    status.hidden = true;
+    const DEPTH = 5, WIDTH = [.75, 1.5, 1.2], sx = new Float32Array(M.total), sy = new Float32Array(M.total), sz = new Float32Array(M.total), key = new Int32Array(M.nSeg), order = new Int32Array(M.nSeg);
+    let mode = 0;
+    function draw(yaw, pitch) {
+      const W = cv.width, H = cv.height, d = W / (cv.clientWidth || 1), top = 30 * d, avail = H - top - (cv.clientWidth < 400 ? 96 : 64) * d, R = Math.min(W * .47, avail * .45), mid = top + avail / 2, D = 3.2, cy = Math.cos(yaw), sy_ = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch);
+      for (let i = 0; i < M.total; i++) { const x = M.X[i], y = M.Y[i], z = M.Z[i], x1 = x * cy + z * sy_, z1 = -x * sy_ + z * cy, y2 = y * cp - z1 * sp, z2 = y * sp + z1 * cp, s = D / (D - z2); sx[i] = W / 2 + x1 * R * s; sy[i] = mid - y2 * R * s; sz[i] = z2; }
+      const NK = mode ? 26 : 2, nKeys = DEPTH * NK * 3, count = new Int32Array(nKeys + 1);
+      for (let g = 0; g < M.nSeg; g++) { const z = (sz[M.from[g]] + sz[M.to[g]]) / 2, bin = Math.min(DEPTH - 1, Math.max(0, Math.floor((z + 1) / 2 * DEPTH))), k = (bin * NK + (mode ? M.pair[g] : M.ent[g])) * 3 + M.cls[g]; key[g] = k; count[k + 1]++; }
+      for (let k = 0; k < nKeys; k++) count[k + 1] += count[k];
+      const pos = count.slice(0, nKeys); for (let g = 0; g < M.nSeg; g++) order[pos[key[g]]++] = g;
+      ctx.clearRect(0, 0, W, H); ctx.globalCompositeOperation = 'lighter'; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      for (let k = 0; k < nKeys; k++) {
+        const from = count[k], to = count[k + 1]; if (from === to) continue;
+        const cls = k % 3, col = Math.floor(k / 3) % NK, t = Math.floor(k / 3 / NK) / (DEPTH - 1), alpha = (.13 + .5 * t) * (cls === 1 ? 1.15 : 1);
+        ctx.strokeStyle = mode ? `hsla(${Math.round(col / 26 * 360)},92%,62%,${alpha})` : (col ? `rgba(167,139,250,${alpha})` : `rgba(94,234,212,${alpha})`);
+        ctx.lineWidth = WIDTH[cls] * d * (.7 + .6 * t); ctx.beginPath();
+        for (let q = from; q < to; q++) { const g = order[q]; ctx.moveTo(sx[M.from[g]], sy[M.from[g]]); ctx.lineTo(sx[M.to[g]], sy[M.to[g]]); }
+        ctx.stroke();
+      }
+      ctx.globalCompositeOperation = 'source-over';
+    }
+    const view = turner(root, { yaw: .4, tilt: .95, tiltSwing: .22, auto: .26, minGap: coarse ? 33 : 0, draw });
+    fitCanvases([cv], () => { const [y, p] = view.now(); draw(y, p); view.kick(); }, coarse ? 1.5 : 2);
+    cv.addEventListener('keydown', e => { const k = { ArrowLeft: [-.3, 0], ArrowRight: [.3, 0], ArrowUp: [0, -.25], ArrowDown: [0, .25] }[e.key]; if (k) { e.preventDefault(); view.turn(k[0], k[1]); } else if (e.key === 'Home') { e.preventDefault(); view.reset(); } });
+    $('#art-reset').onclick = () => view.reset();
+    $$('.seg button', root).forEach(b => b.addEventListener('click', () => {
+      mode = +b.dataset.mode; $$('.seg button', root).forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+      legend.innerHTML = mode ? '<span><i style="background:linear-gradient(90deg,hsl(0,90%,62%),hsl(120,90%,62%),hsl(240,90%,62%),hsl(330,90%,62%))"></i>26 pairs, one colour each</span>' : '<span><i style="background:#5eead4"></i>QmcA ×26</span><span><i style="background:#a78bfa"></i>YbbJ ×26</span>';
+      const [y, p] = view.now(); draw(y, p); view.kick();
+    }));
+  }
+  makeRing($('#orbit'));
+  showStructure($('#art'));
 
   // ----- Numbers count up when they arrive -----
   if (!reduce && 'IntersectionObserver' in window) {
