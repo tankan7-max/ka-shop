@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Tan Kwan Ann — R&amp;D Scientist</title>
-<meta name="description" content="Enzyme engineer and structural biologist in Singapore. Also: abalone, hiking, and a 3D snack shop. Open to collaborations.">
+<meta name="description" content="Enzyme engineer and structural biologist in Singapore, also known as 鲍鱼王, the Abalone Sovereign. Also: hiking and a 3D snack shop. Open to collaborations.">
 <meta name="theme-color" content="#060608">
 <meta name="color-scheme" content="dark">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Tan Kwan Ann — R&amp;D Scientist (and Abalone King)">
+<meta property="og:title" content="Tan Kwan Ann — R&amp;D Scientist, a.k.a. 鲍鱼王 the Abalone Sovereign">
 <meta property="og:description" content="Enzyme engineer and structural biologist in Singapore. Also: abalone, hiking, and a 3D snack shop. Open to collaborations.">
 <meta property="og:url" content="https://tankan7-max.github.io/ka-shop/ka.html">
 <meta property="og:image" content="https://tankan7-max.github.io/ka-shop/ka-og.jpg">
@@ -20,7 +20,7 @@
 <link rel="preload" href="fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"Person","name":"Tan Kwan Ann","jobTitle":"R&D Scientist","description":"Enzyme engineer and structural biologist in Singapore.","url":"https://tankan7-max.github.io/ka-shop/ka.html","sameAs":["https://www.linkedin.com/in/tan-kwan-ann","https://github.com/tankan7-max"],"knowsAbout":["Enzyme engineering","Protein engineering","Structural biology","Cryo-EM","Biocatalysis"]}
+{"@context":"https://schema.org","@type":"Person","name":"Tan Kwan Ann","alternateName":["鲍鱼王","Abalone King","Abalone Sovereign"],"jobTitle":"R&D Scientist","description":"Enzyme engineer and structural biologist in Singapore.","url":"https://tankan7-max.github.io/ka-shop/ka.html","sameAs":["https://www.linkedin.com/in/tan-kwan-ann","https://github.com/tankan7-max"],"knowsAbout":["Enzyme engineering","Protein engineering","Structural biology","Cryo-EM","Biocatalysis"]}
 </script>
 <style>
   /* Fonts are self-hosted (see fonts/LICENSES.txt): nothing is fetched from other websites. */
@@ -76,11 +76,14 @@
   .hero .wrap { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 40px; align-items: center; padding-top: 84px; padding-bottom: 92px; }
   .eyebrow { display: inline-flex; align-items: center; gap: 10px; margin: 0 0 20px; font: 500 12px/1 var(--mono); letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
   h1 { font: 700 clamp(46px, 9.4vw, 112px)/.94 var(--display); letter-spacing: -.045em; margin: 0 0 22px; background: linear-gradient(180deg, #fff 35%, #9d9da8 120%); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .king { display: inline-flex; align-items: center; gap: 9px; margin: 0 0 22px; padding: 8px 14px 8px 10px; border: 1px solid rgba(245,194,107,.35); border-radius: 999px; background: rgba(245,194,107,.07); color: var(--ink); font: 500 13.5px/1 var(--sans); cursor: pointer; transition: background .2s, transform .2s, border-color .2s; }
+  .king { display: inline-flex; align-items: center; gap: 11px; margin: 0 0 22px; padding: 9px 16px 9px 12px; border: 1px solid rgba(245,194,107,.35); border-radius: 999px; background: rgba(245,194,107,.07); color: var(--ink); font: 500 13.5px/1 var(--sans); cursor: pointer; transition: background .2s, transform .2s, border-color .2s; }
   .king:hover { background: rgba(245,194,107,.14); border-color: rgba(245,194,107,.6); transform: translateY(-1px) rotate(-1deg); }
-  .king .crown { font-size: 17px; line-height: 1; }
-  .king b { font: 600 14px/1 var(--cjk); color: var(--a3); }
-  .king small { color: var(--faint); font: 500 11.5px/1 var(--mono); letter-spacing: .02em; }
+  .king .crown { font-size: 22px; line-height: 1; }
+  .king b { font: 700 24px/1 var(--cjk); letter-spacing: .04em; background: linear-gradient(100deg, #f5c26b, #fb9f6b); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .king .titles { display: flex; flex-direction: column; gap: 3px; text-align: left; }
+  .king .titles span { font: 600 14px/1.1 var(--sans); }
+  .king .titles em { font: 500 11.5px/1.1 var(--mono); font-style: normal; color: var(--muted); letter-spacing: .01em; }
+  .king small { color: var(--faint); font: 500 11.5px/1 var(--mono); letter-spacing: .02em; padding-left: 4px; }
   .roll { margin: 0 0 16px; min-height: 1.35em; font: 600 clamp(22px, 3.2vw, 34px)/1.25 var(--display); letter-spacing: -.02em; }
   .word { display: inline-block; transition: opacity .3s ease, transform .3s ease; }
   .word.out { opacity: 0; transform: translateY(.45em); }
@@ -293,6 +296,7 @@
     .feature-art { max-width: 340px; width: 100%; margin: 0 auto; }
     .invite { padding: 52px 22px; border-radius: 24px; }
   }
+  @media (max-width: 480px) { .king small { display: none; } .king { padding-right: 14px; } }
   @media (max-width: 420px) { .nums { grid-template-columns: 1fr 1fr; gap: 10px; } .num { padding: 16px 14px; } .gallery { column-gap: 12px; } .gallery li { margin-bottom: 12px; } .gallery figure { padding: 6px 6px 10px; } .gallery figcaption { font-size: 12.5px; margin: 9px 3px 0; } }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
@@ -367,8 +371,8 @@
     <div>
       <p class="eyebrow"><i></i>R&amp;D Scientist · Singapore</p>
       <h1>Tan Kwan Ann</h1>
-      <button class="king" id="king" type="button" aria-label="Also known as the Abalone King. Press for a surprise.">
-        <span class="crown" aria-hidden="true">👑</span><b lang="zh-Hans">鲍鱼王</b><span>the Abalone King</span><small aria-hidden="true">(press me)</small>
+      <button class="king" id="king" type="button" aria-label="Also known as 鲍鱼王, the Abalone King, or the Abalone Sovereign. Press for a surprise.">
+        <span class="crown" aria-hidden="true">👑</span><b lang="zh-Hans">鲍鱼王</b><span class="titles"><span>the Abalone King</span><em>a.k.a. the Abalone Sovereign</em></span><small aria-hidden="true">(press me)</small>
       </button>
       <p class="roll"><span class="sr">I engineer enzymes and solve protein structures.</span><span aria-hidden="true">I <span class="word grad" id="word">engineer enzymes</span></span></p>
       <p class="lede">PhD in structural biology, now making enzymes work in industry. Weekdays I make enzymes <b>behave</b>. Weekends: hiking, snack research, and vibe-coding a <b>3D snack shop</b>.</p>
@@ -393,10 +397,10 @@
 <div class="marquee" aria-hidden="true">
   <div class="track">
     <ul>
-      <li>Directed evolution</li><li>Cryo-EM</li><li>Golden Gate</li><li class="fun">Abalone appreciation</li><li>HPLC</li><li>Cofactor recycling</li><li>Python</li><li class="fun">Snack research</li><li>Lyophilization</li><li>Gibson Assembly</li><li>MALDI-TOF/TOF</li><li class="fun">Apprentice vibe-coder</li><li>Assay development</li><li>Saturation mutagenesis</li><li class="fun">Hiking</li>
+      <li>Directed evolution</li><li>Cryo-EM</li><li>Golden Gate</li><li class="fun">Abalone appreciation</li><li class="fun" lang="zh-Hans">鲍鱼王</li><li>HPLC</li><li>Cofactor recycling</li><li>Python</li><li class="fun">Snack research</li><li>Lyophilization</li><li>Gibson Assembly</li><li>MALDI-TOF/TOF</li><li class="fun">Apprentice vibe-coder</li><li>Assay development</li><li>Saturation mutagenesis</li><li class="fun">Hiking</li>
     </ul>
     <ul aria-hidden="true">
-      <li>Directed evolution</li><li>Cryo-EM</li><li>Golden Gate</li><li class="fun">Abalone appreciation</li><li>HPLC</li><li>Cofactor recycling</li><li>Python</li><li class="fun">Snack research</li><li>Lyophilization</li><li>Gibson Assembly</li><li>MALDI-TOF/TOF</li><li class="fun">Apprentice vibe-coder</li><li>Assay development</li><li>Saturation mutagenesis</li><li class="fun">Hiking</li>
+      <li>Directed evolution</li><li>Cryo-EM</li><li>Golden Gate</li><li class="fun">Abalone appreciation</li><li class="fun" lang="zh-Hans">鲍鱼王</li><li>HPLC</li><li>Cofactor recycling</li><li>Python</li><li class="fun">Snack research</li><li>Lyophilization</li><li>Gibson Assembly</li><li>MALDI-TOF/TOF</li><li class="fun">Apprentice vibe-coder</li><li>Assay development</li><li>Saturation mutagenesis</li><li class="fun">Hiking</li>
     </ul>
   </div>
 </div>
@@ -593,7 +597,7 @@
 
 <footer>
   <div class="wrap">
-    <span>© 2026 Tan Kwan Ann · Built with AI as my pair programmer, fuelled by snacks.</span>
+    <span>© 2026 Tan Kwan Ann (<span lang="zh-Hans">鲍鱼王</span>, the Abalone Sovereign) · Built with AI as my pair programmer, fuelled by snacks.</span>
     <span class="foot-links"><a href="mailto:tankan7@gmail.com">Email</a><a href="https://www.linkedin.com/in/tan-kwan-ann" rel="noopener">LinkedIn</a><a href="https://github.com/tankan7-max" rel="noopener">GitHub</a><a href="Tan_Kwan_Ann_Resume.pdf" download>Resume (PDF)</a><a href="#top">Back to top ↑</a></span>
   </div>
 </footer>
@@ -621,9 +625,9 @@
   }
   $$('[data-copy]').forEach(b => b.addEventListener('click', async () => toast(await copyText(b.dataset.copy) ? (b.dataset.done || 'Copied') : 'Could not copy — please select the text instead.')));
 
-  // ----- The Abalone King -----
+  // ----- The Abalone King (a.k.a. the Abalone Sovereign) -----
   $('#king').addEventListener('click', () => {
-    toast('👑 All hail the Abalone King');
+    toast('👑 All hail the Abalone Sovereign');
     if (reduce) return;
     const box = document.createElement('div'); box.className = 'rain'; box.setAttribute('aria-hidden', 'true');
     for (let i = 0; i < 30; i++) {
@@ -635,7 +639,7 @@
   });
 
   // ----- Rolling line under the name -----
-  const words = ['engineer enzymes', 'solve protein structures', 'screen variants for a living', 'vibe-code (apprentice)', 'go hiking', 'do serious snack research', 'defeat abalone'];
+  const words = ['engineer enzymes', 'solve protein structures', 'screen variants for a living', 'vibe-code (apprentice)', 'go hiking', 'do serious snack research', 'defeat abalone', 'rule the abalone kingdom'];
   const wordEl = $('#word');
   if (!reduce) { let i = 0; setInterval(() => { if (document.hidden) return; wordEl.classList.add('out'); setTimeout(() => { i = (i + 1) % words.length; wordEl.textContent = words[i]; wordEl.classList.remove('out'); }, 320); }, 2700); }
 
