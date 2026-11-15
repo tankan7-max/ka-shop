@@ -659,6 +659,22 @@ function renderCart() {
 }
 $('clear-btn').onclick = () => { if (cart.size && confirm('Remove everything from your cart?')) { cart.clear(); renderCart(); showToast('Cart cleared'); } };
 
+// iPhones: touch-action alone does not always stop a double-tap zooming the
+// page — the card's blank space and the mini map still zoom. Second layer:
+// swallow the second tap of a quick double-tap on plain surfaces. Buttons
+// and fields are left alone, so tapping + twice quickly still adds two, and
+// everything that runs off pointer events (walking, looking, picking, the
+// mini map, the joystick) is untouched — this only stops the tap's click,
+// which those never use.
+let lastTapEnd = 0;
+document.addEventListener('touchend', e => {
+  const t = e.target;
+  if (t && t.closest && t.closest('button, input, select, textarea, a')) return;
+  const now = Date.now();
+  if (now - lastTapEnd <= 350) e.preventDefault();
+  lastTapEnd = now;
+}, { passive: false });
+
 // --- Card for the selected snack ---
 let selected = null, cardQty = 1;
 function updateCard() {
