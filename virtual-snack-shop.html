@@ -7,6 +7,9 @@
 <meta name="description" content="Walk around a 3D snack shop, pick snacks off the shelves and send your order.">
 <meta name="theme-color" content="#2a9d8f">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232a9d8f'/%3E%3Cpath d='M8 12h16l-1.6 12H9.6zM12 12a4 4 0 0 1 8 0' fill='none' stroke='%23fff' stroke-width='2.4' stroke-linejoin='round'/%3E%3C/svg%3E">
+<script type="importmap">
+{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.min.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }
+</script>
 <style>
   :root {
     --brand: #2a9d8f; --brand-dark: #1f7a6f; --brand-soft: #e3f4f1;
@@ -17,6 +20,7 @@
   }
   * { box-sizing: border-box; }
   html, body { height: 100%; margin: 0; }
+  html { touch-action: manipulation; }   /* phones: tapping a button twice quickly must not zoom the page */
   body { font: 15px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--ink); background: var(--bg); overflow: hidden; }
   [hidden] { display: none !important; }
   button, input, textarea { font: inherit; color: inherit; }
@@ -381,6 +385,17 @@ function readInventory(inv) {
   if (inv && Number.isInteger(inv.low_stock_at) && inv.low_stock_at >= 0) LOW_STOCK = inv.low_stock_at;
   return out;
 }
+// Products also come from the database when it is connected and has any (managed in products.html);
+// the list in products.json is then only the fallback.
+if (LIVE) {
+  try {
+    const cat = await callDb('catalogue', {});
+    if (cat && Array.isArray(cat.products) && cat.products.length) {
+      db = { ...db, products: cat.products, categories: Array.isArray(cat.categories) && cat.categories.length ? cat.categories : db.categories };
+      usingFallback = false;
+    }
+  } catch (e) { console.warn('Could not read products from the database, using products.json instead:', e); }
+}
 async function fetchInventory() {
   if (LIVE) {
     try { const ref = savedRef(); return readInventory(await callDb('inventory', { p_token: BROWSER_ID, p_ref: ref ? ref.ref : null })); }
@@ -409,12 +424,13 @@ document.title = SHOP.name;
 $('brand-name').textContent = $('splash-title').textContent = SHOP.name;
 
 // What kind of pack is it? Decides the 3D shape. Set "shape" in a product's "model" to choose
-// yourself (bag, box, bar, carton, can, tube or cup); otherwise it is worked out from the pack text.
+// yourself (bag, box, bar, carton, can, tube, cup or bottle); otherwise it is worked out from the pack text.
+const ROUND_KINDS = ['can', 'tube', 'cup', 'bottle'];
 function packKind(p, m) {
-  const known = ['bag', 'box', 'bar', 'carton', 'can', 'tube', 'cup'];
+  const known = ['bag', 'box', 'bar', 'carton', 'can', 'tube', 'cup', 'bottle'];
   if (known.includes(m.shape)) return m.shape;
   const pack = (p.pack || '').toLowerCase();
-  if (m.type === 'cylinder') return /tube/.test(pack) ? 'tube' : /cup|bowl|tub/.test(pack) ? 'cup' : 'can';
+  if (m.type === 'cylinder') return /bottle/.test(pack) ? 'bottle' : /tube/.test(pack) ? 'tube' : /cup|bowl|tub/.test(pack) ? 'cup' : 'can';
   if (/\b(bar|roll|stick|block)\b/.test(pack) || (m.depth || 1) <= 0.1) return 'bar';
   if (/packet|carton/.test(pack)) return 'carton';
   if (/\bbox\b/.test(pack) || (m.depth || 0.2) > 0.18) return 'box';
@@ -424,14 +440,16 @@ const hashOf = s => { let h = 2166136261; for (let i = 0; i < s.length; i++) h =
 
 const PRODUCTS = db.products.map(p => {
   const m = p.model || {};
-  const id = String(p.id || p.name);
+  const id = String(p.id || p.name), kind = packKind(p, m), tex = p.texture || {};
   return {
     id, name: p.name, category: p.category || 'Other snacks',
     price: p.price_sgd !== undefined ? p.price_sgd : p.price, pack: p.pack || '',
     color: Number.isFinite(m.color) ? m.color : (Number.isFinite(p.color) ? p.color : 0xcccccc),
-    kind: packKind(p, m), round: m.type === 'cylinder',
+    kind, round: ROUND_KINDS.includes(kind),
     width: m.width || p.width || 0.5, height: m.height || p.height || 0.5, depth: m.depth || p.depth || 0.2,
-    photoUrl: (p.texture && p.texture.image_url) || p.texture_url || null, photo: null,
+    photoUrl: tex.image_url || p.texture_url || null, photo: null,
+    photoFills: tex.fit === 'cover',                    // the photo is the whole pack front (flat artwork), not a picture of the pack
+    modelUrl: typeof m.glb_url === 'string' && m.glb_url ? m.glb_url : null,   // an uploaded 3D model (.glb) used instead of the built-in shape
     hash: hashOf(id), search: `${p.name} ${p.category} ${p.pack}`.toLowerCase(),
   };
 }).filter(p => p.name && typeof p.price === 'number');
@@ -499,7 +517,11 @@ function drawPack(ctx, p, x, y, w, h) {
   // Top and bottom bands.
   ctx.fillStyle = shade(p.color, -0.28); ctx.fillRect(0, 0, w, h * 0.055); ctx.fillRect(0, h * 0.945, w, h * 0.055);
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  if (p.photo) {
+  if (p.photo && p.photoFills) {
+    // The photo is the artwork itself: stretch it over the whole front, cropping what doesn't fit.
+    const s = Math.max(w / p.photo.naturalWidth, h / p.photo.naturalHeight), pw = p.photo.naturalWidth * s, ph = p.photo.naturalHeight * s;
+    ctx.drawImage(p.photo, (w - pw) / 2, (h - ph) / 2, pw, ph);
+  } else if (p.photo) {
     const m = Math.min(w, h) * 0.06;
     ctx.fillStyle = '#fff'; roundRect(ctx, m, m, w - 2 * m, h - 2 * m, m * 1.5); ctx.fill();
     const s = Math.min((w - 3 * m) / p.photo.naturalWidth, (h - 3 * m) / p.photo.naturalHeight);
@@ -666,7 +688,7 @@ $('card-minus').onclick = () => { cardQty = Math.max(1, cardQty - 1); updateCard
 $('card-plus').onclick = () => { cardQty += 1; updateCard(); };
 $('card-add').onclick = () => { if (selected) { addToCart(selected, cardQty); cardQty = 1; updateCard(); } };
 $('card-inspect').onclick = () => { if (selected && world) world.inspect(selected); };
-$('card-find').onclick = () => { if (selected && world) { const p = selected; closeCard(); world.findProduct(p); } };
+$('card-find').onclick = () => { if (selected && world) { const p = selected, pack = world.selectedPack(); closeCard(); world.findProduct(p, pack); } };
 
 // --- "All snacks" list, grouped by shelf, with search ---
 let activeCat = 'All';
@@ -938,10 +960,11 @@ renderCart();
 // ===========================================================================
 // 4. THE 3D SHOP
 // ===========================================================================
+let modelsPossible = false;   // uploaded 3D models need the loader add-on, which only comes from the first address below
 async function loadThree() {
   const file = 'three@0.160.0/build/three.module.min.js';
   for (const cdn of ['https://unpkg.com/', 'https://cdn.jsdelivr.net/npm/']) {
-    try { return await import(cdn + file); } catch (e) { console.warn('Could not load the 3D library from ' + cdn, e); }
+    try { const lib = await import(cdn + file); modelsPossible = cdn.includes('unpkg'); return lib; } catch (e) { console.warn('Could not load the 3D library from ' + cdn, e); }
   }
   throw new Error('The 3D library could not be downloaded.');
 }
@@ -1196,7 +1219,7 @@ function startWorld(THREE) {
   function packTexture(p) {
     // Cans, tubes and cups have the art twice around; everything else has it on the front and back.
     const faceW = p.round ? Math.PI * p.width / 2 : p.width;
-    const W = 320, H = Math.round(clamp(W * p.height / faceW, 96, 640));
+    const W = 320, H = Math.round(clamp(W * p.height * labelShare(p) / faceW, 96, 640));
     const tex = canvasTexture(p.round ? W * 2 : W, H, ctx => { drawPack(ctx, p, 0, 0, W, H); if (p.round) drawPack(ctx, p, W, 0, W, H); });
     if (p.round) { tex.wrapS = THREE.RepeatWrapping; tex.offset.x = 0.25; }
     // When the product's photo arrives, every pack picture still in use is drawn again.
@@ -1206,20 +1229,106 @@ function startWorld(THREE) {
     tex.userData.retire = () => p.repaints.delete(repaint);
     return tex;
   }
-  function packMesh(p, w, d, count) {
-    const tex = packTexture(p);
-    const art = std(0xffffff, { map: tex, emissive: 0xffffff, emissiveMap: tex, emissiveIntensity: 0.3, roughness: p.kind === 'can' ? 0.3 : 0.5, metalness: p.kind === 'can' ? 0.45 : 0 });
-    const side = std(new THREE.Color(shade(p.color, -0.12)), { roughness: 0.6 });
-    const metal = std(0xd9dde0, { metalness: 0.9, roughness: 0.3 }), lid = std(0xf4f4f2, { roughness: 0.5 });
-    let geo, mats;
-    if (p.round) {
-      geo = new THREE.CylinderGeometry(w / 2, p.kind === 'cup' ? w * 0.36 : w / 2, p.height, 28);
-      mats = [art, p.kind === 'can' ? metal : lid, p.kind === 'cup' ? lid : metal];
-    } else {
-      geo = p.kind === 'bag' ? pillowGeometry(w, p.height, d, false) : p.kind === 'bar' ? pillowGeometry(w, p.height, d, true) : new THREE.BoxGeometry(w, p.height, d);
-      mats = [side, side, side, side, art, art];
+  // --- Pack shapes. Each is built from a few simple parts joined into one shape, so a whole
+  // shelf of the same snack is still drawn in one go. Parts are coloured by number:
+  // 0 the printed pack art, 1 plain pack colour, 2 metal, 3 white plastic or paper, 4 dark.
+  const ART = 0, SIDE = 1, METAL = 2, WHITE = 3, DARK = 4;
+  function joinParts(parts) {            // parts: [{ geo, mat }] — mat is one number, or one per face group of the part
+    const flat = parts.map(({ geo, mat }) => ({ g: geo.index ? geo.toNonIndexed() : geo, mat }));
+    const n = flat.reduce((sum, { g }) => sum + g.attributes.position.count, 0);
+    const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3), uv = new Float32Array(n * 2), out = new THREE.BufferGeometry();
+    let at = 0;
+    flat.forEach(({ g, mat }) => {
+      const count = g.attributes.position.count;
+      pos.set(g.attributes.position.array, at * 3); nor.set(g.attributes.normal.array, at * 3); uv.set(g.attributes.uv.array, at * 2);
+      if (Array.isArray(mat)) g.groups.forEach(gr => out.addGroup(at + gr.start, gr.count, mat[gr.materialIndex])); else out.addGroup(at, count, mat);
+      at += count;
+    });
+    out.setAttribute('position', new THREE.BufferAttribute(pos, 3)); out.setAttribute('normal', new THREE.BufferAttribute(nor, 3)); out.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+    return out;
+  }
+  // A shape turned on a lathe from an outline of [radius, height] points; the art runs evenly from bottom to top.
+  function turned(outline) {
+    const g = new THREE.LatheGeometry(outline.map(([x, y]) => new THREE.Vector2(x, y)), 28), pos = g.attributes.position, uv = g.attributes.uv;
+    const ys = outline.map(o => o[1]), lo = Math.min(...ys), hi = Math.max(...ys);
+    for (let i = 0; i < pos.count; i++) uv.setY(i, (pos.getY(i) - lo) / (hi - lo || 1));
+    return g;
+  }
+  const disc = (r, y, up = true) => new THREE.CircleGeometry(r, 28).rotateX(up ? -Math.PI / 2 : Math.PI / 2).translate(0, y, 0);
+  const drum = (rTop, rBottom, y0, y1) => new THREE.CylinderGeometry(rTop, rBottom, y1 - y0, 28).translate(0, (y0 + y1) / 2, 0);
+  const block = (w, h, d, x, y, z) => new THREE.BoxGeometry(w, h, d).translate(x, y, z);
+  const BOX_FACES = [SIDE, SIDE, SIDE, SIDE, ART, ART];      // a box has the art on its front and back
+  // How much of the pack's height the printed label covers (the art is drawn to fit that).
+  const labelShare = p => (p.kind === 'bottle' ? 0.56 : 1);
+
+  function packGeometry(p, w, d) {
+    const h = p.height, r = w / 2, top = h / 2, bot = -h / 2;
+    switch (p.kind) {
+      case 'can':        // drinks can: rounded shoulder and base, recessed lid with a ring pull
+        return joinParts([
+          { geo: turned([[r * 0.8, bot], [r * 0.96, bot + h * 0.035], [r, bot + h * 0.08], [r, top - h * 0.12], [r * 0.86, top - h * 0.025], [r * 0.86, top]]), mat: ART },
+          { geo: turned([[r * 0.86, top], [r * 0.8, top], [r * 0.78, top - h * 0.02]]), mat: METAL },
+          { geo: disc(r * 0.79, top - h * 0.02), mat: METAL }, { geo: disc(r * 0.8, bot, false), mat: METAL },
+          { geo: block(r * 0.34, h * 0.008, r * 0.62, 0, top - h * 0.014, r * 0.16), mat: DARK },
+        ]);
+      case 'tube':       // crisps tube: straight card tube, plastic lid, metal base
+        return joinParts([
+          { geo: turned([[r, bot + h * 0.02], [r, top - h * 0.05]]), mat: ART },
+          { geo: drum(r * 1.035, r * 1.035, top - h * 0.05, top), mat: WHITE },
+          { geo: drum(r * 1.02, r * 1.02, bot, bot + h * 0.02), mat: METAL },
+        ]);
+      case 'cup':        // noodle cup: narrow base, wide rim, peel-off lid with a tab
+        return joinParts([
+          { geo: turned([[r * 0.7, bot], [r * 0.97, top - h * 0.08]]), mat: ART },
+          { geo: turned([[r * 0.97, top - h * 0.08], [r * 1.04, top - h * 0.07], [r * 1.04, top - h * 0.015], [r, top]]), mat: WHITE },
+          { geo: disc(r, top), mat: WHITE }, { geo: disc(r * 0.7, bot, false), mat: WHITE },
+          { geo: block(r * 0.5, h * 0.01, r * 0.3, 0, top + h * 0.006, r * 1.05), mat: WHITE },
+        ]);
+      case 'bottle': {   // bottle: label round the body, clear-ish shoulder and neck, screw cap
+        const waist = bot + h * labelShare(p);
+        return joinParts([
+          { geo: turned([[r * 0.9, bot], [r, bot + h * 0.03], [r, waist]]), mat: ART },
+          { geo: turned([[r, waist], [r, waist + h * 0.06], [r * 0.5, top - h * 0.2], [r * 0.36, top - h * 0.16], [r * 0.36, top - h * 0.08]]), mat: SIDE },
+          { geo: drum(r * 0.42, r * 0.42, top - h * 0.085, top), mat: WHITE }, { geo: disc(r * 0.9, bot, false), mat: SIDE },
+        ]);
+      }
+      case 'carton':     // drink packet: brick with a folded top seam and a straw on the side
+        return joinParts([
+          { geo: new THREE.BoxGeometry(w, h, d), mat: BOX_FACES },
+          { geo: block(w * 0.94, h * 0.03, d * 0.08, 0, top + h * 0.012, 0), mat: SIDE },
+          { geo: new THREE.CylinderGeometry(w * 0.035, w * 0.035, h * 0.6, 8).rotateZ(0.12).translate(w / 2 + w * 0.05, h * 0.08, 0), mat: WHITE },
+        ]);
+      case 'bag': return joinParts([{ geo: pillowGeometry(w, h, d, false), mat: BOX_FACES }]);
+      case 'bar': return joinParts([{ geo: pillowGeometry(w, h, d, true), mat: BOX_FACES }]);
+      default: return joinParts([{ geo: new THREE.BoxGeometry(w, h, d), mat: BOX_FACES }]);
     }
-    return new THREE.InstancedMesh(geo, mats, count);
+  }
+  function packMesh(p, w, d, count) {
+    const tex = packTexture(p), shiny = p.kind === 'can';
+    const mats = [
+      std(0xffffff, { map: tex, emissive: 0xffffff, emissiveMap: tex, emissiveIntensity: 0.3, roughness: shiny ? 0.3 : 0.5, metalness: shiny ? 0.45 : 0 }),
+      std(new THREE.Color(shade(p.color, -0.12)), { roughness: p.kind === 'bottle' ? 0.25 : 0.6, emissive: new THREE.Color(shade(p.color, -0.12)), emissiveIntensity: 0.2 }),
+      std(0xd9dde0, { metalness: 0.9, roughness: 0.3 }), std(0xf4f4f2, { roughness: 0.5, emissive: 0xffffff, emissiveIntensity: 0.15 }), std(0x8d9499, { metalness: 0.8, roughness: 0.35 }),
+    ];
+    return new THREE.InstancedMesh(packGeometry(p, w, d), mats, count);
+  }
+  // An uploaded 3D model, cut into parts that fit a w × h × d space: standing on the shelf, centred, facing front.
+  function modelParts(gltf, w, h, d) {
+    gltf.scene.updateMatrixWorld(true);
+    const box = new THREE.Box3().setFromObject(gltf.scene), size = box.getSize(new THREE.Vector3()), mid = box.getCenter(new THREE.Vector3());
+    if (!(size.x > 0 && size.y > 0 && size.z > 0)) return [];
+    const k = Math.min(w / size.x, h / size.y, d / size.z);
+    const fit = new THREE.Matrix4().makeTranslation(0, -h / 2, 0).multiply(new THREE.Matrix4().makeScale(k, k, k)).multiply(new THREE.Matrix4().makeTranslation(-mid.x, -box.min.y, -mid.z));
+    const parts = [];
+    gltf.scene.traverse(o => {
+      if (!o.isMesh || o.isSkinnedMesh || !o.geometry.attributes.position) return;
+      const geo = o.geometry.clone().applyMatrix4(fit.clone().multiply(o.matrixWorld));
+      if (!geo.attributes.normal) geo.computeVertexNormals();
+      // A little glow of its own, like the other packs, so it reads in the dim shop.
+      (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => { if (m && m.emissive && !m.emissiveMap && m.emissive.getHex() === 0) { m.emissive.copy(m.color); m.emissiveMap = m.map; m.emissiveIntensity = 0.3; } });
+      parts.push({ geo, material: o.material });
+    });
+    return parts;
   }
 
   const productInstances = new Map();  // product -> every pack of it on the shelves
@@ -1256,7 +1365,7 @@ function startWorld(THREE) {
       const soldTag = plane(SLOT_W - 0.06, 0.12, flat(tagTexture(p, '#9aa3a7', true)));
       soldTag.position.set(x0 + slots[0].c * SLOT_W, LEVELS[slots[0].l] - 0.05, UNIT_D / 2 + 0.012); soldTag.userData.product = p;
       g.add(soldTag); soldTag.updateMatrixWorld(); clickable.push(soldTag);
-      p.shelf = { soldTag, tags: [], mesh: null };
+      p.shelf = { soldTag, tags: [], meshes: [], list: null };
       // Fit the pack into a slot.
       const w = Math.min(p.width, SLOT_W - 0.08), d = Math.min(p.depth, UNIT_D - 0.08);
       const across = Math.max(1, Math.min(3, Math.floor((SLOT_W - 0.06) / (w + 0.03))));
@@ -1320,14 +1429,40 @@ function startWorld(THREE) {
     const mesh = packMesh(p, list[0].w, list[0].d, list.length);
     list.forEach((it, i) => { mesh.setMatrixAt(i, it.m); it.index = i; });
     mesh.instanceMatrix.needsUpdate = true; mesh.computeBoundingSphere();
-    mesh.userData.product = p; mesh.userData.list = list; scene.add(mesh); clickable.push(mesh); p.shelf.mesh = mesh;
+    mesh.userData.product = p; mesh.userData.list = list; scene.add(mesh); clickable.push(mesh); p.shelf.meshes = [mesh]; p.shelf.list = list;
   });
+  // Swap a product's built-in pack shape for its uploaded 3D model, on every shelf position it has.
+  function useModel(p, gltf) {
+    const list = p.shelf.list, parts = modelParts(gltf, list[0].w, p.height, list[0].d);
+    if (!parts.length) return;
+    p.customParts = parts;
+    p.shelf.meshes.forEach(m => { scene.remove(m); clickable.splice(clickable.indexOf(m), 1); m.geometry.dispose(); });
+    p.shelf.meshes = parts.map(({ geo, material }) => {
+      const mesh = new THREE.InstancedMesh(geo, material, list.length);
+      list.forEach((it, i) => mesh.setMatrixAt(i, it.m));
+      mesh.instanceMatrix.needsUpdate = true; mesh.computeBoundingSphere();
+      mesh.userData.product = p; mesh.userData.list = list; scene.add(mesh); clickable.push(mesh);
+      return mesh;
+    });
+    applyStock();
+  }
+  function loadModels() {
+    const wanted = PRODUCTS.filter(p => p.modelUrl && p.shelf && p.shelf.list);
+    if (!wanted.length) return;
+    if (!modelsPossible) { console.info('Uploaded 3D models are skipped on this visit (the loader could not be fetched); built-in pack shapes are shown.'); return; }
+    import('three/addons/loaders/GLTFLoader.js').then(({ GLTFLoader }) => {
+      const loader = new GLTFLoader();
+      wanted.forEach(p => loader.load(p.modelUrl,
+        gltf => { try { useModel(p, gltf); } catch (e) { console.warn(`3D model for "${p.name}" could not be used; showing the built-in shape.`, e); } },
+        undefined, () => console.info(`3D model for "${p.name}" could not be loaded; showing the built-in shape.`)));
+    }).catch(e => console.warn('Could not fetch the 3D model loader; showing built-in pack shapes.', e));
+  }
   // Show on the shelves what is in stock: only as many packs as are left, or the grey tag when sold out.
   function applyStock() {
     PRODUCTS.forEach(p => {
-      if (!p.shelf || !p.shelf.mesh) return;
-      const n = Math.min(p.shelf.mesh.userData.list.length, stockOf(p));
-      p.shelf.mesh.count = n; p.shelf.mesh.visible = n > 0;
+      if (!p.shelf || !p.shelf.list) return;
+      const n = Math.min(p.shelf.list.length, stockOf(p));
+      p.shelf.meshes.forEach(m => { m.count = n; m.visible = n > 0; });
       p.shelf.tags.forEach(t => { t.visible = n > 0; }); p.shelf.soldTag.visible = n <= 0;
     });
     placeOutline(hoverBox);
@@ -1447,8 +1582,9 @@ function startWorld(THREE) {
     walkTo(spot, lookAtFrom(spot, { x: u.x, y: 1.25, z: u.z }));
   }
   function showSelection(p, it) { placeOutline(selectBox, p, it); selectProduct(p); }
-  function findProduct(p) {
-    const it = p.hero; if (!it) { selectProduct(p); return; }
+  // Walk to a snack: to the very pack that was clicked when there is one, otherwise to its first pack.
+  function findProduct(p, pack = null) {
+    const it = pack && pack.index < stockOf(p) ? pack : p.hero; if (!it || !inStock(p)) { selectProduct(p); return; }
     const c = new THREE.Vector3().setFromMatrixPosition(it.m), u = it.unit;
     const spot = nearestFree(c.x + Math.sin(u.rotY) * 2.1, c.z + Math.cos(u.rotY) * 2.1);
     showSelection(p, it);
@@ -1484,13 +1620,13 @@ function startWorld(THREE) {
   joyEl.addEventListener('contextmenu', e => e.preventDefault());
 
   // Drag to look; a click or tap without dragging selects what is under it.
-  const raycaster = new THREE.Raycaster(), pickList = clickable.concat(blockers);
+  const raycaster = new THREE.Raycaster();
   function pick(clientX, clientY) {
     const rect = canvas.getBoundingClientRect();
     raycaster.setFromCamera(new THREE.Vector2(((clientX - rect.left) / rect.width) * 2 - 1, -((clientY - rect.top) / rect.height) * 2 + 1), camera);
     // Products and solid objects are checked together and the nearest hit wins: if a shelf
     // or wall is in front of a product, nothing is selected.
-    const hit = raycaster.intersectObjects(pickList, true).find(h => h.object.visible);   // hidden price tags don't count
+    const hit = raycaster.intersectObjects(clickable.concat(blockers), true).find(h => h.object.visible);   // hidden price tags don't count
     if (!hit || hit.distance > 14) return null;
     const d = hit.object.userData;
     return { product: d.product, checkout: d.checkout, floor: d.floor, point: hit.point, item: d.list && hit.instanceId !== undefined ? d.list[hit.instanceId] : (d.product && inStock(d.product) ? d.product.hero : null) };
@@ -1593,6 +1729,7 @@ function startWorld(THREE) {
     if (!inspectPack) return;
     inspectPack.traverse(o => {
       if (o.geometry) o.geometry.dispose();
+      if (o.userData.shared || !o.material) return;
       (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => { if (m && m.map) { if (m.map.userData.retire) m.map.userData.retire(); m.map.dispose(); } if (m) m.dispose(); });
     });
     if (inspectPack.parent) inspectPack.parent.remove(inspectPack);
@@ -1675,9 +1812,14 @@ function startWorld(THREE) {
       $('inspect-add').onclick = () => { if (inspectP) { addToCart(inspectP, cardQty); cardQty = 1; updateCard(); setInspectAdd(); } };
     }
     inspectDisposePack();
-    inspectPack = packMesh(p, p.width, p.depth, 1);
-    inspectPack.setMatrixAt(0, new THREE.Matrix4());
-    inspectPack.instanceMatrix.needsUpdate = true;
+    if (p.customParts) {   // the uploaded 3D model: its materials are shared with the shelf, so they are not thrown away afterwards
+      inspectPack = new THREE.Group();
+      p.customParts.forEach(({ geo, material }) => { const m = new THREE.Mesh(geo.clone(), material); m.userData.shared = true; inspectPack.add(m); });
+    } else {
+      inspectPack = packMesh(p, p.width, p.depth, 1);
+      inspectPack.setMatrixAt(0, new THREE.Matrix4());
+      inspectPack.instanceMatrix.needsUpdate = true;
+    }
     inspectScene.add(inspectPack);
     const size = Math.max(p.width, p.height, p.depth);
     inspectBase = (size * 0.62) / Math.tan(THREE.MathUtils.degToRad(20));
@@ -1765,8 +1907,9 @@ function startWorld(THREE) {
     if (firstFrame) { firstFrame = false; window.__shopReady = true; $('splash').classList.add('done'); welcomeOnce(); }
   }
   applyStock();
+  loadModels();
   frame();
-  return { applyStock, findProduct, goToCategory, resetView, clearSelection: () => placeOutline(selectBox), inspect: openInspect, closeInspect, inspectOpen: () => inspectP !== null };
+  return { applyStock, findProduct, selectedPack: () => selectedItem, goToCategory, resetView, clearSelection: () => placeOutline(selectBox), inspect: openInspect, closeInspect, inspectOpen: () => inspectP !== null };
 }
 
 try {

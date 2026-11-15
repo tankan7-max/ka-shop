@@ -9,6 +9,7 @@
   :root { --ink: #1d2327; --muted: #5f6b70; --line: #dfe5e4; --brand: #2a9d8f; --brand-dark: #1f7a6f; --danger: #b3261e; --warn: #9a5b00; --bg: #f4f7f6; --card: #fff; }
   * { box-sizing: border-box; }
   [hidden] { display: none !important; }
+  html { touch-action: manipulation; }   /* phones: tapping + or − quickly must not zoom the page */
   body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--ink); }
   header { background: var(--brand); color: #fff; padding: 16px 20px; }
   header h1 { margin: 0; font-size: 20px; }
@@ -70,7 +71,7 @@
 <body>
 <header>
   <h1>Inventory — Virtual Snack Shop</h1>
-  <p>Stock on hand for every snack. <a href="./virtual-snack-shop.html">← Back to the shop</a></p>
+  <p>Stock on hand for every snack. <a href="./virtual-snack-shop.html">← Back to the shop</a> · <a href="./products.html">Products</a></p>
 </header>
 <main>
   <div id="notice" class="panel" role="alert" hidden></div>
@@ -411,6 +412,11 @@ async function startLive() {
   const mine = await api('admins?select=user_id');
   if (!mine || !mine.length) throw new Error('This login works, but it is not set up as the shop owner yet.');
   const [stored, settings] = await Promise.all([api('stock?select=product_id,qty'), api('settings?select=low_stock_at')]);
+  // Products managed on the Products page live in the database; products.json is the list only until then.
+  try {
+    const [rows, cats] = await Promise.all([api('products?select=id,name,category,price_sgd,pack&active=eq.true&order=sort,name'), api('categories?select=name&order=sort,name')]);
+    if (rows && rows.length) { PRODUCTS = rows; CATEGORIES = (cats || []).map(c => c.name); }
+  } catch (e) { console.warn('Could not read products from the database, using products.json:', e); }
   if (settings && settings[0]) lowAt = loadedLowAt = settings[0].low_stock_at;
   document.body.classList.remove('locked'); $('signin').hidden = true; $('who').textContent = session.email;
   needsSave = false;

@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Products — Virtual Snack Shop</title>
+<style>
+  :root { --ink: #1d2327; --muted: #5f6b70; --line: #dfe5e4; --brand: #2a9d8f; --brand-dark: #1f7a6f; --danger: #b3261e; --bg: #f4f7f6; --card: #fff; }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { touch-action: manipulation; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--ink); }
+  header { background: var(--brand); color: #fff; padding: 16px 20px; }
+  header h1 { margin: 0; font-size: 20px; }
+  header p { margin: 4px 0 0; opacity: .95; font-size: 14px; }
+  header a { color: #fff; }
+  main { max-width: 820px; margin: 0 auto; padding: 16px 16px 60px; }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; border: 1px solid var(--line); background: var(--card); border-radius: 10px; padding: 8px 14px; min-height: 40px; }
+  button.primary { background: var(--brand); border-color: var(--brand); color: #fff; font-weight: 700; }
+  button.primary:hover { background: var(--brand-dark); }
+  button.danger { color: var(--danger); border-color: #f0c4c0; }
+  button.small { min-height: 32px; padding: 3px 10px; font-size: 14px; }
+  button:disabled { opacity: .45; cursor: default; }
+  button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin: 12px 0; font-size: 14px; line-height: 1.5; }
+  .panel summary { font-weight: 700; cursor: pointer; }
+  #notice { background: #fdecea; border-color: #f5c6c2; color: #7a1f1a; }
+  #live-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; background: #e3f4f1; border-color: #b6e0d9; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 12px 0; }
+  .toolbar input[type="search"] { flex: 1 1 200px; padding: 10px 12px; font-size: 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); }
+  body.locked main > :not(#signin):not(#notice) { display: none !important; }
+  #signin label, .field { display: block; font-weight: 600; margin-top: 10px; }
+  #signin input { display: block; width: 100%; max-width: 340px; height: 42px; padding: 0 10px; margin-top: 4px; font-size: 16px; border: 1px solid var(--line); border-radius: 10px; }
+  .error { color: var(--danger); font-weight: 600; min-height: 20px; margin: 8px 0 0; }
+  section.cat { margin-top: 18px; }
+  section.cat h2 { font-size: 16px; margin: 0 0 6px; color: var(--brand-dark); display: flex; align-items: center; gap: 6px; }
+  section.cat h2 span { margin-right: auto; }
+  .row { display: grid; grid-template-columns: 52px 1fr auto; gap: 12px; align-items: center; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px; margin-bottom: 8px; }
+  .row.off { opacity: .6; }
+  .swatch { width: 52px; height: 52px; border-radius: 10px; background: #eef1f2 center / contain no-repeat; border: 1px solid var(--line); }
+  .row .name { font-weight: 600; }
+  .row .meta { font-size: 13px; color: var(--muted); }
+  .badge { display: inline-block; font-size: 12px; font-weight: 700; padding: 0 7px; border-radius: 999px; background: #e3f4f1; color: var(--brand-dark); margin-left: 6px; }
+  .badge.off { background: #eceff1; color: var(--muted); }
+  dialog { border: 0; border-radius: 16px; padding: 0; width: min(620px, calc(100vw - 20px)); max-height: calc(100dvh - 20px); box-shadow: 0 8px 28px rgba(20,30,35,.25); color: var(--ink); }
+  dialog::backdrop { background: rgba(20,30,35,.45); }
+  dialog form { padding: 18px 20px; }
+  dialog h2 { margin: 0 0 4px; font-size: 20px; }
+  .field input:not([type="checkbox"]):not([type="color"]):not([type="file"]), .field select { display: block; width: 100%; height: 42px; padding: 0 10px; margin-top: 4px; font-size: 16px; font-weight: 400; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+  .field small, .hint { display: block; font-weight: 400; color: var(--muted); font-size: 13px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0 12px; }
+  fieldset { border: 1px solid var(--line); border-radius: 12px; margin: 14px 0 0; padding: 4px 14px 12px; }
+  legend { font-weight: 700; padding: 0 6px; }
+  .check { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-weight: 600; }
+  .check input { width: 20px; height: 20px; accent-color: var(--brand); }
+  .file-line { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 6px; }
+  #photo-preview { width: 84px; height: 84px; border-radius: 10px; border: 1px solid var(--line); background: #eef1f2 center / contain no-repeat; }
+  .dialog-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; align-items: center; }
+  .dialog-btns .spacer { flex: 1; }
+  #status { color: var(--muted); font-size: 14px; }
+  code { background: rgba(0,0,0,.06); padding: 1px 5px; border-radius: 5px; }
+</style>
+</head>
+<body class="locked">
+<header>
+  <h1>Products — Virtual Snack Shop</h1>
+  <p>What the shop sells. <a href="./virtual-snack-shop.html">← Back to the shop</a> · <a href="./inventory.html">Stock</a></p>
+</header>
+<main>
+  <div id="notice" class="panel" role="alert" hidden></div>
+
+  <form id="signin" class="panel" hidden>
+    <b>Sign in to manage the products</b>
+    <label>Email<input id="signin-email" type="email" autocomplete="username" required></label>
+    <label>Password<input id="signin-password" type="password" autocomplete="current-password" required></label>
+    <p id="signin-error" class="error" role="alert"></p>
+    <button class="primary" type="submit">Sign in</button>
+  </form>
+
+  <div id="live-bar" class="panel">
+    <span><b>Live.</b> Signed in as <span id="who"></span>. Changes show in the shop the next time a customer opens it.</span>
+    <button id="signout" type="button">Sign out</button>
+  </div>
+
+  <div id="import-box" class="panel" hidden>
+    <b>The database has no products yet.</b> The shop is still using the list in <code>products.json</code>.
+    Copy that list into the database once, and from then on you manage products on this page.
+    <div class="toolbar" style="margin-bottom:0"><button id="import" class="primary" type="button">Copy the products from products.json</button></div>
+  </div>
+
+  <details class="panel">
+    <summary>How this works</summary>
+    <b>Add a product</b> with its name, price and pack, pick the pack shape that looks most like it, and
+    upload a photo of the front of the pack. The shop builds the 3D pack from that. Tick
+    “the photo is the flat artwork” when your picture is just the label or front panel (no background) and
+    it will be wrapped right across the pack.<br>
+    For anything the built-in shapes cannot do, upload a <b>3D model</b> (a <code>.glb</code> file). It replaces
+    the built-in shape for that product, is sized to the width, height and depth you enter, and should face
+    forward (+Z) and stand upright (+Y).<br>
+    <b>Hide</b> a product to take it off the shelves without losing it; <b>Delete</b> removes it for good.
+    A new product starts with the stock you enter; after that, change stock on the <a href="./inventory.html">Stock</a> page.<br>
+    <b>Download backup</b> saves everything as <code>products.json</code>. The shop falls back to that file if
+    the database cannot be reached, so upload a fresh copy to the repository now and then.
+  </details>
+
+  <div class="toolbar">
+    <input id="search" type="search" placeholder="Search products…" aria-label="Search products">
+    <button id="add" class="primary" type="button">Add a product</button>
+    <button id="backup" type="button">Download backup</button>
+  </div>
+  <p id="status" role="status"></p>
+  <div id="list"></div>
+</main>
+
+<dialog id="editor" aria-labelledby="editor-title">
+  <form id="editor-form" method="dialog">
+    <h2 id="editor-title">Product</h2>
+    <label class="field">Name<input id="f-name" required maxlength="120" autocomplete="off"></label>
+    <div class="grid">
+      <label class="field">Price (S$)<input id="f-price" type="number" min="0" max="9999" step="0.01" inputmode="decimal" required></label>
+      <label class="field">Pack<input id="f-pack" maxlength="120" placeholder="1 pack, 60g" autocomplete="off"></label>
+    </div>
+    <div class="grid">
+      <label class="field">Shelf (category)<select id="f-category"></select></label>
+      <label class="field" id="f-newcat-wrap" hidden>New shelf name<input id="f-newcat" maxlength="80" autocomplete="off"></label>
+      <label class="field" id="f-stock-wrap">Starting stock<input id="f-stock" type="number" min="0" max="9999" step="1" inputmode="numeric" value="10"></label>
+    </div>
+
+    <fieldset>
+      <legend>How the pack looks</legend>
+      <div class="grid">
+        <label class="field">Pack shape<select id="f-shape">
+          <option value="bag">Bag (chips, sweets)</option><option value="box">Box</option><option value="bar">Bar or roll (flow-wrap)</option>
+          <option value="carton">Drink packet</option><option value="can">Can</option><option value="bottle">Bottle</option>
+          <option value="tube">Tube (stacked crisps)</option><option value="cup">Cup (noodles)</option>
+        </select></label>
+        <label class="field">Pack colour<input id="f-color" type="color" value="#2a9d8f" style="display:block;width:100%;height:42px;margin-top:4px;padding:2px;border:1px solid var(--line);border-radius:10px;background:#fff"></label>
+      </div>
+      <div class="grid">
+        <label class="field">Width<input id="f-w" type="number" min="0.05" max="0.8" step="0.01" inputmode="decimal" required></label>
+        <label class="field">Height<input id="f-h" type="number" min="0.05" max="0.6" step="0.01" inputmode="decimal" required></label>
+        <label class="field">Depth<input id="f-d" type="number" min="0.03" max="0.5" step="0.01" inputmode="decimal" required></label>
+      </div>
+      <span class="hint">Sizes are in shop units, about 3× real life so packs read well on the shelf: a real 15&nbsp;cm-wide bag is about 0.45. Picking a shape fills in typical sizes.</span>
+
+      <div class="field">Photo of the pack front
+        <div class="file-line">
+          <div id="photo-preview"></div>
+          <div>
+            <input id="f-photo" type="file" accept="image/jpeg,image/png,image/webp" aria-label="Photo of the pack front">
+            <small>JPEG, PNG or WebP. It is made smaller before uploading. Without a photo the shop draws the pack from the name and colour.</small>
+            <button id="photo-remove" class="small" type="button" hidden>Remove photo</button>
+          </div>
+        </div>
+      </div>
+      <label class="check"><input id="f-cover" type="checkbox"> The photo is the flat artwork — wrap it across the whole pack front</label>
+
+      <div class="field">3D model (optional)
+        <div class="file-line">
+          <input id="f-model" type="file" accept=".glb,model/gltf-binary" aria-label="3D model file">
+          <button id="model-remove" class="small" type="button" hidden>Remove 3D model</button>
+        </div>
+        <small id="model-info">A <code>.glb</code> file up to 8&nbsp;MB, without Draco compression. Keep it low-poly: every pack on the shelf is a copy.</small>
+      </div>
+    </fieldset>
+
+    <label class="check"><input id="f-active" type="checkbox" checked> On sale (shown in the shop)</label>
+    <p id="editor-error" class="error" role="alert"></p>
+    <div class="dialog-btns">
+      <button id="save" class="primary" type="submit">Save</button>
+      <button id="cancel" type="button">Cancel</button>
+      <span class="spacer"></span>
+      <a id="view-link" target="_blank" rel="noopener" hidden>View in shop</a>
+      <button id="delete" class="danger" type="button" hidden>Delete</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+const $ = id => document.getElementById(id);
+const el = (tag, props = {}, ...kids) => { const n = Object.assign(document.createElement(tag), props); n.append(...kids); return n; };
+const BUCKET = 'product-files';
+// Typical size of each pack shape, in shop units (width, height, depth).
+const SIZES = { bag: [0.5, 0.55, 0.18], box: [0.5, 0.35, 0.22], bar: [0.5, 0.2, 0.12], carton: [0.2, 0.34, 0.13], can: [0.2, 0.36, 0.2], bottle: [0.22, 0.5, 0.22], tube: [0.26, 0.52, 0.26], cup: [0.32, 0.3, 0.32] };
+const ROUND = ['can', 'bottle', 'tube', 'cup'];
+
+let DB_URL = '', DB_KEY = '', session = null, fileDb = null;
+let products = [], categories = [];        // as stored in the database
+let editing = null, draft = null;          // the product open in the editor, and its unsaved photo / model changes
+
+function notice(...parts) { const n = $('notice'); n.textContent = ''; n.append(...parts); n.hidden = false; }
+const say = text => { $('status').textContent = text; };
+
+// --- Signing in and talking to the database (same owner login as the Stock page). ---
+const SESSION_KEY = 'virtual-snack-shop-owner-session';
+function keepSession(s) { session = s; try { if (s) localStorage.setItem(SESSION_KEY, JSON.stringify(s)); else localStorage.removeItem(SESSION_KEY); } catch (e) {} }
+async function authCall(grant, body) {
+  const res = await fetch(`${DB_URL}/auth/v1/token?grant_type=${grant}`, { method: 'POST', headers: { apikey: DB_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const d = await res.json().catch(() => ({}));
+  if (!res.ok || !d.access_token) throw new Error(d.msg || d.error_description || d.message || 'Sign-in failed.');
+  keepSession({ access_token: d.access_token, refresh_token: d.refresh_token, expires_at: Date.now() + (d.expires_in || 3600) * 1000, email: (d.user && d.user.email) || '' });
+}
+async function accessToken() {
+  if (!session) throw new Error('Please sign in.');
+  if (session.expires_at - Date.now() < 60000) {
+    try { await authCall('refresh_token', { refresh_token: session.refresh_token }); }
+    catch (e) { showSignIn('Please sign in again.'); throw new Error('Please sign in again.'); }
+  }
+  return session.access_token;
+}
+async function api(path, { method = 'GET', body, prefer } = {}) {
+  const token = await accessToken();
+  const res = await fetch(`${DB_URL}/rest/v1/${path}`, { method, headers: { apikey: DB_KEY, Authorization: 'Bearer ' + token, 'Content-Type': 'application/json', ...(prefer ? { Prefer: prefer } : {}) }, body: body === undefined ? undefined : JSON.stringify(body) });
+  if (res.status === 401) { showSignIn('Please sign in again.'); throw new Error('Please sign in again.'); }
+  const text = await res.text(); let data = null; try { data = text ? JSON.parse(text) : null; } catch (e) {}
+  if (!res.ok) throw new Error((data && (data.message || data.msg)) || 'HTTP ' + res.status);
+  return data;
+}
+// Upload a file and return the address it can be seen at. Each upload gets its own name, so shops never show an old copy.
+async function upload(productId, kind, blob, extension, type) {
+  const token = await accessToken(), path = `${productId}/${kind}-${Date.now().toString(36)}.${extension}`;
+  const res = await fetch(`${DB_URL}/storage/v1/object/${BUCKET}/${path}`, { method: 'POST', headers: { apikey: DB_KEY, Authorization: 'Bearer ' + token, 'Content-Type': type, 'cache-control': 'max-age=31536000' }, body: blob });
+  if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error('Upload failed: ' + (d.message || d.error || 'HTTP ' + res.status)); }
+  return `${DB_URL}/storage/v1/object/public/${BUCKET}/${path}`;
+}
+// Remove a file this page uploaded earlier (other addresses, e.g. photos on other websites, are left alone).
+async function removeFile(url) {
+  const prefix = `${DB_URL}/storage/v1/object/public/${BUCKET}/`;
+  if (!url || !url.startsWith(prefix)) return;
+  try { const token = await accessToken(); await fetch(`${DB_URL}/storage/v1/object/${BUCKET}/${url.slice(prefix.length)}`, { method: 'DELETE', headers: { apikey: DB_KEY, Authorization: 'Bearer ' + token } }); } catch (e) { console.warn('Could not remove the old file:', e); }
+}
+function showSignIn(message = '') { keepSession(null); document.body.classList.add('locked'); $('signin').hidden = false; $('signin-error').textContent = message; }
+$('signin').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = $('signin').querySelector('button'); btn.disabled = true; $('signin-error').textContent = '';
+  try { await authCall('password', { email: $('signin-email').value.trim(), password: $('signin-password').value }); $('signin-password').value = ''; await start(); }
+  catch (err) { showSignIn(err.message); }
+  btn.disabled = false;
+});
+$('signout').onclick = async () => {
+  try { await fetch(`${DB_URL}/auth/v1/logout`, { method: 'POST', headers: { apikey: DB_KEY, Authorization: 'Bearer ' + session.access_token } }); } catch (e) {}
+  products = []; $('list').textContent = ''; showSignIn();
+};
+
+// --- The list ---
+async function start() {
+  const mine = await api('admins?select=user_id');
+  if (!mine || !mine.length) throw new Error('This login works, but it is not set up as the shop owner yet.');
+  document.body.classList.remove('locked'); $('signin').hidden = true; $('who').textContent = session.email;
+  await reload();
+}
+async function reload() {
+  [products, categories] = await Promise.all([api('products?select=*&order=sort,name'), api('categories?select=*&order=sort,name')]);
+  $('import-box').hidden = products.length > 0;
+  render();
+}
+const categoryNames = () => { const names = categories.map(c => c.name); products.forEach(p => { if (!names.includes(p.category)) names.push(p.category); }); return names; };
+const hex = n => '#' + ((Number(n) || 0) & 0xffffff).toString(16).padStart(6, '0');
+function render() {
+  const q = $('search').value.trim().toLowerCase(), list = $('list'); list.textContent = '';
+  const names = categoryNames();
+  names.forEach((cat, ci) => {
+    const items = products.filter(p => p.category === cat && (!q || `${p.name} ${p.category} ${p.pack} ${p.id}`.toLowerCase().includes(q)));
+    if (!items.length) return;
+    const up = el('button', { type: 'button', className: 'small', textContent: '↑', disabled: ci === 0, onclick: () => moveCategory(cat, -1) }); up.setAttribute('aria-label', `Move the ${cat} shelf earlier`);
+    const down = el('button', { type: 'button', className: 'small', textContent: '↓', disabled: ci === names.length - 1, onclick: () => moveCategory(cat, 1) }); down.setAttribute('aria-label', `Move the ${cat} shelf later`);
+    const section = el('section', { className: 'cat' }, el('h2', {}, el('span', { textContent: `${cat} (${items.length})` }), q ? '' : up, q ? '' : down));
+    items.forEach(p => {
+      const sw = el('div', { className: 'swatch' }); sw.style.backgroundColor = hex((p.model || {}).color);
+      if ((p.texture || {}).image_url) sw.style.backgroundImage = `url("${String(p.texture.image_url).replace(/["\\\n]/g, '')}")`;
+      const edit = el('button', { type: 'button', textContent: 'Edit', onclick: () => openEditor(p) }); edit.setAttribute('aria-label', `Edit ${p.name}`);
+      section.append(el('div', { className: 'row' + (p.active ? '' : ' off') }, sw,
+        el('div', {}, el('div', { className: 'name' }, p.name, p.active ? '' : el('span', { className: 'badge off', textContent: 'Hidden' }), (p.model || {}).glb_url ? el('span', { className: 'badge', textContent: '3D model' }) : ''),
+          el('div', { className: 'meta', textContent: `S$${Number(p.price_sgd).toFixed(2)}${p.pack ? ' · ' + p.pack : ''}` })),
+        edit));
+    });
+    list.append(section);
+  });
+  if (!list.children.length) list.textContent = products.length ? 'No products match.' : '';
+  const hidden = products.filter(p => !p.active).length;
+  say(products.length ? `${products.length - hidden} product${products.length - hidden === 1 ? '' : 's'} on sale${hidden ? ` · ${hidden} hidden` : ''} · ${names.length} shelves` : '');
+}
+$('search').addEventListener('input', render);
+// Shelf order: swap this category with its neighbour, then store the whole order.
+async function moveCategory(name, step) {
+  const names = categoryNames(), i = names.indexOf(name), j = i + step;
+  if (j < 0 || j >= names.length) return;
+  [names[i], names[j]] = [names[j], names[i]];
+  try { await api('categories?on_conflict=name', { method: 'POST', prefer: 'resolution=merge-duplicates,return=minimal', body: names.map((n, sort) => ({ name: n, sort })) }); await reload(); }
+  catch (e) { say('Could not change the shelf order: ' + e.message); }
+}
+
+// --- The editor ---
+function fillCategories(selected) {
+  const sel = $('f-category'); sel.textContent = '';
+  categoryNames().forEach(n => sel.append(el('option', { value: n, textContent: n })));
+  sel.append(el('option', { value: '\u0000new', textContent: '+ New shelf…' }));
+  sel.value = selected && categoryNames().includes(selected) ? selected : (categoryNames()[0] || '\u0000new');
+  $('f-newcat-wrap').hidden = sel.value !== '\u0000new';
+}
+$('f-category').onchange = () => { $('f-newcat-wrap').hidden = $('f-category').value !== '\u0000new'; if (!$('f-newcat-wrap').hidden) $('f-newcat').focus(); };
+$('f-shape').onchange = () => { const s = SIZES[$('f-shape').value]; if (s) [$('f-w').value, $('f-h').value, $('f-d').value] = s; };
+function showFiles() {
+  $('photo-preview').style.backgroundImage = draft.photoPreview ? `url("${draft.photoPreview}")` : '';
+  $('photo-remove').hidden = !draft.photoPreview;
+  $('model-remove').hidden = !(draft.modelUrl || draft.modelFile);
+  $('model-info').textContent = draft.modelFile ? `Chosen: ${draft.modelFile.name} (${(draft.modelFile.size / 1048576).toFixed(1)} MB) — uploaded when you save.` : draft.modelUrl ? 'This product has a 3D model. Choose a file to replace it.' : 'A .glb file up to 8 MB, without Draco compression. Keep it low-poly: every pack on the shelf is a copy.';
+}
+function openEditor(p) {
+  editing = p || null;
+  const m = (p && p.model) || {}, t = (p && p.texture) || {};
+  const shape = SIZES[m.shape] ? m.shape : m.type === 'cylinder' ? 'can' : 'bag', size = SIZES[shape];
+  $('editor-title').textContent = p ? `Edit ${p.name}` : 'Add a product';
+  $('f-name').value = p ? p.name : ''; $('f-price').value = p ? Number(p.price_sgd).toFixed(2) : ''; $('f-pack').value = p ? p.pack : '';
+  fillCategories(p && p.category); $('f-newcat').value = '';
+  $('f-stock-wrap').hidden = !!p; $('f-stock').value = 10;
+  $('f-shape').value = shape; $('f-color').value = hex(m.color === undefined ? 0x2a9d8f : m.color);
+  $('f-w').value = m.width || size[0]; $('f-h').value = m.height || size[1]; $('f-d').value = m.depth || size[2];
+  $('f-cover').checked = t.fit === 'cover'; $('f-active').checked = p ? !!p.active : true;
+  $('f-photo').value = ''; $('f-model').value = '';
+  draft = { photoUrl: t.image_url || '', photoPreview: t.image_url || '', photoBlob: null, modelUrl: m.glb_url || '', modelFile: null };
+  showFiles();
+  $('delete').hidden = !p; $('view-link').hidden = !p; if (p) $('view-link').href = `./virtual-snack-shop.html?product=${encodeURIComponent(p.id)}`;
+  $('editor-error').textContent = ''; $('save').disabled = false;
+  $('editor').showModal();
+}
+$('add').onclick = () => openEditor(null);
+$('cancel').onclick = () => $('editor').close();
+
+// A chosen photo is made smaller (longest side 1024) right away, so uploads are quick and shops load fast.
+$('f-photo').onchange = async () => {
+  const file = $('f-photo').files[0]; if (!file) return;
+  try {
+    const img = await new Promise((ok, bad) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => bad(new Error('That file is not a picture this browser can read.')); i.src = URL.createObjectURL(file); });
+    const k = Math.min(1, 1024 / Math.max(img.naturalWidth, img.naturalHeight)), c = document.createElement('canvas');
+    c.width = Math.max(1, Math.round(img.naturalWidth * k)); c.height = Math.max(1, Math.round(img.naturalHeight * k));
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(img.src);
+    const png = file.type === 'image/png';   // PNGs may have see-through parts, so they stay PNG
+    draft.photoBlob = await new Promise(ok => c.toBlob(ok, png ? 'image/png' : 'image/jpeg', 0.9));
+    if (!draft.photoBlob) throw new Error('The picture could not be prepared.');
+    draft.photoPreview = c.toDataURL(png ? 'image/png' : 'image/jpeg', 0.6);
+    $('editor-error').textContent = '';
+  } catch (e) { $('editor-error').textContent = e.message; $('f-photo').value = ''; }
+  showFiles();
+};
+$('photo-remove').onclick = () => { draft.photoBlob = null; draft.photoPreview = ''; $('f-photo').value = ''; showFiles(); };
+$('f-model').onchange = async () => {
+  const file = $('f-model').files[0]; if (!file) return;
+  const magic = new TextDecoder().decode(await file.slice(0, 4).arrayBuffer());
+  if (magic !== 'glTF') { $('editor-error').textContent = 'That is not a .glb file. Export the model as “glTF Binary (.glb)”.'; $('f-model').value = ''; return; }
+  if (file.size > 8 * 1048576) { $('editor-error').textContent = 'That model is over 8 MB. Reduce its detail or texture size and try again.'; $('f-model').value = ''; return; }
+  draft.modelFile = file; $('editor-error').textContent = ''; showFiles();
+};
+$('model-remove').onclick = () => { draft.modelFile = null; draft.modelUrl = ''; $('f-model').value = ''; showFiles(); };
+
+const slug = name => name.toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'product';
+$('editor-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const err = $('editor-error'); err.textContent = '';
+  const name = $('f-name').value.trim(), price = Number($('f-price').value);
+  const category = $('f-category').value === '\u0000new' ? $('f-newcat').value.trim() : $('f-category').value;
+  const num = (id, lo, hi) => Math.min(hi, Math.max(lo, Number($(id).value) || lo));
+  if (!name) { err.textContent = 'Give the product a name.'; return; }
+  if (!Number.isFinite(price) || price < 0 || $('f-price').value === '') { err.textContent = 'Enter the price as a number, like 1.50.'; return; }
+  if (!category) { err.textContent = 'Give the new shelf a name.'; return; }
+  let id = editing ? editing.id : slug(name);
+  if (!editing) for (let n = 2; products.some(p => p.id === id); n++) id = `${slug(name)}-${n}`;
+  $('save').disabled = true;
+  try {
+    // Files first, so the product is only saved once they are safely uploaded.
+    let photoUrl = draft.photoUrl, modelUrl = draft.modelUrl; const stale = [];
+    if (draft.photoBlob) { photoUrl = await upload(id, 'front', draft.photoBlob, draft.photoBlob.type === 'image/png' ? 'png' : 'jpg', draft.photoBlob.type); stale.push(draft.photoUrl); }
+    else if (!draft.photoPreview && draft.photoUrl) { photoUrl = ''; stale.push(draft.photoUrl); }
+    if (draft.modelFile) { modelUrl = await upload(id, 'model', draft.modelFile, 'glb', 'model/gltf-binary'); if (editing) stale.push((editing.model || {}).glb_url); }
+    else if (!draft.modelUrl && editing && (editing.model || {}).glb_url) stale.push(editing.model.glb_url);
+    const shape = $('f-shape').value;
+    const model = { ...((editing && editing.model) || {}), type: ROUND.includes(shape) ? 'cylinder' : 'box', shape, width: num('f-w', 0.05, 0.8), height: num('f-h', 0.05, 0.6), depth: num('f-d', 0.03, 0.5), color: parseInt($('f-color').value.slice(1), 16) };
+    if (modelUrl) model.glb_url = modelUrl; else delete model.glb_url;
+    const texture = { ...((editing && editing.texture) || {}) };
+    if (photoUrl) { texture.type = 'image'; texture.image_url = photoUrl; if ($('f-cover').checked) texture.fit = 'cover'; else delete texture.fit; }
+    else { delete texture.image_url; delete texture.fit; texture.type = 'generated'; }
+    const row = { id, name, category, price_sgd: Math.round(price * 100) / 100, pack: $('f-pack').value.trim(), model, texture, active: $('f-active').checked };
+    if (!editing) row.sort = products.reduce((m, p) => Math.max(m, p.sort || 0), 0) + 1;
+    if (!categories.some(c => c.name === category)) await api('categories', { method: 'POST', prefer: 'return=minimal', body: { name: category, sort: categories.reduce((m, c) => Math.max(m, c.sort || 0), 0) + 1 } });
+    if (editing) await api(`products?id=eq.${encodeURIComponent(id)}`, { method: 'PATCH', prefer: 'return=minimal', body: row });
+    else {
+      await api('products', { method: 'POST', prefer: 'return=minimal', body: row });
+      await api('stock?on_conflict=product_id', { method: 'POST', prefer: 'resolution=ignore-duplicates,return=minimal', body: { product_id: id, qty: Math.max(0, Math.min(9999, Math.floor(Number($('f-stock').value) || 0))) } });
+    }
+    for (const url of stale) await removeFile(url);
+    $('editor').close(); await reload(); say(`Saved “${name}”. ` + $('status').textContent);
+  } catch (ex) { err.textContent = 'Could not save: ' + ex.message; }
+  $('save').disabled = false;
+});
+$('delete').onclick = async () => {
+  const p = editing; if (!p || !confirm(`Delete “${p.name}” for good? To take it off the shelves but keep it, untick “On sale” instead.`)) return;
+  try {
+    await api(`products?id=eq.${encodeURIComponent(p.id)}`, { method: 'DELETE', prefer: 'return=minimal' });
+    await api(`stock?product_id=eq.${encodeURIComponent(p.id)}`, { method: 'DELETE', prefer: 'return=minimal' });
+    await removeFile((p.texture || {}).image_url); await removeFile((p.model || {}).glb_url);
+    $('editor').close(); await reload(); say(`Deleted “${p.name}”. ` + $('status').textContent);
+  } catch (ex) { $('editor-error').textContent = 'Could not delete: ' + ex.message; }
+};
+
+// --- First time: copy the list from products.json into the database. ---
+$('import').onclick = async () => {
+  const btn = $('import'); btn.disabled = true;
+  try {
+    const src = (fileDb.products || []).filter(p => p && p.id && p.name);
+    const bad = src.filter(p => !/^[a-z0-9][a-z0-9-]{0,79}$/.test(p.id));
+    if (bad.length) throw new Error('These ids need fixing in products.json first (small letters, digits and dashes only): ' + bad.map(p => p.id).join(', '));
+    const cats = [...(fileDb.categories || [])]; src.forEach(p => { const c = p.category || 'Other snacks'; if (!cats.includes(c)) cats.push(c); });
+    await api('categories?on_conflict=name', { method: 'POST', prefer: 'resolution=merge-duplicates,return=minimal', body: cats.map((name, sort) => ({ name, sort })) });
+    await api('products?on_conflict=id', { method: 'POST', prefer: 'resolution=merge-duplicates,return=minimal', body: src.map((p, sort) => ({ id: p.id, name: p.name, category: p.category || 'Other snacks', price_sgd: Number(p.price_sgd) || 0, pack: p.pack || '', model: p.model || {}, texture: p.texture || {}, reference: p.reference || {}, active: true, sort })) });
+    await reload(); say(`Copied ${src.length} products into the database. ` + $('status').textContent);
+  } catch (e) { say('Could not copy the products: ' + e.message); }
+  btn.disabled = false;
+};
+
+// --- Backup: everything as a products.json file, for the repository. ---
+$('backup').onclick = () => {
+  const out = { ...fileDb, categories: categoryNames(), products: products.filter(p => p.active).map(p => ({ id: p.id, name: p.name, category: p.category, price_sgd: Number(p.price_sgd), pack: p.pack, model: p.model, texture: p.texture, reference: p.reference })) };
+  const a = el('a', { href: URL.createObjectURL(new Blob([JSON.stringify(out, null, 2) + '\n'], { type: 'application/json' })), download: 'products.json' });
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  say('Backup downloaded — upload it to the repository (and run sync-products.py) so the shop has a fallback.');
+};
+
+(async function load() {
+  try {
+    const res = await fetch('products.json', { cache: 'no-cache' });
+    if (!res.ok) throw new Error('products.json: HTTP ' + res.status);
+    fileDb = await res.json();
+    const shop = fileDb.shop || {};
+    DB_URL = String(shop.supabase_url || '').trim().replace(/\/+$/, ''); DB_KEY = String(shop.supabase_key || '').trim();
+    if (!DB_URL || !DB_KEY) { notice('This page needs the shop’s database. Set "supabase_url" and "supabase_key" under "shop" in products.json first; until then, products are edited in products.json itself.'); return; }
+    try { session = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); } catch (e) { session = null; }
+    if (session && session.refresh_token) { try { await start(); } catch (e) { showSignIn(e.message); } }
+    else showSignIn();
+  } catch (e) {
+    notice('Could not load the shop data (' + e.message + '). Open this page from the live site or a local web server, not straight from a file.');
+  }
+})();
+</script>
+</body>
+</html>
