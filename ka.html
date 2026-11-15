@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tan Kwan Ann — R&amp;D Scientist</title>
+<meta name="description" content="Tan Kwan Ann — R&D scientist in protein and enzyme engineering and structural biology, Singapore.">
+<meta name="theme-color" content="#0f3d3a">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f3d3a'/%3E%3Ctext x='16' y='22' font-family='Georgia,serif' font-size='16' font-weight='700' text-anchor='middle' fill='%23f3e9d2'%3EKA%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #faf7f0; --card: #ffffff; --ink: #17211f; --muted: #5c6a66; --line: #e4ddce;
+    --deep: #0f3d3a; --accent: #1f8a7c; --accent-soft: #dff1ec; --gold: #b7842b; --cream: #f3e9d2;
+    --serif: "Fraunces", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+    --sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --shadow: 0 1px 2px rgba(23,33,31,.05), 0 12px 32px rgba(23,33,31,.07);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper: #0d1514; --card: #131e1c; --ink: #e9efe9; --muted: #9aaaa5; --line: #24332f; --accent: #58c7b4; --accent-soft: #16302c; --gold: #e0b560; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 32px rgba(0,0,0,.35); }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.65 var(--sans); -webkit-font-smoothing: antialiased; }
+  a { color: inherit; }
+  a:focus-visible, button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; border-radius: 6px; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- Top: name, what I do, portrait ---------- */
+  .hero { position: relative; overflow: hidden; background: radial-gradient(120% 140% at 85% 0%, #1b5a53 0%, #0f3d3a 45%, #0a2a28 100%); color: #f4f1e8; }
+  .hero .wrap { position: relative; display: grid; grid-template-columns: 1fr auto; gap: 48px; align-items: center; padding-top: 72px; padding-bottom: 76px; }
+  .cage { position: absolute; right: -140px; top: -120px; width: 640px; height: 640px; opacity: .5; pointer-events: none; }
+  .eyebrow { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 18px; padding: 0; list-style: none; }
+  .eyebrow li { font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; padding: 5px 12px; border: 1px solid rgba(243,233,210,.35); border-radius: 999px; color: var(--cream); }
+  h1 { font: 700 clamp(44px, 8vw, 84px)/1 var(--serif); letter-spacing: -.02em; margin: 0 0 20px; }
+  .lede { font: 400 clamp(18px, 2.2vw, 22px)/1.5 var(--serif); max-width: 34em; margin: 0 0 28px; color: #e6e2d4; }
+  .lede b { color: #fff; font-weight: 600; }
+  .contact { display: flex; flex-wrap: wrap; gap: 10px; margin: 0; padding: 0; list-style: none; }
+  .contact a, .contact span { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 999px; font-size: 14px; font-weight: 600; text-decoration: none; border: 1px solid rgba(243,233,210,.3); background: rgba(255,255,255,.06); color: #f4f1e8; transition: background .2s, transform .2s; }
+  .contact a:hover { background: rgba(255,255,255,.16); transform: translateY(-1px); }
+  .contact a.primary { background: var(--cream); color: #0f3d3a; border-color: var(--cream); }
+  .contact a.primary:hover { background: #fff; }
+  .open { display: inline-flex; align-items: center; gap: 10px; margin: 0 0 22px; font-size: 14px; font-weight: 600; color: #bfeee4; }
+  .open i { width: 10px; height: 10px; border-radius: 50%; background: #58e0c6; box-shadow: 0 0 0 0 rgba(88,224,198,.6); animation: pulse 2.4s infinite; }
+  @keyframes pulse { 70% { box-shadow: 0 0 0 10px rgba(88,224,198,0); } 100% { box-shadow: 0 0 0 0 rgba(88,224,198,0); } }
+  svg.i { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+  .portrait { position: relative; width: 260px; height: 260px; flex: none; }
+  .portrait img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; border: 5px solid rgba(243,233,210,.9); box-shadow: 0 20px 50px rgba(0,0,0,.4); display: block; }
+  .portrait::before { content: ""; position: absolute; inset: -16px; border-radius: 50%; border: 1px dashed rgba(243,233,210,.45); animation: turn 60s linear infinite; }
+  @keyframes turn { to { transform: rotate(360deg); } }
+
+  /* ---------- Four numbers ---------- */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: -40px; position: relative; z-index: 1; }
+  .stat { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 20px 20px 18px; box-shadow: var(--shadow); }
+  .stat b { display: block; font: 700 clamp(28px, 4vw, 40px)/1.05 var(--serif); color: var(--accent); letter-spacing: -.01em; }
+  .stat span { display: block; margin-top: 8px; font-size: 13.5px; line-height: 1.45; color: var(--muted); }
+
+  /* ---------- Sections ---------- */
+  section { padding: 64px 0 0; }
+  .label { display: flex; align-items: center; gap: 14px; margin: 0 0 28px; font: 600 13px/1 var(--sans); letter-spacing: .16em; text-transform: uppercase; color: var(--gold); }
+  .label::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+  h2 { font: 600 clamp(26px, 3.4vw, 34px)/1.2 var(--serif); letter-spacing: -.01em; margin: 0 0 6px; }
+  h3 { font: 600 21px/1.3 var(--serif); margin: 0; }
+
+  /* Experience: a line down the left with a dot per role */
+  .timeline { position: relative; margin: 0; padding: 0 0 0 30px; list-style: none; }
+  .timeline::before { content: ""; position: absolute; left: 6px; top: 8px; bottom: 8px; width: 2px; background: linear-gradient(var(--accent), var(--line)); border-radius: 2px; }
+  .role { position: relative; padding-bottom: 36px; }
+  .role:last-child { padding-bottom: 0; }
+  .role::before { content: ""; position: absolute; left: -30px; top: 7px; width: 14px; height: 14px; border-radius: 50%; background: var(--paper); border: 3px solid var(--accent); }
+  .role.now::before { background: var(--accent); box-shadow: 0 0 0 5px var(--accent-soft); }
+  .role header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; }
+  .when { font-size: 13.5px; font-weight: 600; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .where { margin: 2px 0 12px; color: var(--accent); font-weight: 600; font-size: 15px; }
+  .role ul { margin: 0; padding-left: 18px; }
+  .role li { margin-bottom: 8px; }
+  .role li::marker { color: var(--accent); }
+  mark { background: linear-gradient(transparent 62%, var(--accent-soft) 0); color: inherit; font-weight: 600; padding: 0 1px; }
+
+  /* Expertise: one card per area, skills as chips */
+  .skills { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 16px; }
+  .skill { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 20px; box-shadow: var(--shadow); }
+  .skill h3 { font-size: 17px; display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .skill h3 svg { width: 20px; height: 20px; color: var(--accent); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+  .chips li { font-size: 13px; font-weight: 500; padding: 4px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--ink); }
+
+  /* Publications */
+  .pubs { display: grid; gap: 16px; margin: 0; padding: 0; list-style: none; }
+  .pub { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--gold); border-radius: 14px; padding: 18px 22px; box-shadow: var(--shadow); }
+  .pub h3 { font-size: 19px; margin-bottom: 6px; }
+  .pub p { margin: 0; color: var(--muted); font-size: 14.5px; }
+  .pub .me { color: var(--ink); font-weight: 700; }
+  .pub a { color: var(--accent); font-weight: 600; text-decoration: none; white-space: nowrap; }
+  .pub a:hover { text-decoration: underline; }
+  .tag { display: inline-block; font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--gold); margin-bottom: 6px; }
+
+  /* Education and beyond the bench, side by side */
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+  .list { margin: 0; padding: 0; list-style: none; }
+  .list li { padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .list li:first-child { padding-top: 0; }
+  .list li:last-child { border-bottom: 0; }
+  .list header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .list h3 { font-size: 18px; }
+  .list p { margin: 4px 0 0; color: var(--muted); font-size: 14.5px; }
+
+  /* Featured structure and side project: picture on one side, words on the other */
+  .feature { display: grid; grid-template-columns: 300px 1fr; gap: 36px; align-items: center; background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 28px; box-shadow: var(--shadow); }
+  .feature p { margin: 8px 0 0; color: var(--muted); max-width: 40em; }
+  .feature .chips { margin-top: 14px; }
+  .feature-art { position: relative; display: grid; place-items: center; aspect-ratio: 1; border-radius: 18px; overflow: hidden; background: radial-gradient(circle at 50% 40%, #1b5a53, #0a2a28); }
+  .feature-art svg { width: 86%; height: 86%; }
+  .feature-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #fff; }
+  .links { display: flex; flex-wrap: wrap; gap: 6px 22px; margin-top: 16px !important; }
+  .links a { color: var(--accent); font-weight: 600; text-decoration: none; }
+  .links a:hover { text-decoration: underline; }
+  .project { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); }
+  .shot { display: block; border-radius: 16px; overflow: hidden; border: 1px solid var(--line); transition: transform .3s; }
+  .shot:hover { transform: scale(1.015); }
+  .shot img { display: block; width: 100%; height: auto; }
+  .outside { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 0; padding: 0; list-style: none; }
+  .outside li { display: flex; gap: 14px; align-items: flex-start; background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 18px 20px; box-shadow: var(--shadow); }
+  .outside svg { width: 24px; height: 24px; color: var(--accent); margin-top: 2px; }
+  .outside b { display: block; font: 600 18px/1.3 var(--serif); }
+  .outside span { color: var(--muted); font-size: 14.5px; }
+  .invite { display: flex; flex-wrap: wrap; gap: 20px 40px; align-items: center; justify-content: space-between; background: radial-gradient(120% 160% at 90% 0%, #1b5a53, #0f3d3a 55%, #0a2a28); color: #f4f1e8; border-radius: 24px; padding: 36px 40px; }
+  .invite p { margin: 6px 0 0; color: #d9e6e0; max-width: 34em; }
+  .invite a { flex: none; padding: 14px 26px; border-radius: 999px; background: var(--cream); color: #0f3d3a; font-weight: 700; text-decoration: none; transition: transform .2s, background .2s; }
+  .invite a:hover { background: #fff; transform: translateY(-2px); }
+
+  footer { margin-top: 72px; padding: 28px 0 40px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13.5px; }
+  footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
+  footer a { color: var(--accent); font-weight: 600; text-decoration: none; }
+
+  /* Gentle fade-in as each part scrolls into view (only when the page has switched it on) */
+  .js .reveal { opacity: 0; transform: translateY(14px); transition: opacity .6s ease, transform .6s ease; }
+  .js .reveal.in { opacity: 1; transform: none; }
+
+  @media (max-width: 820px) {
+    .hero .wrap { grid-template-columns: 1fr; padding-top: 48px; padding-bottom: 68px; gap: 28px; }
+    .portrait { width: 168px; height: 168px; order: -1; }
+    .stats { grid-template-columns: 1fr 1fr; }
+    .two { grid-template-columns: 1fr; gap: 0; }
+    .two > div + div { margin-top: 56px; }
+    .feature, .project { grid-template-columns: 1fr; padding: 20px; gap: 22px; }
+    .feature-art { max-width: 260px; }
+    .invite { padding: 28px 24px; }
+    section { padding-top: 52px; }
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .portrait::before, .open i { animation: none; } .js .reveal { opacity: 1; transform: none; transition: none; } }
+
+  /* Printing gives a clean, compact paper resume */
+  @media print {
+    :root { --paper: #fff; --card: #fff; --ink: #111; --muted: #333; --line: #c9c9c9; --accent: #0f5c53; --accent-soft: #e8f3f0; --gold: #7a5a1c; --shadow: none; }
+    @page { size: A4; margin: 11mm 13mm; }
+    body { font-size: 9pt; line-height: 1.38; }
+    .wrap { max-width: none; padding: 0; }
+    .hero { background: none; color: #111; }
+    .hero .wrap { padding: 0 0 7pt; gap: 14pt; }
+    .cage, .portrait::before, .open, #structure, #collab, .shot, .feature-art, footer, .project .chips { display: none !important; }
+    .eyebrow { margin-bottom: 4pt; gap: 4pt; } .eyebrow li { border-color: #999; color: #333; padding: 1pt 6pt; font-size: 6.5pt; }
+    h1 { font-size: 25pt; margin-bottom: 4pt; }
+    .lede { color: #222; font-size: 9.5pt; margin-bottom: 5pt; max-width: none; } .lede b { color: #111; }
+    .contact { gap: 0 12pt; } .contact a, .contact span, .contact a.primary { background: none; border: 0; color: #111; padding: 0; font-size: 8.5pt; gap: 3pt; }
+    .contact a[download] { display: none; } svg.i { width: 9pt; height: 9pt; }
+    .portrait { width: 62pt; height: 62pt; } .portrait img { border: 1pt solid #999; box-shadow: none; }
+    .stats { margin-top: 0; gap: 5pt; } .stat { padding: 4pt 7pt; border-radius: 5pt; }
+    .stat b { font-size: 13pt; } .stat span { font-size: 7pt; margin-top: 1pt; line-height: 1.3; }
+    section { padding-top: 9pt; } .label { margin-bottom: 5pt; font-size: 7pt; gap: 8pt; }
+    #summary p:not(.label) { font-size: 9.5pt !important; line-height: 1.4 !important; max-width: none !important; }
+    h2 { font-size: 12pt; } h3 { font-size: 10.5pt; }
+    .timeline { padding-left: 14pt; } .timeline::before { left: 3pt; width: 1pt; } .role::before { left: -14pt; top: 4pt; width: 6pt; height: 6pt; border-width: 1.5pt; box-shadow: none !important; }
+    .role { padding-bottom: 6pt; break-inside: avoid; } .where { margin: 0 0 2pt; font-size: 8.5pt; } .when { font-size: 8pt; }
+    .role ul { padding-left: 11pt; } .role li { margin-bottom: 1pt; }
+    mark { background: none; }
+    .skills { display: block; } .skill { display: flex; gap: 6pt; align-items: baseline; padding: 0 0 2pt; border: 0; border-radius: 0; }
+    .skill h3 { flex: none; font: 700 8.5pt/1.35 var(--sans); margin: 0; } .skill h3 svg { display: none; } .skill h3::after { content: ":"; }
+    .chips { gap: 0; } .chips li { background: none; padding: 0; font-size: 8.5pt; border-radius: 0; } .chips li:not(:last-child)::after { content: ",\00a0"; }
+    .pubs { gap: 4pt; } .pub { padding: 0 0 0 7pt; border: 0; border-left: 2pt solid var(--gold); border-radius: 0; break-inside: avoid; }
+    .pub h3 { font-size: 9.5pt; margin-bottom: 0; } .pub p { font-size: 8.5pt; } .tag { font-size: 6.5pt; margin-bottom: 0; }
+    .two { gap: 18pt; } .list li { padding: 3pt 0; border: 0; } .list h3 { font-size: 9.5pt; } .list p { font-size: 8.5pt; margin-top: 0; }
+    .feature, .project { display: block; padding: 0; border: 0; border-radius: 0; } .feature p { margin-top: 2pt; max-width: none; } .links { margin-top: 2pt !important; font-size: 8.5pt; }
+    .outside { display: block; } .outside li { display: inline; padding: 0; border: 0; } .outside svg, .outside span { display: none; } .outside b { display: inline; font: 400 9pt/1.4 var(--sans); } .outside li:not(:last-child) b::after { content: " · "; }
+    .js .reveal { opacity: 1 !important; transform: none !important; }
+    /* Paper is narrow, but it keeps the wide-screen arrangement. */
+    .hero .wrap { grid-template-columns: 1fr auto !important; align-items: start; } .portrait { order: 0 !important; }
+    .stats { grid-template-columns: repeat(4, 1fr) !important; }
+    .two { grid-template-columns: 1fr 1fr !important; } .two > div + div { margin-top: 0 !important; }
+    .outside div { display: inline; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <!-- A ring of 26 pairs: a nod to the 26-heterodimer QmcA–YbbJ cage. Drawn by the script at the bottom. -->
+  <svg class="cage" id="cage" viewBox="-320 -320 640 640" aria-hidden="true"></svg>
+  <div class="wrap">
+    <div>
+      <ul class="eyebrow" aria-label="Fields">
+        <li>R&amp;D Scientist</li><li>Protein &amp; Enzyme Engineering</li><li>Structural Biology</li>
+      </ul>
+      <h1>Tan Kwan Ann</h1>
+      <p class="lede">I engineer enzymes for industry and solve protein structures — from <b>variant design and cloning</b> through <b>high-throughput screening</b> to <b>formulation and lyophilization</b>. PhD in structural biology, based in Singapore.</p>
+      <p class="open"><i></i>Open to collaborations</p>
+      <ul class="contact">
+        <li><a class="primary" href="mailto:tankan7@gmail.com"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>tankan7@gmail.com</a></li>
+        <li><a href="https://www.linkedin.com/in/tan-kwan-ann" rel="noopener"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 10v7M8 7v.01M12 17v-4a2 2 0 0 1 4 0v4M12 10v7"/></svg>LinkedIn</a></li>
+        <li><a href="https://github.com/tankan7-max" rel="noopener"><svg class="i" viewBox="0 0 24 24"><path d="M9 19c-4 1.300-4-2-6-2.500M15 21v-3.400a3 3 0 0 0-.800-2.300c2.800-.300 5.800-1.400 5.800-6.200a4.800 4.800 0 0 0-1.300-3.300 4.500 4.500 0 0 0-.100-3.300s-1.100-.300-3.500 1.300a12 12 0 0 0-6.200 0C6.500 1.700 5.400 2 5.400 2a4.500 4.500 0 0 0-.100 3.300A4.800 4.800 0 0 0 4 8.600c0 4.800 3 5.900 5.800 6.200A3 3 0 0 0 9 17.100V21"/></svg>GitHub</a></li>
+        <li><a href="Tan_Kwan_Ann_Resume.pdf" download><svg class="i" viewBox="0 0 24 24"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 20h14"/></svg>Resume (PDF)</a></li>
+        <li><span><svg class="i" viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.800 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Singapore · Singapore Citizen</span></li>
+      </ul>
+    </div>
+    <div class="portrait"><img src="ka-photo.jpg" alt="Portrait of Tan Kwan Ann" width="260" height="260"></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="stats reveal" aria-label="Highlights">
+    <div class="stat"><b>1,100+</b><span>enzyme variants constructed and screened</span></div>
+    <div class="stat"><b>300–400</b><span>variants per week through high-throughput screening</span></div>
+    <div class="stat"><b>60%</b><span>activity kept at 60% DMSO by the lead GDH mutant (wild type: &lt;10%)</span></div>
+    <div class="stat"><b>2.9 Å</b><span>Cryo-EM structure of the QmcA–YbbJ complex</span></div>
+  </div>
+
+  <section id="summary" class="reveal">
+    <p class="label">Summary</p>
+    <p style="font: 400 clamp(18px, 2vw, 21px)/1.6 var(--serif); margin: 0; max-width: 46em;">R&amp;D scientist (PhD, structural biology) with industrial experience in enzyme engineering, biocatalyst development and protein process development. At Allozymes, core driver of two industrial enzyme-engineering projects, engineering a DMSO-tolerant glucose dehydrogenase that keeps working where the wild type fails. Covers the full loop from variant design and cloning to screening, expression, formulation and lyophilization, backed by a 2.9 Å Cryo-EM structure and peer-reviewed publications.</p>
+  </section>
+
+  <section id="structure" class="reveal">
+    <p class="label">Featured structure</p>
+    <div class="feature">
+      <a class="feature-art" href="https://www.rcsb.org/structure/8Z5G" rel="noopener" aria-label="QmcA–YbbJ complex on the RCSB Protein Data Bank">
+        <svg id="cage2" viewBox="-150 -150 300 300" aria-hidden="true"></svg>
+        <img src="https://cdn.rcsb.org/images/structures/8z5g_assembly-1.jpeg" alt="Structure of the QmcA–YbbJ complex (PDB 8Z5G)" loading="lazy" onerror="this.remove()">
+      </a>
+      <div>
+        <span class="tag">PDB 8Z5G · Cryo-EM · 2.9 Å</span>
+        <h2>The QmcA–YbbJ complex</h2>
+        <p>A membrane protein cage built from 26 heterodimers of the SPFH-family protein QmcA and its NfeD partner YbbJ, from <i>E. coli</i>. Solved during my PhD at NTU and published in <i>Structure</i> (2024) as co-first author.</p>
+        <p class="links"><a href="https://www.rcsb.org/structure/8Z5G" rel="noopener">View on the Protein Data Bank →</a><a href="https://www.rcsb.org/3d-view/8Z5G" rel="noopener">Turn it around in 3D →</a><a href="https://doi.org/10.1016/j.str.2024.07.022" rel="noopener">Read the paper →</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="experience">
+    <p class="label reveal">Experience</p>
+    <ol class="timeline">
+      <li class="role now reveal">
+        <header><h3>Scientist I</h3><span class="when">Nov 2025 – Present</span></header>
+        <p class="where">Allozymes Pte Ltd · Singapore</p>
+        <ul>
+          <li>Core driver of two confidential industrial enzyme-engineering projects, each with a core team of two: one improving glucose dehydrogenase (GDH) activity and solvent tolerance for cofactor recycling, the other targeting a separate industrial application.</li>
+          <li>Developed and validated high-throughput screening workflows (UV-Vis plate reader, GC, HPLC) supporting <mark>300–400 variants per week</mark>, and characterized activity, stability, solvent tolerance and cofactor specificity under industrially relevant conditions.</li>
+          <li>Constructed and screened <mark>1,100+ enzyme variants</mark> to engineer DMSO-tolerant GDH; the lead mutant retained <mark>60% activity at 60% DMSO</mark>, versus &lt;10% for wild type.</li>
+          <li>Designed cloning workflows (Golden Gate, Gibson, site-directed mutagenesis) and optimized recombinant expression, induction and cultivation conditions.</li>
+          <li>Developed and transferred a lyophilized-protein stability assay (reconstituted GDH activity via NADH formation) to track week-by-week activity retention; lyophilized powder retained <mark>at least 75% activity after 22 days</mark> at both 4&nbsp;°C and −20&nbsp;°C.</li>
+          <li>Contributed to downstream process development (lysis optimization, formulation, lyophilization workflows) and authored SOPs to support reproducibility and knowledge transfer.</li>
+        </ul>
+      </li>
+      <li class="role reveal">
+        <header><h3>Postgraduate Researcher</h3><span class="when">Aug 2021 – Aug 2025</span></header>
+        <p class="where">Nanyang Technological University (NTU) · Singapore</p>
+        <ul>
+          <li>Led a multi-year structural biology project on membrane protein complexes, solving a <mark>2.9 Å Cryo-EM structure</mark> of the QmcA–YbbJ complex, a 26-heterodimer cage (co-first author, <i>Structure</i>, 2024).</li>
+          <li>Optimized recombinant expression and purification workflows to improve throughput and sample quality; applied Cryo-EM and MALDI-TOF/TOF for structural characterization.</li>
+          <li>Planned experiments, delegated work and guided <mark>4 junior researchers</mark> through execution and troubleshooting; presented findings to scientific stakeholders.</li>
+          <li>Supported 2 classes of 30+ students, training them in Python.</li>
+        </ul>
+      </li>
+      <li class="role reveal">
+        <header><h3>Research Assistant</h3><span class="when">Jul 2020 – Jul 2021</span></header>
+        <p class="where">Nanyang Technological University (NTU) · Singapore</p>
+        <ul>
+          <li>Built bioinformatics data-mining pipelines and biological databases.</li>
+          <li>Conducted MALDI-MS-based enzymatic activity screening; supported laboratory operations, safety compliance and project execution.</li>
+        </ul>
+      </li>
+      <li class="role reveal">
+        <header><h3>Admin Executive</h3><span class="when">2014 – 2016</span></header>
+        <p class="where">Oneberry Technologies Pte Ltd</p>
+        <ul><li>Compiled case reports that supported law-enforcement action against high-rise littering.</li></ul>
+      </li>
+    </ol>
+  </section>
+
+  <section id="expertise">
+    <p class="label reveal">Core technical expertise</p>
+    <div class="skills">
+      <div class="skill reveal"><h3><svg class="i" viewBox="0 0 24 24"><path d="M7 3c0 6 10 6 10 12s-10 3-10 6M17 3c0 6-10 6-10 12s10 3 10 6M8.500 7h7M8.500 17h7"/></svg>Protein &amp; enzyme engineering</h3>
+        <ul class="chips"><li>Directed evolution</li><li>Rational design</li><li>Site-directed mutagenesis</li><li>Saturation mutagenesis</li></ul></div>
+      <div class="skill reveal"><h3><svg class="i" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.800 3h10.400a2 2 0 0 0 1.800-3l-5-9V3M7.500 15h9"/></svg>Biocatalysis &amp; screening</h3>
+        <ul class="chips"><li>Activity screening</li><li>Cofactor recycling</li><li>High-throughput screening</li><li>Assay development</li><li>Stability testing</li></ul></div>
+      <div class="skill reveal"><h3><svg class="i" viewBox="0 0 24 24"><path d="M4 20V4M4 20h16M8 16v-5M12 16V8M16 16v-3"/></svg>Analytics</h3>
+        <ul class="chips"><li>UV-Vis plate reader</li><li>GC</li><li>HPLC</li><li>MALDI-TOF/TOF</li></ul></div>
+      <div class="skill reveal"><h3><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 4v4M12 16v4M4 12h4M16 12h4"/></svg>Molecular biology</h3>
+        <ul class="chips"><li>Golden Gate Assembly</li><li>Gibson Assembly</li><li>Cloning workflow design</li><li>Recombinant protein expression</li></ul></div>
+      <div class="skill reveal"><h3><svg class="i" viewBox="0 0 24 24"><path d="M6 3h12M8 3v5a4 4 0 0 0 8 0V3M12 12v6M8 21h8"/></svg>Protein production &amp; process</h3>
+        <ul class="chips"><li>Expression &amp; purification</li><li>Induction / cultivation optimization</li><li>Lysis optimization</li><li>SDS-PAGE</li><li>Formulation</li><li>Lyophilization</li><li>SOP authoring</li><li>Workflow transfer</li></ul></div>
+      <div class="skill reveal"><h3><svg class="i" viewBox="0 0 24 24"><path d="M12 3 4 7.500v9L12 21l8-4.500v-9zM4 7.500l8 4.500 8-4.500M12 12v9"/></svg>Structural biology</h3>
+        <ul class="chips"><li>Cryo-EM</li><li>Protein complex characterization</li></ul></div>
+      <div class="skill reveal"><h3><svg class="i" viewBox="0 0 24 24"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M13.500 5l-3 14"/></svg>Computational</h3>
+        <ul class="chips"><li>Python</li><li>Bioinformatics</li><li>GraphPad Prism</li></ul></div>
+    </div>
+  </section>
+
+  <section id="publications">
+    <p class="label reveal">Publications</p>
+    <ul class="pubs">
+      <li class="pub reveal">
+        <span class="tag">Research article · Co-first author</span>
+        <h3>Cryo-EM structure of the SPFH-NfeD family protein complex QmcA-YbbJ</h3>
+        <p><span class="me">Tan KA*</span>, Qiao Z*, Lim ZZE, Yeo JY, Yong Y, Do PH, Ero R, Gao YG. <i>Structure</i> 32(10):1603–1610 (2024). <a href="https://doi.org/10.1016/j.str.2024.07.022" rel="noopener">doi:10.1016/j.str.2024.07.022</a><br>*co-first authors</p>
+      </li>
+      <li class="pub reveal">
+        <span class="tag">Review</span>
+        <h3>Structural insights into the membrane-bound proteolytic machinery of bacterial protein quality control</h3>
+        <p>Ero R, Qiao Z, <span class="me">Tan KA</span>, Gao YG. <i>Biochemical Society Transactions</i> 52(5):2077–2086 (2024). <a href="https://doi.org/10.1042/BST20231250" rel="noopener">doi:10.1042/BST20231250</a></p>
+      </li>
+    </ul>
+  </section>
+
+  <section class="two">
+    <div id="education">
+      <p class="label reveal">Education</p>
+      <ul class="list">
+        <li class="reveal"><header><h3>PhD in Biology</h3><span class="when">Feb 2026</span></header>
+          <p>Nanyang Technological University (NTU) · NTU Research Scholarship Awardee</p>
+          <p>Thesis: Structural studies of Stomatin, Prohibitin, Flotillin and HflK/C (SPFH) family proteins QmcA and YqiK in <i>E. coli</i></p></li>
+        <li class="reveal"><header><h3>BSc Applied Physics</h3><span class="when">2020</span></header>
+          <p>Nanyang Technological University (NTU) · Honours, Second Upper</p></li>
+        <li class="reveal"><header><h3>Diploma in Aerospace Systems &amp; Management</h3><span class="when">2012</span></header>
+          <p>Nanyang Polytechnic</p></li>
+      </ul>
+    </div>
+    <div id="leadership">
+      <p class="label reveal">Leadership &amp; beyond the bench</p>
+      <ul class="list">
+        <li class="reveal"><header><h3>Volunteer Leader</h3><span class="when">2024 – Present</span></header>
+          <p>Led teams of 10+ volunteers across National Day Parade, Chingay and River Hongbao.</p></li>
+        <li class="reveal"><header><h3>Residential Mentor</h3><span class="when">2022 – 2025</span></header>
+          <p>Co-organized and hosted 5 Apple Crumble baking events.</p></li>
+        <li class="reveal"><header><h3>National Service</h3><span class="when">2012 – 2014</span></header>
+          <p>MG Team Commander; led an MG team supporting infantry platoon operations.</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="project">
+    <p class="label reveal">Side project</p>
+    <div class="feature project reveal">
+      <a class="shot" href="virtual-snack-shop.html" aria-label="Open the Virtual Snack Shop"><img src="ka-shop.jpg" alt="Inside the Virtual Snack Shop: 3D shelves of snacks, a mini map and another shopper walking past" width="1040" height="585"></a>
+      <div>
+        <span class="tag">Apprentice vibe-coder</span>
+        <h2>Virtual Snack Shop</h2>
+        <p>An online shop you walk around in first person, which I am building with AI as my pair programmer. Customers browse 3D shelves in the browser, pick snacks up to inspect them, and pay by PayNow.</p>
+        <ul class="chips"><li>First-person 3D in the browser</li><li>Live stock</li><li>Orders held at checkout</li><li>See other shoppers</li><li>Product &amp; stock manager</li><li>three.js</li><li>Supabase</li></ul>
+        <p class="links"><a href="virtual-snack-shop.html">Walk into the shop →</a><a href="https://github.com/tankan7-max/ka-shop" rel="noopener">See the code →</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="outside" class="reveal">
+    <p class="label">Outside the lab</p>
+    <ul class="outside">
+      <li><svg class="i" viewBox="0 0 24 24"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M13.500 5l-3 14"/></svg><div><b>Apprentice vibe-coder</b><span>Learning to build software by describing it, one small shop at a time.</span></div></li>
+      <li><svg class="i" viewBox="0 0 24 24"><path d="m3 19 6-11 4 7 2-3 6 7z"/><circle cx="17" cy="6" r="2"/></svg><div><b>Hiking</b><span>Happiest on a trail.</span></div></li>
+    </ul>
+  </section>
+
+  <section id="collab" class="reveal">
+    <div class="invite">
+      <div>
+        <h2>Open to collaborations</h2>
+        <p>Enzyme engineering, structural biology, or something that mixes the bench with code — I would be glad to hear about it.</p>
+      </div>
+      <a href="mailto:tankan7@gmail.com?subject=Collaboration">Get in touch</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Tan Kwan Ann · R&amp;D Scientist · Singapore</span>
+    <span><a href="mailto:tankan7@gmail.com">tankan7@gmail.com</a> · <a href="https://www.linkedin.com/in/tan-kwan-ann" rel="noopener">LinkedIn</a> · <a href="https://github.com/tankan7-max" rel="noopener">GitHub</a> · <a href="Tan_Kwan_Ann_Resume.pdf" download>Resume (PDF)</a></span>
+  </div>
+</footer>
+
+<script>
+// The ring in the header: 26 pairs of dots around a circle, like the 26-heterodimer cage.
+(function () {
+  const NS = 'http://www.w3.org/2000/svg';
+  function ring(svg, outer, inner, big, small) {
+    const add = (tag, attrs) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); svg.appendChild(n); };
+    [outer, inner, inner * 2 - outer].forEach(r => add('circle', { r, fill: 'none', stroke: 'rgba(243,233,210,.18)', 'stroke-width': 1 }));
+    for (let i = 0; i < 26; i++) {
+      const a = i / 26 * Math.PI * 2, c = Math.cos(a), s = Math.sin(a);
+      add('line', { x1: c * inner, y1: s * inner, x2: c * outer, y2: s * outer, stroke: 'rgba(243,233,210,.28)', 'stroke-width': 1.5 });
+      add('circle', { cx: c * outer, cy: s * outer, r: big, fill: '#58c7b4', opacity: .85 });
+      add('circle', { cx: c * inner, cy: s * inner, r: small, fill: '#e0b560', opacity: .9 });
+    }
+  }
+  ring(document.getElementById('cage'), 300, 236, 9, 6);
+  ring(document.getElementById('cage2'), 132, 100, 7, 5);   // behind the structure picture, and in its place if that cannot load
+})();
+// Fade each part in as it scrolls into view.
+if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  document.documentElement.classList.add('js');
+  const seen = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); seen.unobserve(e.target); } }), { rootMargin: '0px 0px -8% 0px' });
+  document.querySelectorAll('.reveal').forEach(n => seen.observe(n));
+  window.addEventListener('beforeprint', () => document.querySelectorAll('.reveal').forEach(n => n.classList.add('in')));
+}
+</script>
+</body>
+</html>
