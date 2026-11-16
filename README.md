@@ -18,9 +18,10 @@ It is one web page (`virtual-snack-shop.html`) plus one product list
 | `inventory.html` | Stock manager page: change quantities, record orders, download the updated `inventory.json`. |
 | `products.html` | Product manager page (needs the Supabase database): add, edit, hide or delete products, upload pack photos and 3D models. |
 | `qrcode.js` | The QR code library used for the PayNow code at checkout (MIT licence, by Kazuhiko Arase). |
-| `ka.html` | Tan Kwan Ann's personal page: dark, with a spinning 3D ring, photos and a print-to-PDF resume (print it from the browser for a two-page paper version). |
-| `ka-*.jpg`, `Tan_Kwan_Ann_Resume.pdf` | Photos and the resume download used by `ka.html`. `ka-og.jpg` is the picture shown when the page's link is shared. |
-| `ka-8z5g.bin` | The backbone of PDB 8Z5G (11,024 amino acids, 52 chains) drawn in 3D by `ka.html`. Data from the Protein Data Bank (free to reuse, CC0). Rebuild it with `tools/make-structure.py`. |
+| `ka.html` | Tan Kwan Ann's professional page: dark, with a spinning 3D ring, an interactive 3D protein structure and a print-to-PDF résumé (two pages from the browser's print dialog). |
+| `ka2.html` | The joke edition, 鲍鱼王 the Abalone King of the Multiverse: an abalone clicker game, royal decrees, a translated résumé and a universe roller. Links back to `ka.html`. |
+| `images/`, `Tan_Kwan_Ann_Resume.pdf` | Photos and the résumé download used by `ka.html` and `ka2.html`. `ka-og.jpg` and `ka2-og.jpg` are the pictures shown when each page's link is shared. |
+| `data/ka-8z5g.bin` | The backbone of PDB 8Z5G (11,024 amino acids, 52 chains) drawn in 3D by `ka.html`. Data from the Protein Data Bank (free to reuse, CC0). Rebuild it with `tools/make-structure.py`. |
 | `fonts/` | The page's fonts, hosted here so it loads nothing from other websites (open licence, see `fonts/LICENSES.txt`). |
 
 ## Try it on your computer
