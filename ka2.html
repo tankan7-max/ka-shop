@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>鲍鱼王 👑 — the Abalone King of the Multiverse</title>
+<meta name="description" content="Tan Kwan Ann, also known as 鲍鱼王, the Abalone King of the Multiverse. In every universe, it is abalone. The serious version is next door.">
+<meta name="theme-color" content="#060608">
+<meta name="color-scheme" content="dark">
+<meta property="og:type" content="website">
+<meta property="og:title" content="鲍鱼王 — the Abalone King of the Multiverse">
+<meta property="og:description" content="Tan Kwan Ann, a.k.a. 鲍鱼王, the Abalone Sovereign. In every universe, it is abalone.">
+<meta property="og:url" content="https://tankan7-max.github.io/ka-shop/ka2.html">
+<meta property="og:image" content="https://tankan7-max.github.io/ka-shop/images/ka-abalone.jpg">
+<meta property="og:image:width" content="675">
+<meta property="og:image:height" content="900">
+<meta property="og:image:alt" content="A braised abalone on a plate — the Abalone King in action">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%235eead4'/%3E%3Cstop offset='1' stop-color='%23a78bfa'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='9' fill='%23060608'/%3E%3Ctext x='16' y='22' font-family='Arial,sans-serif' font-size='14' font-weight='800' text-anchor='middle' fill='url(%23g)'%3EKA%3C/text%3E%3C/svg%3E">
+<link rel="preload" href="fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Person","name":"Tan Kwan Ann","alternateName":["鲍鱼王","Abalone King","Abalone Sovereign"],"jobTitle":"Abalone King of the Multiverse (and R&D Scientist)","description":"Abalone King, a.k.a. 鲍鱼王, the Abalone Sovereign. In every universe, it is abalone.","url":"https://tankan7-max.github.io/ka-shop/ka2.html","sameAs":["https://www.linkedin.com/in/tan-kwan-ann","https://github.com/tankan7-max"],"knowsAbout":["Enzyme engineering","Protein engineering","Structural biology","Cryo-EM","Biocatalysis"]}
+</script>
+<style>
+  /* Fonts are self-hosted (see fonts/LICENSES.txt): nothing is fetched from other websites. */
+  @font-face { font-family: "Bricolage Grotesque"; src: url("fonts/bricolage-grotesque-latin-wght-normal.woff2") format("woff2"); font-weight: 200 800; font-style: normal; font-display: swap; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+  @font-face { font-family: "Inter"; src: url("fonts/inter-latin-wght-normal.woff2") format("woff2"); font-weight: 100 900; font-style: normal; font-display: swap; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+  @font-face { font-family: "JetBrains Mono"; src: url("fonts/jetbrains-mono-latin-wght-normal.woff2") format("woff2"); font-weight: 100 800; font-style: normal; font-display: swap; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+  :root {
+    --bg: #060608; --panel: #0d0d11; --panel-2: #131318; --ink: #f5f5f7; --muted: #a8a8b3; --faint: #8b8b97;
+    --line: rgba(255,255,255,.08); --line-strong: rgba(255,255,255,.17);
+    --a1: #5eead4; --a2: #a78bfa; --a3: #f5c26b;
+    --grad: linear-gradient(100deg, var(--a1), var(--a2));
+    --cjk: "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Zen Hei", sans-serif;
+    --display: "Bricolage Grotesque", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; scrollbar-color: #2a2a33 var(--bg); }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.65 var(--sans), var(--cjk); -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; overflow-x: hidden; }
+  body::before { content: ""; position: fixed; inset: 0; z-index: 100; pointer-events: none; opacity: .045; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  ::selection { background: var(--a1); color: #060608; }
+  a { color: inherit; }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--a1); outline-offset: 3px; border-radius: 8px; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 28px; }
+  svg.i { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+  .skip { position: absolute; left: 12px; top: -60px; z-index: 200; background: var(--ink); color: #060608; padding: 10px 16px; border-radius: 10px; font-weight: 600; text-decoration: none; transition: top .2s; }
+  .skip:focus { top: 12px; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .grad { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+  /* ---------- Nav ---------- */
+  .progress { position: fixed; left: 0; top: 0; right: 0; height: 2px; z-index: 60; background: var(--grad); transform-origin: 0 50%; transform: scaleX(0); }
+  nav { position: sticky; top: 0; z-index: 50; background: rgba(6,6,8,.7); backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4); border-bottom: 1px solid var(--line); }
+  nav .wrap { display: flex; align-items: center; gap: 24px; min-height: 62px; }
+  .mark { display: inline-flex; align-items: center; min-height: 36px; padding: 0 4px; font: 700 17px/1 var(--display); letter-spacing: -.02em; text-decoration: none; }
+  .mark b { color: var(--a1); font-weight: 700; }
+  nav ul { display: flex; gap: 4px; margin: 0 0 0 auto; padding: 0; list-style: none; }
+  nav ul a { display: block; padding: 8px 11px; border-radius: 999px; font: 500 12.5px/1 var(--mono); color: var(--muted); text-decoration: none; transition: color .2s, background .2s; }
+  nav ul a:hover { color: var(--ink); background: rgba(255,255,255,.05); }
+  nav ul a[aria-current="true"] { color: var(--ink); background: rgba(94,234,212,.1); }
+  nav .resume { flex: none; display: inline-flex; align-items: center; gap: 7px; font: 600 13px/1 var(--sans); color: #060608; background: var(--ink); border-radius: 999px; padding: 10px 16px; text-decoration: none; transition: box-shadow .25s, transform .2s; }
+  nav .resume:hover { box-shadow: 0 0 0 4px rgba(94,234,212,.2); transform: translateY(-1px); }
+
+  /* ---------- Hero ---------- */
+  .hero { position: relative; overflow: hidden; isolation: isolate; }
+  .hero::before { content: ""; position: absolute; inset: -20% -10% 0; z-index: -2; pointer-events: none; will-change: transform;
+    background: radial-gradient(620px 400px at 80% 18%, rgba(167,139,250,.22), transparent 62%), radial-gradient(680px 440px at 14% 6%, rgba(94,234,212,.15), transparent 60%), radial-gradient(520px 320px at 58% 92%, rgba(245,194,107,.08), transparent 65%);
+    animation: drift 24s ease-in-out infinite alternate; }
+  .hero::after { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; background-image: radial-gradient(rgba(255,255,255,.09) 1px, transparent 1.2px); background-size: 26px 26px; -webkit-mask-image: radial-gradient(ellipse 70% 80% at 62% 40%, #000, transparent 75%); mask-image: radial-gradient(ellipse 70% 80% at 62% 40%, #000, transparent 75%); }
+  @keyframes drift { to { transform: translate3d(-3%, 4%, 0) scale(1.08); } }
+  .hero .wrap { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 40px; align-items: center; padding-top: 84px; padding-bottom: 92px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 10px; margin: 0 0 20px; font: 500 12px/1 var(--mono); letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
+  h1 { font: 700 clamp(40px, 5.2vw, 88px)/.94 var(--display); letter-spacing: -.045em; margin: 0 0 22px; background: linear-gradient(180deg, #fff 35%, #9d9da8 120%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  /* The name must stay on one line: size it to its column (15% of the column fits "Tan Kwan Ann" at 6.35em wide). The vw size above is the fallback for older browsers. */
+  @supports (width: 1cqw) { .hero .wrap > div:first-child { container-type: inline-size; } h1 { font-size: clamp(40px, 15cqw, 92px); } }
+  .king { display: inline-flex; align-items: center; gap: 13px; margin: 0 0 24px; padding: 12px 22px 12px 16px; border: 1px solid rgba(245,194,107,.55); border-radius: 999px; background: linear-gradient(100deg, rgba(245,194,107,.16), rgba(251,159,107,.1)); color: var(--ink); font: 500 14.5px/1 var(--sans); cursor: pointer; transition: background .2s, transform .2s, border-color .2s; animation: kingglow 3s ease-in-out infinite; }
+  @keyframes kingglow { 0%, 100% { box-shadow: 0 0 0 0 rgba(245,194,107,.22); } 50% { box-shadow: 0 0 26px 5px rgba(245,194,107,.35); } }
+  @keyframes wob { 0%, 100% { transform: rotate(-8deg); } 50% { transform: rotate(10deg); } }
+  .shells { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: -1; }
+  .shells span { position: absolute; font-size: 26px; opacity: .4; animation: bob 7s ease-in-out infinite; }
+  @keyframes bob { 0%, 100% { transform: translateY(0) rotate(-6deg); } 50% { transform: translateY(-14px) rotate(8deg); } }
+  .king:hover { background: rgba(245,194,107,.14); border-color: rgba(245,194,107,.6); transform: translateY(-1px) rotate(-1deg); }
+  .king .crown { font-size: 34px; line-height: 1; flex: none; animation: wob 2.4s ease-in-out infinite; }
+  .king b { font: 700 34px/1 var(--cjk); white-space: nowrap; flex: none; letter-spacing: .04em; background: linear-gradient(100deg, #f5c26b, #fb9f6b); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .king .titles { display: flex; flex-direction: column; gap: 3px; text-align: left; }
+  .king .titles span { font: 600 14px/1.1 var(--sans); }
+  .king .titles em { font: 500 11.5px/1.1 var(--mono); font-style: normal; color: var(--muted); letter-spacing: .01em; }
+  .king small { color: var(--faint); font: 500 11.5px/1 var(--mono); letter-spacing: .02em; padding-left: 4px; }
+  .roll { margin: 0 0 16px; min-height: 1.35em; font: 600 clamp(22px, 3.2vw, 34px)/1.25 var(--display); letter-spacing: -.02em; }
+  .word { display: inline-block; transition: opacity .3s ease, transform .3s ease; }
+  .word.out { opacity: 0; transform: translateY(.45em); }
+  .lede { font-size: clamp(17px, 1.9vw, 19.5px); line-height: 1.6; color: var(--muted); max-width: 33em; margin: 0 0 28px; }
+  .lede b { color: var(--ink); font-weight: 600; }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 0; padding: 0; list-style: none; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 19px; border-radius: 999px; font: 600 14px/1 var(--sans); text-decoration: none; border: 1px solid var(--line-strong); background: rgba(255,255,255,.03); color: var(--ink); cursor: pointer; transition: border-color .2s, background .2s, transform .2s, box-shadow .25s; }
+  .btn:hover { border-color: rgba(255,255,255,.4); background: rgba(255,255,255,.07); transform: translateY(-1px); }
+  .btn.primary { background: var(--ink); color: #060608; border-color: var(--ink); }
+  .btn.primary:hover { background: #fff; box-shadow: 0 0 0 5px rgba(94,234,212,.18), 0 10px 40px rgba(94,234,212,.25); }
+  .status { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin: 26px 0 0; padding: 9px 15px; border-radius: 18px; line-height: 1.35 !important; border: 1px solid rgba(94,234,212,.25); background: rgba(94,234,212,.06); color: var(--a1); font: 500 12.5px/1 var(--mono); }
+  .status i, .eyebrow i { width: 8px; height: 8px; margin-right: 0; border-radius: 50%; background: var(--a1); box-shadow: 0 0 0 0 rgba(94,234,212,.6); animation: pulse 2.4s infinite; flex: none; }
+  .status span { color: var(--muted); }
+  @keyframes pulse { 70% { box-shadow: 0 0 0 9px rgba(94,234,212,0); } 100% { box-shadow: 0 0 0 0 rgba(94,234,212,0); } }
+
+  /* A ring of 26 pairs orbits the portrait. Drag it. */
+  .orbit { --orb: 440px; position: relative; width: var(--orb); height: var(--orb); flex: none; cursor: grab; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+  .orbit.drag { cursor: grabbing; }
+  .orbit canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .orbit .front { z-index: 3; }
+  .orbit::before { content: ""; position: absolute; inset: 14%; border-radius: 50%; background: radial-gradient(circle, rgba(94,234,212,.2), rgba(167,139,250,.12) 55%, transparent 72%); filter: blur(10px); }
+  .portrait { position: absolute; left: 50%; top: 50%; width: 52%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; z-index: 2; }
+  .portrait::before { content: ""; position: absolute; inset: -3px; border-radius: 50%; background: conic-gradient(var(--a1), var(--a2), var(--a3), var(--a1)); animation: spin 9s linear infinite; }
+  .portrait img { position: relative; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; border: 4px solid var(--bg); display: block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .orbit-hint { position: absolute; left: 0; right: 0; bottom: -4px; text-align: center; font: 500 11px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); z-index: 4; pointer-events: none; }
+
+  /* ---------- Ticker ---------- */
+  .marquee { overflow: hidden; border-block: 1px solid var(--line); background: rgba(255,255,255,.015); -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent); mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent); }
+  .marquee .track { display: flex; width: max-content; animation: marq 46s linear infinite; }
+  .marquee:hover .track { animation-play-state: paused; }
+  .marquee ul { display: flex; gap: 10px; margin: 0; padding: 16px 5px; list-style: none; }
+  .marquee li { display: inline-flex; align-items: center; gap: 9px; white-space: nowrap; padding: 7px 15px; border: 1px solid var(--line); border-radius: 999px; font: 500 13px/1 var(--mono); color: var(--muted); }
+  .marquee li::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--a1); }
+  .marquee li:nth-child(3n+2)::before { background: var(--a2); } .marquee li:nth-child(3n)::before { background: var(--a3); }
+  .marquee li.fun { border-style: dashed; color: var(--ink); }
+  @keyframes marq { to { transform: translateX(-50%); } }
+
+  .pantry { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; margin: 0 0 54px; padding: 0; list-style: none; }
+  .pantry figure { margin: 0; padding: 9px 9px 16px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 16px; }
+  .pantry img { display: block; width: 100%; height: 250px; object-fit: cover; border-radius: 10px; }
+  .pantry figcaption { padding: 12px 6px 0; }
+  .pantry figcaption b { display: block; font: 600 17px/1.3 var(--display); letter-spacing: -.01em; }
+  .pantry figcaption span { display: block; color: var(--muted); font-size: 14.5px; margin-top: 4px; }
+  .pantry figcaption em { display: block; margin-top: 9px; font: 600 11px/1 var(--mono); letter-spacing: .14em; color: var(--a1); font-style: normal; }
+  .outside button.uni { all: unset; display: flex; gap: 16px; align-items: flex-start; width: 100%; cursor: pointer; text-align: left; }
+  .outside button.uni .e { font-size: 22px; line-height: 1.2; }
+  .outside button.uni:hover b { color: var(--a1); }
+
+  /* ---------- Sections ---------- */
+  main { counter-reset: sec; padding-bottom: 8px; }
+  section { padding: 104px 0 0; scroll-margin-top: 0; }
+  .label { display: flex; align-items: center; gap: 14px; margin: 0 0 14px; font: 500 12px/1 var(--mono); letter-spacing: .2em; text-transform: uppercase; color: var(--faint); }
+  .label::before { counter-increment: sec; content: counter(sec, decimal-leading-zero); color: var(--a1); }
+  .label::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line-strong), transparent); }
+  .kicker { margin: 0 0 34px; color: var(--muted); font-size: 15.5px; }
+  .label + :not(.kicker) { margin-top: 30px; }
+  h2 { font: 650 clamp(28px, 3.6vw, 40px)/1.12 var(--display); letter-spacing: -.035em; margin: 0 0 8px; }
+  h3 { font: 600 20px/1.3 var(--display); letter-spacing: -.015em; margin: 0; }
+  .spot { position: relative; isolation: isolate; }
+  .spot::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity .35s; background: radial-gradient(380px circle at var(--mx, 50%) var(--my, 0%), rgba(94,234,212,.11), rgba(167,139,250,.05) 45%, transparent 65%); }
+  .spot:hover::before { opacity: 1; }
+
+  /* About: the summary and four numbers */
+  .about { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 48px; align-items: start; }
+  .summary-text { font-size: clamp(18px, 2vw, 21px); line-height: 1.65; color: var(--muted); margin: 0; }
+  .nums { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0; padding: 0; list-style: none; }
+  .num { padding: 20px 18px 18px; background: var(--panel); border: 1px solid var(--line); border-radius: 18px; border-top-color: var(--line-strong); transition: border-color .3s, transform .3s; }
+  .num:hover { border-color: var(--line-strong); transform: translateY(-3px); }
+  .num b { display: block; font: 700 clamp(30px, 4vw, 42px)/1 var(--display); letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+  .num > span { display: block; margin-top: 9px; color: var(--muted); font-size: 13.5px; line-height: 1.45; }
+  .num.fun { border-style: dashed; border-color: rgba(245,194,107,.35); }
+  .num.fun b { background: linear-gradient(100deg, var(--a3), #fb7185); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .num.wide { grid-column: 1 / -1; }
+  .wink { display: inline-block; margin-top: 9px; padding: 3px 8px; border-radius: 999px; background: rgba(245,194,107,.12); color: var(--a3); font: 500 10.5px/1.2 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+
+  /* Feature panels: featured structure and the side project */
+  .feature { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr); gap: 44px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 26px; padding: 30px; }
+  .feature p { margin: 10px 0 0; color: var(--muted); max-width: 40em; }
+  .feature .chips { margin-top: 18px; }
+  .feature-art { position: relative; aspect-ratio: 1; border-radius: 20px; overflow: hidden; background: radial-gradient(circle at 50% 46%, #1a1a32, #0a0a10 72%); border: 1px solid var(--line); cursor: grab; touch-action: pan-y; }
+  .feature-art.drag { cursor: grabbing; }
+  .feature-art canvas { position: absolute; inset: 0; width: 100%; height: 100%; outline-offset: -4px; }
+  .art-legend { position: absolute; left: 14px; top: 12px; right: 14px; display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 0; font: 500 11.5px/1.3 var(--mono); letter-spacing: .04em; color: var(--muted); pointer-events: none; }
+  .art-legend i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 7px; vertical-align: -1px; }
+  .art-ui { position: absolute; left: 12px; right: 12px; bottom: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+  .seg { display: inline-flex; padding: 3px; border-radius: 999px; background: rgba(6,6,8,.72); border: 1px solid var(--line-strong); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+  .seg button, .art-reset { padding: 8px 13px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font: 500 12px/1 var(--sans); cursor: pointer; transition: color .2s, background .2s; }
+  .seg button:hover, .art-reset:hover { color: var(--ink); }
+  .seg button[aria-pressed="true"] { background: var(--ink); color: #060608; font-weight: 600; }
+  .art-reset { border: 1px solid var(--line-strong); background: rgba(6,6,8,.72); }
+  @media (pointer: coarse) { .seg button, .art-reset { padding: 11px 15px; } }
+  .art-status { position: absolute; inset: 0; display: grid; place-content: center; gap: 10px; margin: 0; padding: 24px; text-align: center; color: var(--muted); font-size: 14px; }
+  .art-status a { color: var(--a1); font-weight: 500; }
+  .art-credit { position: absolute; left: 14px; bottom: 58px; margin: 0; font: 500 10px/1.3 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--faint); pointer-events: none; }
+  .feature .how { font-size: 14px; color: var(--faint); max-width: 36em; }
+  .tag { display: inline-block; font: 500 11.5px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--a1); margin-bottom: 12px; }
+  .links { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 20px !important; }
+  .links a { color: var(--ink); font-weight: 500; text-decoration: none; border-bottom: 1px solid var(--line-strong); padding-bottom: 1px; transition: border-color .2s, color .2s; }
+  .links a:hover { color: var(--a1); border-color: var(--a1); }
+  .project { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); }
+  .shot { position: relative; display: block; border-radius: 16px; overflow: hidden; border: 1px solid var(--line); transition: transform .35s, border-color .3s, box-shadow .35s; }
+  .shot:hover { transform: scale(1.015) rotate(-.4deg); border-color: var(--line-strong); box-shadow: 0 20px 60px rgba(94,234,212,.12); }
+  .shot img { display: block; width: 100%; height: auto; }
+  .shot::after { content: "Walk in →"; position: absolute; right: 12px; bottom: 12px; padding: 8px 14px; border-radius: 999px; background: var(--ink); color: #060608; font: 600 13px/1 var(--sans); opacity: 0; transform: translateY(6px); transition: opacity .25s, transform .25s; }
+  .shot:hover::after, .shot:focus-visible::after { opacity: 1; transform: none; }
+
+  /* Experience: hairline timeline with plain-English translations */
+  .timeline { position: relative; margin: 0; padding: 0 0 0 30px; list-style: none; }
+  .timeline::before { content: ""; position: absolute; left: 6px; top: 8px; bottom: 8px; width: 1px; background: linear-gradient(var(--a1), var(--line-strong) 28%, var(--line)); }
+  .role { position: relative; padding-bottom: 46px; }
+  .role:last-child { padding-bottom: 0; }
+  .role::before { content: ""; position: absolute; left: -30px; top: 8px; width: 13px; height: 13px; border-radius: 50%; background: var(--bg); border: 1px solid var(--faint); }
+  .role.now::before { background: var(--a1); border-color: var(--a1); box-shadow: 0 0 0 4px rgba(94,234,212,.15), 0 0 18px rgba(94,234,212,.6); }
+  .role header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; }
+  .when { font: 500 12.5px/1 var(--mono); color: var(--faint); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .where { margin: 4px 0 14px; color: var(--muted); font-weight: 500; font-size: 15px; }
+  .tldr { margin: 0 0 14px; padding: 10px 14px; border-left: 2px solid var(--a2); background: linear-gradient(90deg, rgba(167,139,250,.09), transparent); border-radius: 0 10px 10px 0; color: var(--ink); font-size: 15px; }
+  .tldr b { margin-right: 8px; font: 600 11px/1 var(--mono); letter-spacing: .1em; color: var(--a2); }
+  .role ul { margin: 0; padding-left: 18px; color: var(--muted); }
+  .role li { margin-bottom: 9px; }
+  .role li::marker { color: var(--faint); }
+
+  /* Expertise */
+  .skills { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+  .skill { padding: 22px; background: var(--panel); border: 1px solid var(--line); border-radius: 20px; transition: border-color .3s; }
+  .skill:hover { border-color: var(--line-strong); }
+  .skill h3 { font-size: 17px; display: flex; align-items: center; gap: 11px; margin-bottom: 15px; }
+  .skill h3 svg { width: 20px; height: 20px; color: var(--a1); }
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; margin: 0; padding: 0; list-style: none; }
+  .chips li { font-size: 13px; font-weight: 500; padding: 5px 11px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); transition: border-color .2s, color .2s, background .2s; }
+  .chips li:hover { border-color: rgba(94,234,212,.4); color: var(--ink); background: rgba(94,234,212,.06); }
+
+  /* Publications */
+  .pubs { display: grid; gap: 14px; margin: 0; padding: 0; list-style: none; }
+  .pub { padding: 26px 26px 22px; background: var(--panel); border: 1px solid var(--line); border-radius: 20px; transition: border-color .3s; }
+  .pub:hover { border-color: var(--line-strong); }
+  .pub h3 { font-size: 20px; margin-bottom: 9px; }
+  .pub p { margin: 0; color: var(--muted); font-size: 14.5px; line-height: 1.65; }
+  .pub .me { color: var(--ink); font-weight: 600; }
+  .pub a { color: var(--a1); font-weight: 500; text-decoration: none; white-space: nowrap; }
+  .pub a:hover { text-decoration: underline; }
+  .pub-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .ghost { display: inline-flex; align-items: center; gap: 7px; padding: 7px 13px; border-radius: 999px; border: 1px solid var(--line-strong); background: transparent; color: var(--muted); font: 500 12.5px/1 var(--sans); text-decoration: none; cursor: pointer; transition: color .2s, border-color .2s, background .2s; }
+  .ghost:hover { color: var(--ink); border-color: rgba(255,255,255,.4); background: rgba(255,255,255,.05); }
+  .pub .ghost { color: var(--muted); font-weight: 500; }
+
+  /* Education and beyond the bench */
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; }
+  .list { margin: 0; padding: 0; list-style: none; }
+  .list li { padding: 18px 0; border-top: 1px solid var(--line); }
+  .list li:last-child { border-bottom: 1px solid var(--line); }
+  .list header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .list h3 { font-size: 17px; }
+  .list p { margin: 5px 0 0; color: var(--muted); font-size: 14.5px; line-height: 1.6; }
+
+  /* Outside the lab: quick facts, then the photo wall */
+  .outside { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin: 0 0 54px; padding: 0; list-style: none; }
+  .outside li { display: flex; gap: 16px; align-items: flex-start; padding: 20px; background: var(--panel); border: 1px solid var(--line); border-radius: 18px; }
+  .outside svg { width: 22px; height: 22px; color: var(--a1); margin-top: 3px; }
+  .outside b { display: block; font: 600 17px/1.3 var(--display); letter-spacing: -.01em; }
+  .outside span { color: var(--muted); font-size: 14.5px; }
+  .sub { display: flex; align-items: baseline; gap: 12px; margin: 0 0 22px; font: 650 24px/1.2 var(--display); letter-spacing: -.03em; }
+  .sub small { font: 500 11.5px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+  .gallery { column-count: 3; column-gap: 18px; margin: 0; padding: 0; list-style: none; }
+  .gallery li { break-inside: avoid; margin: 0 0 18px; }
+  .gallery figure { margin: 0; padding: 9px 9px 14px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 16px; transition: transform .35s cubic-bezier(.2,.8,.2,1), border-color .3s, box-shadow .35s; }
+  .gallery li:nth-child(4n+1) figure { transform: rotate(-1.3deg); } .gallery li:nth-child(4n+2) figure { transform: rotate(1deg); }
+  .gallery li:nth-child(4n+3) figure { transform: rotate(-.6deg); } .gallery li:nth-child(4n) figure { transform: rotate(1.5deg); }
+  .gallery figure:hover, .gallery figure:focus-within { transform: rotate(0) translateY(-4px) scale(1.015); border-color: var(--line-strong); box-shadow: 0 20px 50px rgba(0,0,0,.5); }
+  .ph { display: block; width: 100%; padding: 0; border: 0; background: none; cursor: zoom-in; border-radius: 10px; overflow: hidden; }
+  .ph img { display: block; width: 100%; height: auto; }
+  .ph img.crop { aspect-ratio: 3 / 4; object-fit: cover; object-position: 50% 44%; }
+  .gallery figcaption { margin: 12px 4px 0; font-size: 13.5px; line-height: 1.5; color: var(--muted); }
+  .gallery figcaption b { color: var(--ink); font: 600 13.5px/1 var(--cjk); }
+
+  dialog.lightbox { border: 0; padding: 0; background: transparent; color: var(--ink); width: min(92vw, 880px); max-height: 94vh; overflow: visible; }
+  dialog.lightbox::backdrop { background: rgba(4,4,6,.86); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  .lb-body { display: grid; justify-items: center; gap: 14px; }
+  .lb-body img { max-width: 100%; max-height: 78vh; width: auto; height: auto; border-radius: 16px; border: 1px solid var(--line-strong); box-shadow: 0 30px 90px rgba(0,0,0,.7); }
+  .lb-body figcaption { max-width: 34em; text-align: center; color: var(--muted); }
+  .lb-body figcaption b { color: var(--ink); }
+  .lb-btn { position: absolute; top: 50%; width: 46px; height: 46px; margin-top: -23px; border-radius: 50%; border: 1px solid var(--line-strong); background: rgba(13,13,17,.8); color: var(--ink); font: 400 22px/1 var(--sans); cursor: pointer; display: grid; place-items: center; transition: background .2s; }
+  .lb-btn:hover { background: rgba(255,255,255,.12); }
+  .lb-prev { left: -8px; } .lb-next { right: -8px; }
+  .lb-close { top: -14px; right: -8px; margin: 0; }
+
+  /* Contact */
+  .invite { position: relative; overflow: hidden; isolation: isolate; text-align: center; border-radius: 30px; padding: 72px 36px; background: var(--panel); border: 1px solid transparent;
+    background: linear-gradient(var(--panel), var(--panel)) padding-box, linear-gradient(120deg, rgba(94,234,212,.7), rgba(167,139,250,.5) 50%, rgba(245,194,107,.5)) border-box; }
+  .invite::before { content: ""; position: absolute; inset: 0; z-index: -1; background: radial-gradient(520px 260px at 20% 0%, rgba(94,234,212,.14), transparent 65%), radial-gradient(520px 280px at 90% 100%, rgba(167,139,250,.16), transparent 65%); }
+  .invite h2 { font-size: clamp(36px, 6.4vw, 70px); letter-spacing: -.045em; line-height: 1; margin-bottom: 14px; }
+  .invite p { margin: 0 auto; max-width: 34em; color: var(--muted); font-size: 17.5px; }
+  .invite .hero-actions { justify-content: center; margin-top: 30px; }
+
+  footer { margin-top: 100px; padding: 30px 0 48px; border-top: 1px solid var(--line); color: var(--faint); font-size: 13.5px; }
+  footer .wrap { display: flex; flex-wrap: wrap; gap: 10px 28px; justify-content: space-between; align-items: center; }
+  footer a { color: var(--muted); font-weight: 500; text-decoration: none; padding: 4px 0; }
+  footer a:hover { color: var(--ink); }
+  .foot-links { display: flex; flex-wrap: wrap; gap: 6px 20px; }
+  .print-only { display: none; }
+
+  .toast { position: fixed; left: 50%; bottom: 26px; z-index: 120; transform: translate(-50%, 20px); padding: 11px 18px; border-radius: 999px; background: var(--ink); color: #060608; font: 600 14px/1.2 var(--sans); opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; max-width: calc(100vw - 32px); }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  .rain { position: fixed; inset: 0; z-index: 110; pointer-events: none; overflow: hidden; }
+  .rain span { position: absolute; top: -8%; animation: fall 2.3s cubic-bezier(.3,0,.7,1) forwards; }
+  @keyframes fall { to { transform: translate(var(--dx), 118vh) rotate(420deg); } }
+
+  /* Parts fade up as they scroll into view (only when scripts are running) */
+  .js .reveal { opacity: 0; transform: translateY(16px); transition: opacity .7s ease, transform .7s cubic-bezier(.2,.8,.2,1); }
+  .js .reveal.in { opacity: 1; transform: none; }
+
+  @media (max-width: 960px) {
+    .feature { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 30px; }
+    .gallery { column-count: 2; }
+  }
+  @media (max-width: 820px) {
+    .wrap { padding: 0 20px; }
+    nav .wrap { flex-wrap: wrap; gap: 0 12px; padding-top: 6px; padding-bottom: 4px; }
+    nav ul { order: 3; flex: 1 0 100%; margin: 0 -20px; padding: 2px 16px 6px; overflow-x: auto; scrollbar-width: none; }
+    nav ul::-webkit-scrollbar { display: none; }
+    nav ul li { flex: none; }
+    nav .resume { margin-left: auto; }
+    section { padding-top: 76px; scroll-margin-top: 30px; }
+    .hero .wrap { grid-template-columns: 1fr; padding-top: 36px; padding-bottom: 64px; gap: 22px; }
+    .orbit { --orb: min(86vw, 360px); margin: 0 auto; order: -1; }
+    .about, .two, .feature, .project { grid-template-columns: 1fr; }
+    .about { gap: 36px; } .two { gap: 0; } .two > div + div { margin-top: 76px; }
+    .feature, .project { padding: 20px; gap: 24px; }
+    .feature-art { max-width: 460px; width: 100%; margin: 0 auto; aspect-ratio: 4 / 5; }
+    .invite { padding: 52px 22px; border-radius: 24px; }
+  }
+  @media (max-width: 480px) { .king small { display: none; } .king { padding-right: 14px; } .king b { font-size: 24px; } .king .crown { font-size: 24px; } .art-credit { display: none; } }
+  @media (max-width: 420px) { .nums { grid-template-columns: 1fr 1fr; gap: 10px; } .num { padding: 16px 14px; } .gallery { column-gap: 12px; } .gallery li { margin-bottom: 12px; } .gallery figure { padding: 6px 6px 10px; } .gallery figcaption { font-size: 12.5px; margin: 9px 3px 0; } }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .hero::before, .portrait::before, .status i, .eyebrow i, .marquee .track, .king, .king .crown, .shells span { animation: none; }
+    .marquee { -webkit-mask-image: none; mask-image: none; } .marquee .track { width: auto; } .marquee ul { flex-wrap: wrap; justify-content: center; } .marquee ul[aria-hidden] { display: none; }
+    .js .reveal { opacity: 1; transform: none; transition: none; }
+    .gallery figure, .gallery li:nth-child(n) figure { transform: none; }
+    .word { transition: none; } .toast { transition: none; }
+  }
+
+  @media (forced-colors: active) { h1, .grad, .num.fun b { -webkit-text-fill-color: CanvasText; color: CanvasText; background: none; } .portrait::before { display: none; } }
+
+  /* Printing gives a clean, compact paper resume */
+  @media print {
+    :root { --bg: #fff; --panel: #fff; --panel-2: #fff; --ink: #111; --muted: #333; --faint: #555; --line: #ccc; --line-strong: #999; --a1: #0f5c53; --a2: #4c3d99; --a3: #7a5a1c; }
+    @page { size: A4; margin: 11mm 13mm; }
+    body { font-size: 9pt; line-height: 1.38; overflow: visible; } body::before, .hero::before, .hero::after, .orbit::before { display: none; }
+    .wrap { max-width: none; padding: 0; }
+    .skip, nav, .progress, .marquee, .orbit canvas, .orbit-hint, .status, .king, .roll, .nums, .about .nums, #structure, #contact, .shot, .project .chips, .sub, .gallery, .toast, .rain, footer, .pub-actions, .hero-actions li:not(.print-ok), .tldr { display: none !important; }
+    .print-only { display: block; margin: 3pt 0 0; font-size: 8.5pt; color: #111; }
+    h1 { font-size: 25pt; margin-bottom: 4pt; background: none; color: #111; -webkit-text-fill-color: #111; }
+    .grad { background: none; color: #111; -webkit-text-fill-color: #111; }
+    .hero .wrap { grid-template-columns: 1fr auto; align-items: start; padding: 0 0 7pt; gap: 14pt; }
+    .eyebrow { margin-bottom: 4pt; color: #333; } .eyebrow i { display: none; }
+    .lede { color: #222; font-size: 9.5pt; margin-bottom: 5pt; max-width: none; } .lede b { color: #111; }
+    .hero-actions { gap: 0 12pt; } .btn, .btn.primary { background: none; border: 0; color: #111; padding: 0; font-size: 8.5pt; gap: 3pt; border-radius: 0; }
+    .btn[download] { display: none; } svg.i { width: 9pt; height: 9pt; }
+    .orbit { --orb: 62pt; } .portrait { width: 100%; } .portrait::before { display: none; } .portrait img { border: 1pt solid #999; }
+    section { padding-top: 9pt; } .label { margin-bottom: 5pt; font-size: 7pt; gap: 8pt; } .label::before { display: none; } .kicker { display: none; }
+    .about { display: block; } .summary-text { font-size: 9.5pt !important; line-height: 1.4 !important; max-width: none !important; }
+    h2 { font-size: 12pt; } h3 { font-size: 10.5pt; }
+    .timeline { padding-left: 14pt; } .timeline::before { left: 3pt; width: 1pt; background: #999; } .role::before { left: -14pt; top: 4pt; width: 6pt; height: 6pt; box-shadow: none !important; }
+    .role { padding-bottom: 6pt; break-inside: avoid; } .where { margin: 0 0 2pt; font-size: 8.5pt; } .when { font-size: 8pt; }
+    .role ul { padding-left: 11pt; } .role li { margin-bottom: 1pt; }
+    .skills { display: block; } .skill { border: 0; border-radius: 0; padding: 0 0 2pt; background: none; } .skill h3 { font: 700 8.5pt/1.35 var(--sans); margin: 0; display: inline; } .skill h3 svg { display: none; } .skill h3::after { content: ": "; }
+    .skill .chips { display: inline; } .chips li { display: inline; border: 0; padding: 0; font-size: 8.5pt; border-radius: 0; color: #111; } .chips li:not(:last-child)::after { content: ", "; }
+    .pubs { gap: 4pt; } .pub { padding: 0 0 0 7pt; border: 0; border-left: 2pt solid #7a5a1c; border-radius: 0; break-inside: avoid; background: none; }
+    .pub h3 { font-size: 9.5pt; margin-bottom: 0; } .pub p { font-size: 8.5pt; } .tag { font-size: 6.5pt; margin-bottom: 0; }
+    .two { gap: 18pt; } .list li { padding: 3pt 0; border: 0; } .list h3 { font-size: 9.5pt; } .list p { font-size: 8.5pt; margin-top: 0; }
+    .feature, .project { display: block; padding: 0; border: 0; border-radius: 0; background: none; } .feature p { margin-top: 2pt; max-width: none; } .links { margin-top: 2pt !important; font-size: 8.5pt; }
+    .outside { display: block; margin: 0; } .outside li { display: inline; padding: 0; border: 0; background: none; } .outside svg, .outside span { display: none; } .outside b { display: inline; font: 400 9pt/1.4 var(--sans); } .outside li:not(:last-child) b::after { content: " · "; }
+    .js .reveal { opacity: 1 !important; transform: none !important; }
+    /* Paper is narrow, so browsers apply the phone layout when printing. Keep the wide arrangement instead. */
+    .hero .wrap { grid-template-columns: 1fr auto !important; align-items: start; padding: 0 0 7pt !important; gap: 14pt !important; }
+    .orbit { order: 0 !important; margin: 0 !important; --orb: 62pt !important; }
+    .two { grid-template-columns: 1fr 1fr !important; gap: 18pt !important; } .two > div + div { margin-top: 0 !important; }
+    section { padding-top: 9pt !important; }
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="progress" aria-hidden="true"></div>
+
+<nav aria-label="Sections">
+  <div class="wrap">
+    <a class="mark" href="#top" aria-label="Back to the top">KA<b>.</b></a>
+    <ul>
+      <li><a href="#about">The Kingdom</a></li>
+      <li><a href="#pantry">Pantry</a></li>
+      <li><a href="#multiverse">Multiverse</a></li>
+      <li><a href="#outside">Photos</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <a class="resume" href="ka.html">Serious version →</a>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="shells" aria-hidden="true"><span style="left:6%;top:12%">🐚</span><span style="left:88%;top:8%;animation-delay:1.2s">👑</span><span style="left:46%;top:4%;animation-delay:2s">✨</span><span style="left:92%;top:64%;animation-delay:.6s">🐚</span><span style="left:2%;top:70%;animation-delay:1.8s">🥫</span><span style="left:60%;top:88%;animation-delay:2.6s">🐚</span><span style="left:78%;top:38%;animation-delay:3.1s">🌌</span></div>
+  <div class="wrap">
+    <div>
+      <p class="eyebrow"><i></i>👑 The Abalone Multiverse · Singapore</p>
+      <h1>Tan Kwan Ann</h1>
+      <button class="king" id="king" type="button" aria-label="Also known as 鲍鱼王, the Abalone King, or the Abalone Sovereign. Press for a surprise.">
+        <span class="crown" aria-hidden="true">👑</span><b lang="zh-Hans">鲍鱼王</b><span class="titles"><span>the Abalone King</span><em>a.k.a. the Abalone Sovereign</em></span><small aria-hidden="true">(press me)</small>
+      </button>
+      <p class="roll"><span class="sr">I defeat abalone and rule the abalone kingdom.</span><span aria-hidden="true">I <span class="word grad" id="word">defeat abalone</span></span></p>
+      <p class="lede">Structural biologist by weekday, Abalone King by acclamation. Braised, canned, or three-for-two — all abalone bow to the King. Somewhere in the multiverse, every universe is abalone. The abalone never stood a chance.</p>
+      <ul class="hero-actions">
+        <li class="print-ok"><a class="btn primary" href="mailto:tankan7@gmail.com"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>tankan7@gmail.com</a></li>
+        <li class="print-ok"><a class="btn" href="https://www.linkedin.com/in/tan-kwan-ann" rel="noopener"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 10v7M8 7v.01M12 17v-4a2 2 0 0 1 4 0v4M12 10v7"/></svg>LinkedIn</a></li>
+        <li class="print-ok"><a class="btn" href="https://github.com/tankan7-max" rel="noopener"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 19c-4 1.300-4-2-6-2.500M15 21v-3.400a3 3 0 0 0-.800-2.300c2.800-.300 5.800-1.400 5.800-6.200a4.800 4.800 0 0 0-1.300-3.300 4.500 4.500 0 0 0-.100-3.300s-1.100-.300-3.500 1.300a12 12 0 0 0-6.200 0C6.500 1.700 5.400 2 5.400 2a4.500 4.500 0 0 0-.100 3.300A4.800 4.800 0 0 0 4 8.600c0 4.800 3 5.900 5.800 6.200A3 3 0 0 0 9 17.100V21"/></svg>GitHub</a></li>
+        <li><a class="btn" href="Tan_Kwan_Ann_Resume.pdf" download><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 20h14"/></svg>Resume (PDF)</a></li>
+      </ul>
+      <p class="status"><i></i>Open to abalone tips <span>· Singapore Citizen</span></p>
+      <p class="print-only">Singapore · Singapore Citizen</p>
+    </div>
+    <div class="orbit" id="orbit" role="img" aria-label="Portrait of Tan Kwan Ann with a ring of 26 glowing pairs of dots orbiting it, echoing the 26 protein pairs of the structure solved during the PhD. Drag to spin.">
+      <canvas class="back" aria-hidden="true"></canvas>
+      <div class="portrait"><img src="images/ka-photo.jpg" alt="" width="230" height="230" fetchpriority="high"></div>
+      <canvas class="front" aria-hidden="true"></canvas>
+      <span class="orbit-hint" aria-hidden="true">26 pairs · drag to spin</span>
+    </div>
+  </div>
+</header>
+
+<div class="marquee" aria-hidden="true">
+  <div class="track">
+    <ul>
+      <li class="fun">Abalone appreciation</li><li class="fun" lang="zh-Hans">鲍鱼王</li><li class="fun">Canned abalone sommelier</li><li class="fun">Snack research</li><li class="fun">3 for $2</li><li class="fun">Black truffle baby abalone</li><li class="fun">Two for $11.95</li><li class="fun">Sambal abalone</li><li class="fun">3 for $2, obviously</li><li class="fun">All universes are abalone</li><li class="fun">Multiverse of abalone</li><li class="fun">Universe 8Z5G</li><li class="fun">Every timeline: abalone</li><li class="fun">Apprentice vibe-coder</li><li class="fun">Hiking</li>
+    </ul>
+    <ul aria-hidden="true">
+      <li class="fun">Abalone appreciation</li><li class="fun" lang="zh-Hans">鲍鱼王</li><li class="fun">Canned abalone sommelier</li><li class="fun">Snack research</li><li class="fun">3 for $2</li><li class="fun">Black truffle baby abalone</li><li class="fun">Two for $11.95</li><li class="fun">Sambal abalone</li><li class="fun">3 for $2, obviously</li><li class="fun">All universes are abalone</li><li class="fun">Multiverse of abalone</li><li class="fun">Universe 8Z5G</li><li class="fun">Every timeline: abalone</li><li class="fun">Apprentice vibe-coder</li><li class="fun">Hiking</li>
+    </ul>
+  </div>
+</div>
+
+<main class="wrap" id="main">
+  <section id="about" aria-labelledby="h-about">
+    <h2 class="label reveal" id="h-about">The Kingdom</h2>
+    <div class="about">
+      <p class="summary-text reveal">Tan Kwan Ann, PhD in structural biology and R&amp;D scientist at Allozymes — and, by popular acclamation, <b>鲍鱼王</b>, the Abalone King. By weekday she engineers enzymes and solves protein structures. The rest of the time she defeats abalone wherever it is found: braised on a plate, canned two-for-$11.95, or three-for-two at a laksa stall. Somewhere in the multiverse, every universe is abalone — and the King reigns in all of them.</p>
+      <ul class="nums reveal" aria-label="Some numbers">
+        <li class="num fun"><b><span data-count="7.86" data-dec="2">7.86</span> km</b><span>one walk, mostly in circles</span><em class="wink" style="font-style:normal">less serious</em></li>
+        <li class="num fun"><b>∞</b><span>universes — and every single one is abalone</span><em class="wink" style="font-style:normal">multiverse record</em></li>
+        <li class="num fun wide"><b>∞</b><span>abalone defeated — and counting</span><em class="wink" style="font-style:normal">royal record</em></li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="pantry" aria-labelledby="h-pantry">
+    <h2 class="label reveal" id="h-pantry">The Royal Pantry</h2>
+    <p class="kicker reveal">Tributes received. All defeated.</p>
+    <ul class="pantry reveal">
+      <li><figure><img src="images/ka-abalone-cans.jpg" alt="Shelves of canned baby abalone: black truffle, mushroom and sambal chilli" width="675" height="900" loading="lazy" decoding="async"><figcaption><b>Black truffle baby abalone</b><span>Two for $11.95. The royal pantry staple.</span><em>STATUS: DEFEATED</em></figcaption></figure></li>
+      <li><figure><img src="images/ka-abalone-meat.jpg" alt="A vacuum pack of cooked abalone meat" width="675" height="900" loading="lazy" decoding="async"><figcaption><b>Cooked abalone meat</b><span>Heat and serve. Zero cooking required.</span><em>STATUS: DEFEATED</em></figcaption></figure></li>
+      <li><figure><img src="images/ka-abalone-laksa.jpg" alt="A laksa stall advertising fortune abalone, 3 for $2" width="675" height="900" loading="lazy" decoding="async"><figcaption><b>Fortune abalone, 3 for $2</b><span>At Geylang Laksa. Even the laksa stall pays tribute.</span><em>STATUS: DEFEATED</em></figcaption></figure></li>
+    </ul>
+  </section>
+
+  <section id="multiverse" aria-labelledby="h-multi">
+    <h2 class="label reveal" id="h-multi">The Multiverse</h2>
+    <p class="kicker reveal">Every universe. All abalone. Tap one to visit it.</p>
+    <ul class="outside reveal">
+      <li><button class="uni" type="button" data-toast="🌌 Universe 8Z5G: 26 pairs of proteins in a ring. All abalone."><span class="e">🌌</span><div><b>Universe 8Z5G</b><span>26 pairs of proteins in a ring. All abalone.</span></div></button></li>
+      <li><button class="uni" type="button" data-toast="🥫 Universe 2-for-$11.95: black truffle baby abalone, canned. Defeated."><span class="e">🥫</span><div><b>Universe 2-for-$11.95</b><span>Black truffle baby abalone, canned. Defeated.</span></div></button></li>
+      <li><button class="uni" type="button" data-toast="🍜 Universe 3-for-$2: fortune abalone at Geylang Laksa. Defeated."><span class="e">🍜</span><div><b>Universe 3-for-$2</b><span>Fortune abalone at Geylang Laksa. Defeated.</span></div></button></li>
+      <li><button class="uni" type="button" data-toast="🍲 Universe Braised: on a plate, glistening. Defeated."><span class="e">🍲</span><div><b>Universe Braised</b><span>On a plate, glistening. Defeated.</span></div></button></li>
+      <li><button class="uni" type="button" data-toast="🧊 Universe Heat-and-Serve: cooked abalone meat, zero cooking. Defeated."><span class="e">🧊</span><div><b>Universe Heat-and-Serve</b><span>Cooked abalone meat, zero cooking. Defeated.</span></div></button></li>
+      <li><button class="uni" type="button" data-toast="👑 Universe The King: you are here. The King reigns in all of them."><span class="e">👑</span><div><b>Universe The King</b><span>You are here. The King reigns in all of them.</span></div></button></li>
+    </ul>
+  </section>
+
+  <section id="outside" aria-labelledby="h-out">
+    <h2 class="label reveal" id="h-out">Outside the lab</h2>
+    <p class="kicker reveal">Evidence that I have a life.</p>
+    <ul class="outside reveal">
+      <li><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M13.500 5l-3 14"/></svg><div><b>Apprentice vibe-coder</b><span>Learning to build software by describing it, one small shop at a time.</span></div></li>
+      <li><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 19 6-11 4 7 2-3 6 7z"/><circle cx="17" cy="6" r="2"/></svg><div><b>Hiking</b><span>Happiest on a trail.</span></div></li>
+    </ul>
+    <h3 class="sub reveal">Life, lately <small>tap a photo</small></h3>
+    <ul class="gallery" aria-label="Photos">
+      <li class="reveal"><figure><button class="ph" type="button" aria-label="Open photo: braised abalone"><img src="images/ka-abalone.jpg" alt="A braised abalone on a plate" width="675" height="900" loading="lazy" decoding="async"></button><figcaption><b lang="zh-Hans">鲍鱼王</b> in action. The abalone never stood a chance.</figcaption></figure></li>
+      <li class="reveal"><figure><button class="ph" type="button" aria-label="Open photo: sample tubes at the bench"><img src="images/ka-lab.jpg" alt="Three sample tubes in an orange rack, held by a gloved hand" width="675" height="900" loading="lazy" decoding="async"></button><figcaption>At the bench. Three tubes, two of them doing something.</figcaption></figure></li>
+      <li class="reveal"><figure><button class="ph" type="button" aria-label="Open photo: at a wedding"><img src="images/ka-wedding.jpg" alt="Kwan Ann with friends at a wedding, giving a thumbs up" width="900" height="675" loading="lazy" decoding="async"></button><figcaption>Professional wedding guest. Thumbs up included.</figcaption></figure></li>
+      <li class="reveal"><figure><button class="ph" type="button" aria-label="Open photo: a walking route map"><img class="crop" src="images/ka-walk.jpg" alt="Phone map of a 7.86 km outdoor walk, with a scribble of circles" width="414" height="900" loading="lazy" decoding="async"></button><figcaption>7.86 km walk. Mostly circles, apparently.</figcaption></figure></li>
+      <li class="reveal"><figure><button class="ph" type="button" aria-label="Open photo: a packet of potato chips"><img src="images/ka-chips.jpg" alt="A packet of Oishi potato chips held up in a supermarket aisle" width="675" height="900" loading="lazy" decoding="async"></button><figcaption>Snack research. Very serious work.</figcaption></figure></li>
+      <li class="reveal"><figure><button class="ph" type="button" aria-label="Open photo: in a Tesla cap and polo"><img src="images/ka-tesla.jpg" alt="Kwan Ann in a Tesla cap and polo in front of a glass display" width="675" height="900" loading="lazy" decoding="async"></button><figcaption>Sells Teslas on the side.</figcaption></figure></li>
+      <li class="reveal"><figure><button class="ph" type="button" aria-label="Open photo: eyes closed against a wooden wall"><img src="images/ka-sauna.jpg" alt="Kwan Ann with eyes closed against a wood-panelled wall, wearing a Tesla polo" width="675" height="900" loading="lazy" decoding="async"></button><figcaption>Sauna mode: off.</figcaption></figure></li>
+      <li class="reveal"><figure><button class="ph" type="button" aria-label="Open photo: shelves of canned baby abalone"><img src="images/ka-abalone-cans.jpg" alt="Shelves of canned baby abalone: black truffle, mushroom and sambal chilli" width="675" height="900" loading="lazy" decoding="async"></button><figcaption>The royal pantry. Black truffle baby abalone, two for $11.95.</figcaption></figure></li>
+      <li class="reveal"><figure><button class="ph" type="button" aria-label="Open photo: a vacuum pack of cooked abalone meat"><img src="images/ka-abalone-meat.jpg" alt="A vacuum pack of cooked abalone meat" width="675" height="900" loading="lazy" decoding="async"></button><figcaption>Cooked abalone meat, heat and serve. Zero cooking required — the King approves.</figcaption></figure></li>
+      <li class="reveal"><figure><button class="ph" type="button" aria-label="Open photo: a laksa stall advertising fortune abalone"><img src="images/ka-abalone-laksa.jpg" alt="A laksa stall advertising fortune abalone, 3 for $2" width="675" height="900" loading="lazy" decoding="async"></button><figcaption>Fortune abalone at Geylang Laksa, 3 for $2. Even the laksa stall pays tribute.</figcaption></figure></li>
+    </ul>
+  </section>
+
+  <section id="contact" aria-labelledby="h-contact">
+    <div class="invite reveal">
+      <h2 id="h-contact"><span class="grad">Say hi to the King.</span></h2>
+      <p>Abalone tips, laksa stalls selling 3-for-$2 abalone, or anything else — the King answers her own email. Tributes in abalone form are also accepted. Messages from parallel universes also accepted.</p>
+      <ul class="hero-actions">
+        <li><a class="btn primary" href="mailto:tankan7@gmail.com?subject=Abalone%20business"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>Say hi</a></li>
+        <li><button class="btn" type="button" data-copy="tankan7@gmail.com" data-done="Copied. Now it’s your move."><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>Copy email</button></li>
+        <li><a class="btn" href="https://www.linkedin.com/in/tan-kwan-ann" rel="noopener">LinkedIn</a></li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Tan Kwan Ann (<span lang="zh-Hans">鲍鱼王</span>, the Abalone Sovereign) · Built with AI as my pair programmer, fuelled by snacks. Long live the King — in every universe.</span>
+    <span class="foot-links"><a href="mailto:tankan7@gmail.com">Email</a><a href="https://www.linkedin.com/in/tan-kwan-ann" rel="noopener">LinkedIn</a><a href="https://github.com/tankan7-max" rel="noopener">GitHub</a><a href="Tan_Kwan_Ann_Resume.pdf" download>Resume (PDF)</a><a href="ka.html">Serious version →</a><a href="#top">Back to top ↑</a></span>
+  </div>
+</footer>
+
+<dialog class="lightbox" id="lightbox" aria-label="Photo viewer">
+  <button class="lb-btn lb-close" type="button" aria-label="Close photo">×</button>
+  <button class="lb-btn lb-prev" type="button" aria-label="Previous photo">‹</button>
+  <figure class="lb-body"><img alt="" src=""><figcaption></figcaption></figure>
+  <button class="lb-btn lb-next" type="button" aria-label="Next photo">›</button>
+</dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+  // ----- Small messages and copy buttons -----
+  const toastEl = $('#toast'); let toastTimer = 0;
+  const toast = msg => { toastEl.textContent = msg; toastEl.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2400); };
+  async function copyText(text) {
+    try { await navigator.clipboard.writeText(text); return true; }
+    catch (e) { const ta = document.createElement('textarea'); ta.value = text; ta.style.cssText = 'position:fixed;opacity:0'; document.body.appendChild(ta); ta.select(); let ok = false; try { ok = document.execCommand('copy'); } catch (err) {} ta.remove(); return ok; }
+  }
+  $$('[data-copy]').forEach(b => b.addEventListener('click', async () => toast(await copyText(b.dataset.copy) ? (b.dataset.done || 'Copied') : 'Could not copy — please select the text instead.')));
+  $$('[data-toast]').forEach(b => b.addEventListener('click', () => toast(b.dataset.toast)));
+
+  // ----- The Abalone King (a.k.a. the Abalone Sovereign) -----
+  const hails = ['👑 All hail the Abalone Sovereign', '🌌 Universe 8Z5G: it is abalone.', '🥫 Universe 2-for-$11.95: it is abalone.', '🍜 Universe 3-for-$2: it is abalone.', '🍲 Universe Braised: it is abalone.', '👑 In every universe, the King reigns.'];
+  let hailI = 0;
+  $('#king').addEventListener('click', () => {
+    toast(hails[hailI % hails.length]); hailI++;
+    if (reduce) return;
+    const box = document.createElement('div'); box.className = 'rain'; box.setAttribute('aria-hidden', 'true');
+    for (let i = 0; i < 60; i++) {
+      const s = document.createElement('span'); s.textContent = ['👑', '🐚', '✨', '🥫'][i % 4];
+      s.style.left = Math.random() * 100 + '%'; s.style.animationDelay = Math.random() * .9 + 's'; s.style.fontSize = 16 + Math.random() * 20 + 'px'; s.style.setProperty('--dx', Math.random() * 90 - 45 + 'px');
+      box.appendChild(s);
+    }
+    document.body.appendChild(box); setTimeout(() => box.remove(), 3800);
+  });
+
+  // ----- Rolling line under the name -----
+  const words = ['defeat abalone', 'rule the abalone kingdom', 'collect abalone like trophies', 'crown every abalone', 'scout abalone on weekends', 'braise abalone', 'buy abalone two for $11.95', 'rule every universe', 'conquer the abalone multiverse', 'defeat abalone in all timelines'];
+  const wordEl = $('#word');
+  if (!reduce) { let i = 0; setInterval(() => { if (document.hidden) return; wordEl.classList.add('out'); setTimeout(() => { i = (i + 1) % words.length; wordEl.textContent = words[i]; wordEl.classList.remove('out'); }, 320); }, 2700); }
+
+  // ----- Shared by the halo and the structure: a drag-to-turn 3D view that only draws while it is on screen -----
+  function turner(root, opts) {
+    // opts: { yaw, tilt, tiltSwing, auto, pitchSign, minGap, draw(yaw, pitch) }
+    let yaw = opts.yaw ?? 0, pitch = opts.tilt, vy = 0, vx = 0, drag = null, idle = 9, raf = 0, last = 0, visible = true, clock = 0, since = 0;
+    const auto = reduce ? 0 : opts.auto, gap = opts.minGap || 0, sign = opts.pitchSign || 1;
+    function frame(t) {
+      raf = 0; since += Math.min(.05, (t - last) / 1000 || .016); last = t;
+      if (since * 1000 < gap && !drag) { raf = requestAnimationFrame(frame); return; }
+      const step = since; since = 0; clock += step;
+      if (!drag) { idle += step; yaw += (vy + (idle > 1.4 ? auto : 0)) * step; pitch += vx * step; const k = Math.exp(-step * 2.2); vy *= k; vx *= k; if (idle > 1.4) pitch += (opts.tilt + (reduce ? 0 : (opts.tiltSwing || 0) * Math.sin(clock * .45)) - pitch) * Math.min(1, step * .8); }
+      opts.draw(yaw, pitch);
+      if (visible && !document.hidden && (auto || drag || Math.abs(vy) > .02 || Math.abs(vx) > .02 || Math.abs(opts.tilt - pitch) > .01)) raf = requestAnimationFrame(frame);
+    }
+    const kick = () => { if (!raf) { last = performance.now(); since = 0; raf = requestAnimationFrame(frame); } };
+    root.addEventListener('pointerdown', e => { if (e.button || (e.target.closest && e.target.closest('button, a'))) return; drag = { x: e.clientX, y: e.clientY, t: performance.now() }; idle = 0; vy = vx = 0; root.classList.add('drag'); try { root.setPointerCapture(e.pointerId); } catch (err) {} kick(); });
+    root.addEventListener('pointermove', e => { if (!drag) return; const now = performance.now(), dx = e.clientX - drag.x, dy = e.clientY - drag.y, dt = Math.max(8, now - drag.t); yaw += dx * .009; pitch = clamp(pitch + dy * .009 * sign, -1.5, 1.5); vy = clamp(dx / dt * 9, -6, 6); vx = clamp(dy / dt * 9 * sign, -4, 4); drag = { x: e.clientX, y: e.clientY, t: now }; });
+    const release = () => { if (!drag) return; drag = null; idle = 0; root.classList.remove('drag'); kick(); };
+    root.addEventListener('pointerup', release); root.addEventListener('pointercancel', release);
+    new IntersectionObserver(es => { visible = es[0].isIntersecting; if (visible) kick(); }).observe(root);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) kick(); });
+    return { kick, turn(dy, dp) { yaw += dy; pitch = clamp(pitch + dp, -1.5, 1.5); idle = 0; kick(); }, reset() { yaw = opts.yaw ?? 0; pitch = opts.tilt; vy = vx = 0; idle = 0; kick(); }, now: () => [yaw, pitch] };
+  }
+  function fitCanvases(canvases, redraw, maxDpr = 2) {
+    const size = () => { const dpr = Math.min(devicePixelRatio || 1, maxDpr); canvases.forEach(c => { c.width = Math.max(1, Math.round(c.clientWidth * dpr)); c.height = Math.max(1, Math.round(c.clientHeight * dpr)); }); redraw(); };
+    new ResizeObserver(size).observe(canvases[0]); size();
+  }
+
+  // ----- The halo around the portrait: 26 pairs in a ring, like the 26 QmcA–YbbJ pairs of the real structure -----
+  function makeRing(root) {
+    const [back, front] = $$('canvas', root), cb = back.getContext('2d'), cf = front.getContext('2d'), N = 26, TAU = Math.PI * 2;
+    // Proportions follow the real structure (ring axis up): QmcA sits inside and lower, YbbJ outside and higher. Opened up a little to leave room for the portrait.
+    const R1 = .66, R2 = 1, H1 = -.11, H2 = .2, A = [], B = [];
+    for (let k = 0; k < N; k++) { const t = k / N * TAU, c = Math.cos(t), s = Math.sin(t); A.push([c * R1, H1, s * R1]); B.push([c * R2, H2, s * R2]); }
+    function draw(ay, ax) {
+      const W = back.width, H = back.height, d = W / (back.clientWidth || 1), R = Math.min(W, H) / 2 * .9, ca = Math.cos(ay), sa = Math.sin(ay), cx = Math.cos(ax), sx = Math.sin(ax);
+      const pr = v => { const x1 = v[0] * ca + v[2] * sa, z1 = -v[0] * sa + v[2] * ca, y2 = v[1] * cx - z1 * sx, z2 = v[1] * sx + z1 * cx, s = 3.6 / (3.6 - z2); return { x: W / 2 + x1 * R * s, y: H / 2 - y2 * R * s, z: z2, s }; };
+      cb.clearRect(0, 0, W, H); cf.clearRect(0, 0, W, H);
+      const a = A.map(pr), b = B.map(pr), items = [];
+      for (let k = 0; k < N; k++) { const n = (k + 1) % N; items.push({ z: (a[k].z + b[k].z) / 2, e: [a[k], b[k]], link: true }, { z: (a[k].z + a[n].z) / 2, e: [a[k], a[n]] }, { z: (b[k].z + b[n].z) / 2, e: [b[k], b[n]] }, { z: Math.max(a[k].z, b[k].z), dot: [a[k], b[k]] }); }
+      items.sort((p, q) => p.z - q.z);
+      for (const it of items) {
+        const ctx = it.z >= 0 ? cf : cb; let depth = clamp((it.z + 1.1) / 2.2, 0, 1);
+        const pt = it.e ? it.e[0] : it.dot[0], fade = it.z >= 0 ? clamp((Math.hypot(pt.x - W / 2, pt.y - H / 2) - W * .27) / (W * .07), .12, 1) : 1;   // anything in front of the portrait fades, so it never covers the face
+        depth *= fade;
+        if (it.e) { ctx.strokeStyle = `rgba(255,255,255,${(it.link ? .14 : .05) + depth * (it.link ? .5 : .2)})`; ctx.lineWidth = d * (it.link ? 1.3 : 1); ctx.beginPath(); ctx.moveTo(it.e[0].x, it.e[0].y); ctx.lineTo(it.e[1].x, it.e[1].y); ctx.stroke(); }
+        else [[it.dot[0], '94,234,212', .8], [it.dot[1], '167,139,250', 1]].forEach(([q, col, size]) => { ctx.shadowColor = `rgba(${col},${depth})`; ctx.shadowBlur = it.z > 0 ? 14 * d * depth : 0; ctx.fillStyle = `rgba(${col},${.3 + depth * .7})`; ctx.beginPath(); ctx.arc(q.x, q.y, R * .034 * size * q.s * (.8 + depth * .5), 0, 7); ctx.fill(); ctx.shadowBlur = 0; });
+      }
+    }
+    const ring = turner(root, { yaw: .3, tilt: .95, tiltSwing: .1, auto: .32, draw });
+    fitCanvases([back, front], () => { const [y, p] = ring.now(); draw(y, p); ring.kick(); });
+  }
+
+
+  makeRing($('#orbit'));
+
+  // ----- Numbers count up when they arrive -----
+  if (!reduce && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver(es => es.forEach(e => {
+      if (!e.isIntersecting) return; io.unobserve(e.target);
+      const el = e.target, to = parseFloat(el.dataset.count), dec = +el.dataset.dec, t0 = performance.now();
+      const step = t => { const k = Math.min(1, (t - t0) / 1100), v = to * (1 - Math.pow(1 - k, 3)); el.textContent = v.toFixed(dec); if (k < 1) requestAnimationFrame(step); };
+      el.textContent = (0).toFixed(dec); requestAnimationFrame(step);
+    }), { threshold: .6 });
+    $$('[data-count]').forEach(n => io.observe(n));
+  }
+
+  // ----- Cursor spotlight on cards (mouse only) -----
+  if (matchMedia('(pointer: fine)').matches) document.addEventListener('pointermove', e => { const t = e.target.closest && e.target.closest('.spot'); if (!t) return; const r = t.getBoundingClientRect(); t.style.setProperty('--mx', e.clientX - r.left + 'px'); t.style.setProperty('--my', e.clientY - r.top + 'px'); }, { passive: true });
+
+  // ----- Scroll progress and the current section in the menu -----
+  const bar = $('.progress'); let ticking = false;
+  addEventListener('scroll', () => { if (ticking) return; ticking = true; requestAnimationFrame(() => { const d = document.documentElement; bar.style.transform = `scaleX(${clamp(d.scrollTop / ((d.scrollHeight - d.clientHeight) || 1), 0, 1)})`; ticking = false; }); }, { passive: true });
+  const links = $$('nav ul a'), map = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
+  const spy = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; links.forEach(a => a.removeAttribute('aria-current')); const a = map.get(e.target.id); if (a) { a.setAttribute('aria-current', 'true'); if (innerWidth <= 820) a.scrollIntoView({ inline: 'center', block: 'nearest' }); } }), { rootMargin: '-45% 0px -50% 0px' });
+  ['about', 'pantry', 'multiverse', 'outside', 'contact'].forEach(id => { const n = document.getElementById(id); if (n) spy.observe(n); });
+
+  // ----- Parts fade in as they scroll into view -----
+  if ('IntersectionObserver' in window && !reduce) {
+    document.documentElement.classList.add('js');
+    const seen = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); seen.unobserve(e.target); } }), { rootMargin: '0px 0px -8% 0px' });
+    $$('.reveal').forEach(n => seen.observe(n));
+    addEventListener('beforeprint', () => $$('.reveal').forEach(n => n.classList.add('in')));
+  }
+
+  // ----- Photo viewer -----
+  const lb = $('#lightbox'), lbImg = $('img', lb), lbCap = $('figcaption', lb), shots = $$('.gallery .ph'); let cur = 0;
+  function show(i) { cur = (i + shots.length) % shots.length; const img = $('img', shots[cur]); lbImg.src = img.currentSrc || img.src; lbImg.alt = img.alt; lbCap.innerHTML = shots[cur].closest('figure').querySelector('figcaption').innerHTML; }
+  shots.forEach((b, i) => b.addEventListener('click', () => { show(i); lb.showModal(); }));
+  $('.lb-prev').onclick = () => show(cur - 1); $('.lb-next').onclick = () => show(cur + 1); $('.lb-close').onclick = () => lb.close();
+  lb.addEventListener('click', e => { if (e.target === lb) lb.close(); });
+  lb.addEventListener('keydown', e => { if (e.key === 'ArrowLeft') show(cur - 1); else if (e.key === 'ArrowRight') show(cur + 1); });
+})();
+</script>
+</body>
+</html>
