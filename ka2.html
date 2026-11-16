@@ -4,17 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>鲍鱼王 👑 — the Abalone King of the Multiverse</title>
-<meta name="description" content="Tan Kwan Ann, also known as 鲍鱼王, the Abalone King of the Multiverse. In every universe, it is abalone. The serious version is next door.">
+<meta name="description" content="鲍鱼王, the Abalone King of the Multiverse (also Tan Kwan Ann). Defeat abalone, read the royal decrees, visit a universe. In every universe, it is abalone. The serious version is next door.">
 <meta name="theme-color" content="#060608">
 <meta name="color-scheme" content="dark">
 <meta property="og:type" content="website">
 <meta property="og:title" content="鲍鱼王 — the Abalone King of the Multiverse">
 <meta property="og:description" content="Tan Kwan Ann, a.k.a. 鲍鱼王, the Abalone Sovereign. In every universe, it is abalone.">
 <meta property="og:url" content="https://tankan7-max.github.io/ka-shop/ka2.html">
-<meta property="og:image" content="https://tankan7-max.github.io/ka-shop/images/ka-abalone.jpg">
-<meta property="og:image:width" content="675">
-<meta property="og:image:height" content="900">
-<meta property="og:image:alt" content="A braised abalone on a plate — the Abalone King in action">
+<meta property="og:image" content="https://tankan7-max.github.io/ka-shop/images/ka2-og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="鲍鱼王, the Abalone King of the Multiverse, next to a braised abalone on a plate">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%235eead4'/%3E%3Cstop offset='1' stop-color='%23a78bfa'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='9' fill='%23060608'/%3E%3Ctext x='16' y='22' font-family='Arial,sans-serif' font-size='14' font-weight='800' text-anchor='middle' fill='url(%23g)'%3EKA%3C/text%3E%3C/svg%3E">
 <link rel="preload" href="fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -372,6 +372,55 @@
     .two { grid-template-columns: 1fr 1fr !important; gap: 18pt !important; } .two > div + div { margin-top: 0 !important; }
     section { padding-top: 9pt !important; }
   }
+
+  /* ---------- More abalone ---------- */
+  .mega { position: absolute; right: -3%; bottom: -9%; font: 800 clamp(150px, 26vw, 340px)/.8 var(--cjk); letter-spacing: -.04em; color: transparent; -webkit-text-stroke: 1px rgba(245,194,107,.07); white-space: nowrap; user-select: none; }
+  .outside span a { color: var(--a1); text-underline-offset: 3px; }
+  .pantry { align-items: stretch; } .pantry li, .pantry figure { height: 100%; }
+  .roller { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 18px; margin: 0 0 22px; }
+  .roller .btn { flex: none; } .uni-out { color: var(--ink); font-size: 15px; min-height: 1.5em; }
+  .trail { position: fixed; z-index: 90; pointer-events: none; font-size: 14px; opacity: .75; transform: translate(-50%, -50%); animation: trail .9s ease-out forwards; }
+  @keyframes trail { to { opacity: 0; transform: translate(-50%, calc(-50% + 26px)) rotate(40deg) scale(.6); } }
+
+  .arena { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 16px; align-items: stretch; }
+  .play, .ladder { padding: 26px; background: var(--panel); border: 1px dashed rgba(245,194,107,.38); border-radius: 22px; }
+  .score b { display: block; font: 800 clamp(58px, 9vw, 96px)/1 var(--display); letter-spacing: -.04em; font-variant-numeric: tabular-nums; background: linear-gradient(100deg, var(--a3), #fb7185); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .score span { display: block; margin-top: 4px; color: var(--muted); font: 500 12.5px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; }
+  .defeat { display: inline-flex; align-items: center; gap: 12px; margin: 22px 0 18px; padding: 17px 28px; border: 0; border-radius: 999px; background: linear-gradient(100deg, #f5c26b, #fb9f6b); color: #1a1205; font: 700 18px/1 var(--sans); cursor: pointer; box-shadow: 0 10px 34px rgba(245,194,107,.25); transition: transform .12s, box-shadow .2s; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+  .defeat:hover { box-shadow: 0 12px 42px rgba(245,194,107,.4); } .defeat:active { transform: scale(.95) rotate(-1.5deg); }
+  .defeat .ab { font-size: 24px; line-height: 1; }
+  .rankline { margin: 0 0 10px; color: var(--muted); } .rankline b { color: var(--ink); font: 650 18px/1.3 var(--display); letter-spacing: -.01em; }
+  .meter { height: 8px; border-radius: 99px; background: rgba(255,255,255,.08); overflow: hidden; } .meter i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--a3), #fb7185); transition: width .25s; }
+  .nextline { margin: 9px 0 20px; color: var(--muted); font-size: 14px; }
+  .ups { display: grid; gap: 10px; }
+  .up { all: unset; box-sizing: border-box; display: block; padding: 13px 16px; border: 1px solid var(--line-strong); border-radius: 14px; cursor: pointer; background: var(--panel-2); transition: border-color .2s, transform .15s; }
+  .up:hover:not(:disabled) { border-color: rgba(245,194,107,.7); transform: translateY(-2px); } .up:focus-visible { outline: 2px solid var(--a1); outline-offset: 3px; }
+  .up:disabled { cursor: not-allowed; opacity: .55; }
+  .up b { display: block; font: 600 15.5px/1.3 var(--display); } .up span { display: block; margin-top: 3px; color: var(--muted); font-size: 13px; }
+  .cps { min-height: 1.4em; margin: 14px 0 0; color: var(--a3); font: 500 13px/1.4 var(--mono); }
+  .reset { margin-top: 6px; padding: 8px 14px; border: 1px solid var(--line-strong); border-radius: 999px; background: none; color: var(--muted); font: 500 12.5px/1 var(--sans); cursor: pointer; } .reset:hover { color: var(--ink); }
+  .ladder h3 { margin: 0 0 14px; font-size: 20px; letter-spacing: -.02em; }
+  .ranks { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; }
+  .ranks li { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 9px 13px; border: 1px solid var(--line); border-radius: 12px; color: var(--faint); font-size: 14.5px; }
+  .ranks li small { font: 500 11.5px/1 var(--mono); letter-spacing: .06em; }
+  .ranks li.got { color: var(--ink); border-color: rgba(245,194,107,.3); background: rgba(245,194,107,.05); }
+  .ranks li.cur { border-color: rgba(245,194,107,.8); font-weight: 650; box-shadow: 0 0 22px rgba(245,194,107,.15); }
+
+  .decrees { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; counter-reset: dec; }
+  .decrees li { position: relative; padding: 18px 22px 18px 88px; background: var(--panel); border: 1px solid var(--line); border-radius: 18px; counter-increment: dec; }
+  .decrees li::before { content: counter(dec, upper-roman); position: absolute; left: 22px; top: 17px; width: 52px; font: 800 26px/1.1 var(--display); letter-spacing: -.02em; background: linear-gradient(100deg, var(--a3), #fb7185); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .decrees b { display: block; font: 600 17px/1.35 var(--display); letter-spacing: -.01em; } .decrees span { display: block; margin-top: 4px; color: var(--muted); font-size: 14.5px; }
+
+  .cv { list-style: none; margin: 0 0 22px; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 14px; }
+  .cv li { padding: 20px 22px; background: var(--panel); border: 1px dashed rgba(245,194,107,.35); border-radius: 18px; }
+  .cv .real { display: block; margin-bottom: 10px; color: var(--faint); font: 500 11.5px/1.4 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+  .cv b { display: block; font: 700 21px/1.2 var(--display); letter-spacing: -.02em; background: linear-gradient(100deg, var(--a3), #fb7185); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .cv p { margin: 8px 0 0; color: var(--muted); font-size: 14.5px; }
+  .cv-links { display: flex; flex-wrap: wrap; gap: 10px; margin: 0; }
+
+  @media (max-width: 820px) { .arena { grid-template-columns: 1fr; } .decrees li { padding-left: 74px; } .decrees li::before { left: 18px; width: 44px; font-size: 22px; } .shells span { opacity: .16; } .mega { opacity: .6; } }
+  @media (prefers-reduced-motion: reduce) { .trail { display: none; } .meter i { transition: none; } .defeat, .up { transition: none; } }
+  @media print { #arena, #decrees, #resume, #multiverse, .mega, .roller, .trail { display: none !important; } }
 </style>
 </head>
 <body>
@@ -384,6 +433,9 @@
     <ul>
       <li><a href="#about">The Kingdom</a></li>
       <li><a href="#pantry">Pantry</a></li>
+      <li><a href="#arena">Arena</a></li>
+      <li><a href="#decrees">Decrees</a></li>
+      <li><a href="#resume">Résumé</a></li>
       <li><a href="#multiverse">Multiverse</a></li>
       <li><a href="#outside">Photos</a></li>
       <li><a href="#contact">Contact</a></li>
@@ -393,16 +445,16 @@
 </nav>
 
 <header class="hero" id="top">
-  <div class="shells" aria-hidden="true"><span style="left:6%;top:12%">🐚</span><span style="left:88%;top:8%;animation-delay:1.2s">👑</span><span style="left:46%;top:4%;animation-delay:2s">✨</span><span style="left:92%;top:64%;animation-delay:.6s">🐚</span><span style="left:2%;top:70%;animation-delay:1.8s">🥫</span><span style="left:60%;top:88%;animation-delay:2.6s">🐚</span><span style="left:78%;top:38%;animation-delay:3.1s">🌌</span></div>
+  <div class="shells" aria-hidden="true"><b class="mega">鲍鱼王</b><span style="left:6%;top:12%">🐚</span><span style="left:88%;top:8%;animation-delay:1.2s">👑</span><span style="left:46%;top:4%;animation-delay:2s">✨</span><span style="left:92%;top:64%;animation-delay:.6s">🐚</span><span style="left:2%;top:70%;animation-delay:1.8s">🥫</span><span style="left:60%;top:88%;animation-delay:2.6s">🐚</span><span style="left:78%;top:38%;animation-delay:3.1s">🌌</span></div>
   <div class="wrap">
     <div>
-      <p class="eyebrow"><i></i>👑 The Abalone Multiverse · Singapore</p>
+      <p class="eyebrow"><i></i>👑 Abalone Multiverse · Singapore</p>
       <h1>Tan Kwan Ann</h1>
       <button class="king" id="king" type="button" aria-label="Also known as 鲍鱼王, the Abalone King, or the Abalone Sovereign. Press for a surprise.">
         <span class="crown" aria-hidden="true">👑</span><b lang="zh-Hans">鲍鱼王</b><span class="titles"><span>the Abalone King</span><em>a.k.a. the Abalone Sovereign</em></span><small aria-hidden="true">(press me)</small>
       </button>
       <p class="roll"><span class="sr">I defeat abalone and rule the abalone kingdom.</span><span aria-hidden="true">I <span class="word grad" id="word">defeat abalone</span></span></p>
-      <p class="lede">Structural biologist by weekday, Abalone King by acclamation. Braised, canned, or three-for-two — all abalone bow to the King. Somewhere in the multiverse, every universe is abalone. The abalone never stood a chance.</p>
+      <p class="lede">Structural biologist by weekday. Abalone King by acclamation. Braised, canned, three-for-two: all abalone bow to the King, including the ones who have not been invited. Somewhere in the multiverse there is a universe where abalone rules a person. It has been dealt with.</p>
       <ul class="hero-actions">
         <li class="print-ok"><a class="btn primary" href="mailto:tankan7@gmail.com"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>tankan7@gmail.com</a></li>
         <li class="print-ok"><a class="btn" href="https://www.linkedin.com/in/tan-kwan-ann" rel="noopener"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 10v7M8 7v.01M12 17v-4a2 2 0 0 1 4 0v4M12 10v7"/></svg>LinkedIn</a></li>
@@ -412,11 +464,11 @@
       <p class="status"><i></i>Open to abalone tips <span>· Singapore Citizen</span></p>
       <p class="print-only">Singapore · Singapore Citizen</p>
     </div>
-    <div class="orbit" id="orbit" role="img" aria-label="Portrait of Tan Kwan Ann with a ring of 26 glowing pairs of dots orbiting it, echoing the 26 protein pairs of the structure solved during the PhD. Drag to spin.">
+    <div class="orbit" id="orbit" role="img" aria-label="Portrait of Tan Kwan Ann with a ring of 26 pairs of the characters 鲍 and 鱼 orbiting it, in homage to the 26 protein pairs of the structure solved during the PhD. Drag to spin.">
       <canvas class="back" aria-hidden="true"></canvas>
       <div class="portrait"><img src="images/ka-photo.jpg" alt="" width="230" height="230" fetchpriority="high"></div>
       <canvas class="front" aria-hidden="true"></canvas>
-      <span class="orbit-hint" aria-hidden="true">26 pairs · drag to spin</span>
+      <span class="orbit-hint" aria-hidden="true">26 pairs of 鲍鱼 · drag to spin</span>
     </div>
   </div>
 </header>
@@ -424,10 +476,10 @@
 <div class="marquee" aria-hidden="true">
   <div class="track">
     <ul>
-      <li class="fun">Abalone appreciation</li><li class="fun" lang="zh-Hans">鲍鱼王</li><li class="fun">Canned abalone sommelier</li><li class="fun">Snack research</li><li class="fun">3 for $2</li><li class="fun">Black truffle baby abalone</li><li class="fun">Two for $11.95</li><li class="fun">Sambal abalone</li><li class="fun">3 for $2, obviously</li><li class="fun">All universes are abalone</li><li class="fun">Multiverse of abalone</li><li class="fun">Universe 8Z5G</li><li class="fun">Every timeline: abalone</li><li class="fun">Apprentice vibe-coder</li><li class="fun">Hiking</li>
+      <li class="fun" lang="zh-Hans">鲍鱼王万岁</li><li class="fun">The Abalone King</li><li class="fun">Two for $11.95</li><li class="fun" lang="zh-Hans">鲍</li><li class="fun" lang="zh-Hans">鱼</li><li class="fun">Canned abalone sommelier</li><li class="fun">3 for $2, obviously</li><li class="fun">Universe 8Z5G</li><li class="fun">Every timeline: abalone</li><li class="fun">Braised, canned, defeated</li><li class="fun" lang="zh-Hans">鲍鱼王</li><li class="fun">Long live the King</li><li class="fun">Abalone-certified (not certified)</li><li class="fun">All universes are abalone</li><li class="fun">Snack research</li><li class="fun">Hiking</li>
     </ul>
     <ul aria-hidden="true">
-      <li class="fun">Abalone appreciation</li><li class="fun" lang="zh-Hans">鲍鱼王</li><li class="fun">Canned abalone sommelier</li><li class="fun">Snack research</li><li class="fun">3 for $2</li><li class="fun">Black truffle baby abalone</li><li class="fun">Two for $11.95</li><li class="fun">Sambal abalone</li><li class="fun">3 for $2, obviously</li><li class="fun">All universes are abalone</li><li class="fun">Multiverse of abalone</li><li class="fun">Universe 8Z5G</li><li class="fun">Every timeline: abalone</li><li class="fun">Apprentice vibe-coder</li><li class="fun">Hiking</li>
+      <li class="fun" lang="zh-Hans">鲍鱼王万岁</li><li class="fun">The Abalone King</li><li class="fun">Two for $11.95</li><li class="fun" lang="zh-Hans">鲍</li><li class="fun" lang="zh-Hans">鱼</li><li class="fun">Canned abalone sommelier</li><li class="fun">3 for $2, obviously</li><li class="fun">Universe 8Z5G</li><li class="fun">Every timeline: abalone</li><li class="fun">Braised, canned, defeated</li><li class="fun" lang="zh-Hans">鲍鱼王</li><li class="fun">Long live the King</li><li class="fun">Abalone-certified (not certified)</li><li class="fun">All universes are abalone</li><li class="fun">Snack research</li><li class="fun">Hiking</li>
     </ul>
   </div>
 </div>
@@ -436,11 +488,11 @@
   <section id="about" aria-labelledby="h-about">
     <h2 class="label reveal" id="h-about">The Kingdom</h2>
     <div class="about">
-      <p class="summary-text reveal">Tan Kwan Ann, PhD in structural biology and R&amp;D scientist at Allozymes — and, by popular acclamation, <b>鲍鱼王</b>, the Abalone King. By weekday he engineers enzymes and solves protein structures. The rest of the time he defeats abalone wherever it is found: braised on a plate, canned two-for-$11.95, or three-for-two at a laksa stall. Somewhere in the multiverse, every universe is abalone — and the King reigns in all of them.</p>
+      <p class="summary-text reveal">Tan Kwan Ann, PhD in structural biology and R&amp;D scientist at Allozymes, and, by popular acclamation, <b>鲍鱼王</b>, the Abalone King. By weekday he engineers enzymes and solves protein structures. The rest of the time he defeats abalone wherever it is found: braised on a plate, canned two-for-$11.95, or three-for-two at a laksa stall. Every universe is abalone, and the King reigns in all of them, including the ones with no abalone, which are being fixed.</p>
       <ul class="nums reveal" aria-label="Some numbers">
-        <li class="num fun"><b><span data-count="7.86" data-dec="2">7.86</span> km</b><span>one walk, mostly in circles</span><em class="wink" style="font-style:normal">less serious</em></li>
-        <li class="num fun"><b>∞</b><span>universes — and every single one is abalone</span><em class="wink" style="font-style:normal">multiverse record</em></li>
-        <li class="num fun wide"><b>∞</b><span>abalone defeated — and counting</span><em class="wink" style="font-style:normal">royal record</em></li>
+        <li class="num fun"><b><span data-count="7.86" data-dec="2">7.86</span> km</b><span>one walk, mostly in circles (the King was scouting)</span><em class="wink" style="font-style:normal">less serious</em></li>
+        <li class="num fun"><b>∞</b><span>universes, and every single one is abalone</span><em class="wink" style="font-style:normal">multiverse record</em></li>
+        <li class="num fun wide"><b>0</b><span>abalone have survived an encounter with the King. See the Arena below to help the number stay at zero.</span><em class="wink" style="font-style:normal">royal record</em></li>
       </ul>
     </div>
   </section>
@@ -455,9 +507,60 @@
     </ul>
   </section>
 
+  <section id="arena" aria-labelledby="h-arena">
+    <h2 class="label reveal" id="h-arena">The Arena</h2>
+    <p class="kicker reveal">Defeat abalone. Gain rank. There is no ceiling, only more abalone.</p>
+    <div class="arena reveal">
+      <div class="play">
+        <div class="score"><b id="score">0</b><span>abalone defeated</span></div>
+        <button class="defeat" id="defeat" type="button"><span class="ab" aria-hidden="true">🐚</span>Defeat abalone</button>
+        <p class="rankline">Rank: <b id="rank">Abalone Apprentice</b></p>
+        <div class="meter" role="progressbar" aria-label="Progress to the next rank" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="meter"><i id="meterfill"></i></div>
+        <p class="nextline" id="nextline">10 more for the next rank.</p>
+        <div class="ups">
+          <button type="button" class="up" id="up-stall"><b>Hire a laksa stall</b><span id="up-stall-t">defeats 1 abalone a second</span></button>
+          <button type="button" class="up" id="up-uni"><b>Open a parallel universe</b><span id="up-uni-t">defeats 10 abalone a second</span></button>
+        </div>
+        <p class="cps" id="cps" aria-live="off"></p>
+        <button class="ghost reset" type="button" id="reset">Start a new reign</button>
+      </div>
+      <div class="ladder">
+        <h3>Royal ranks</h3>
+        <ol class="ranks" id="ranks"></ol>
+      </div>
+    </div>
+  </section>
+
+  <section id="decrees" aria-labelledby="h-decrees">
+    <h2 class="label reveal" id="h-decrees">Royal Decrees</h2>
+    <p class="kicker reveal">By order of the King. Non-negotiable. Occasionally negotiable.</p>
+    <ol class="decrees">
+      <li class="reveal"><b>All abalone shall address the King as “Your Majesty”.</b><span>Failing that, “Sir”. Failing that, nothing, because they are abalone.</span></li>
+      <li class="reveal"><b>Two cans for $11.95 is not a price. It is a treaty.</b><span>Three for $2 is also a treaty. A smaller one, signed in sambal.</span></li>
+      <li class="reveal"><b>Every laksa stall is hereby a duchy.</b><span>Geylang Laksa is a duchy with excellent public relations.</span></li>
+      <li class="reveal"><b>The multiverse contains infinite universes. The King has checked.</b><span>They are all abalone. A recount was requested and also came back abalone.</span></li>
+      <li class="reveal"><b>Enzymes may engineer themselves, provided they stay out of the abalone.</b><span>This does not apply to the 26-pair ring, which has been granted diplomatic immunity.</span></li>
+      <li class="reveal"><b>In the event of a tie, the abalone loses.</b><span>In the event of a tie between two abalone, the more abalone one loses.</span></li>
+      <li class="reveal"><b>Hiking is permitted.</b><span>The trail shall be known as “the royal walk”, and walking in circles as “inspecting the realm”.</span></li>
+    </ol>
+  </section>
+
+  <section id="resume" aria-labelledby="h-resume">
+    <h2 class="label reveal" id="h-resume">Résumé, translated into abalone</h2>
+    <p class="kicker reveal">Real jobs, real dates. Titles reviewed by the Royal Committee of Abalone (a committee of one).</p>
+    <ul class="cv">
+      <li class="reveal"><span class="real">Scientist I · Allozymes · Nov 2025 – now</span><b>Chief Enzyme Strategist</b><p>Makes enzymes tough enough to keep working in 60% DMSO. Abalone, by comparison, last about four minutes of braising. The King notes the gap.</p></li>
+      <li class="reveal"><span class="real">Postgraduate Researcher · NTU · 2021 – 2025</span><b>Keeper of the 26-Part Ring</b><p>Solved a 2.9 Å protein ring that looks suspiciously like a very small crown. The King noticed this, and has chosen not to say so in public.</p></li>
+      <li class="reveal"><span class="real">Research Assistant · NTU · 2020 – 2021</span><b>Minister of Data and Tubes</b><p>Data-mining by day, tubes by night. Zero tubes contained abalone. The King is working on this.</p></li>
+      <li class="reveal"><span class="real">Admin Executive · Oneberry · 2014 – 2016</span><b>Royal Scribe, High-Rise Division</b><p>Compiled case reports against high-rise littering. Zero abalone shells were thrown out of any high-rise on his watch. Zero.</p></li>
+    </ul>
+    <p class="cv-links reveal"><a class="btn" href="ka.html">The real résumé, for people with budgets →</a><a class="btn" href="Tan_Kwan_Ann_Resume.pdf" download>Resume (PDF)</a></p>
+  </section>
+
   <section id="multiverse" aria-labelledby="h-multi">
     <h2 class="label reveal" id="h-multi">The Multiverse</h2>
-    <p class="kicker reveal">Every universe. All abalone. Tap one to visit it.</p>
+    <p class="kicker reveal">Every universe. All abalone. Tap one to visit it, or let fate pick.</p>
+    <p class="roller reveal"><button class="btn" type="button" id="roll"><span aria-hidden="true">🎲</span>Visit a random universe</button><span class="uni-out" id="uni-out" role="status">Press the button. The multiverse is waiting. It is abalone.</span></p>
     <ul class="outside reveal">
       <li><button class="uni" type="button" data-toast="🌌 Universe 8Z5G: 26 pairs of proteins in a ring. All abalone."><span class="e">🌌</span><div><b>Universe 8Z5G</b><span>26 pairs of proteins in a ring. All abalone.</span></div></button></li>
       <li><button class="uni" type="button" data-toast="🥫 Universe 2-for-$11.95: black truffle baby abalone, canned. Defeated."><span class="e">🥫</span><div><b>Universe 2-for-$11.95</b><span>Black truffle baby abalone, canned. Defeated.</span></div></button></li>
@@ -469,31 +572,28 @@
   </section>
 
   <section id="outside" aria-labelledby="h-out">
-    <h2 class="label reveal" id="h-out">Outside the lab</h2>
-    <p class="kicker reveal">Evidence that I have a life.</p>
+    <h2 class="label reveal" id="h-out">Royal hobbies</h2>
+    <p class="kicker reveal">Evidence that the King has a life. Mostly abalone.</p>
     <ul class="outside reveal">
-      <li><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M13.500 5l-3 14"/></svg><div><b>Apprentice vibe-coder</b><span>Learning to build software by describing it, one small shop at a time.</span></div></li>
-      <li><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 19 6-11 4 7 2-3 6 7z"/><circle cx="17" cy="6" r="2"/></svg><div><b>Hiking</b><span>Happiest on a trail.</span></div></li>
+      <li><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M13.500 5l-3 14"/></svg><div><b>Apprentice vibe-coder</b><span>Builds software by describing it. The <a href="virtual-snack-shop.html">Royal Snack Emporium</a> is a walkable 3D shop. Abalone not yet in stock; the King is negotiating.</span></div></li>
+      <li><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 19 6-11 4 7 2-3 6 7z"/><circle cx="17" cy="6" r="2"/></svg><div><b>Hiking</b><span>Happiest on a trail, officially “inspecting the realm”.</span></div></li>
     </ul>
-    <h3 class="sub reveal">Life, lately <small>tap a photo</small></h3>
+    <h3 class="sub reveal">Royal archives <small>tap a photo</small></h3>
     <ul class="gallery" aria-label="Photos">
       <li class="reveal"><figure><button class="ph" type="button" aria-label="Open photo: braised abalone"><img src="images/ka-abalone.jpg" alt="A braised abalone on a plate" width="675" height="900" loading="lazy" decoding="async"></button><figcaption><b lang="zh-Hans">鲍鱼王</b> in action. The abalone never stood a chance.</figcaption></figure></li>
       <li class="reveal"><figure><button class="ph" type="button" aria-label="Open photo: sample tubes at the bench"><img src="images/ka-lab.jpg" alt="Three sample tubes in an orange rack, held by a gloved hand" width="675" height="900" loading="lazy" decoding="async"></button><figcaption>At the bench. Three tubes, two of them doing something.</figcaption></figure></li>
       <li class="reveal"><figure><button class="ph" type="button" aria-label="Open photo: at a wedding"><img src="images/ka-wedding.jpg" alt="Kwan Ann with friends at a wedding, giving a thumbs up" width="900" height="675" loading="lazy" decoding="async"></button><figcaption>Professional wedding guest. Thumbs up included.</figcaption></figure></li>
-      <li class="reveal"><figure><button class="ph" type="button" aria-label="Open photo: a walking route map"><img class="crop" src="images/ka-walk.jpg" alt="Phone map of a 7.86 km outdoor walk, with a scribble of circles" width="414" height="900" loading="lazy" decoding="async"></button><figcaption>7.86 km walk. Mostly circles, apparently.</figcaption></figure></li>
-      <li class="reveal"><figure><button class="ph" type="button" aria-label="Open photo: a packet of potato chips"><img src="images/ka-chips.jpg" alt="A packet of Oishi potato chips held up in a supermarket aisle" width="675" height="900" loading="lazy" decoding="async"></button><figcaption>Snack research. Very serious work.</figcaption></figure></li>
-      <li class="reveal"><figure><button class="ph" type="button" aria-label="Open photo: in a Tesla cap and polo"><img src="images/ka-tesla.jpg" alt="Kwan Ann in a Tesla cap and polo in front of a glass display" width="675" height="900" loading="lazy" decoding="async"></button><figcaption>Sells Teslas on the side.</figcaption></figure></li>
-      <li class="reveal"><figure><button class="ph" type="button" aria-label="Open photo: eyes closed against a wooden wall"><img src="images/ka-sauna.jpg" alt="Kwan Ann with eyes closed against a wood-panelled wall, wearing a Tesla polo" width="675" height="900" loading="lazy" decoding="async"></button><figcaption>Sauna mode: off.</figcaption></figure></li>
-      <li class="reveal"><figure><button class="ph" type="button" aria-label="Open photo: shelves of canned baby abalone"><img src="images/ka-abalone-cans.jpg" alt="Shelves of canned baby abalone: black truffle, mushroom and sambal chilli" width="675" height="900" loading="lazy" decoding="async"></button><figcaption>The royal pantry. Black truffle baby abalone, two for $11.95.</figcaption></figure></li>
-      <li class="reveal"><figure><button class="ph" type="button" aria-label="Open photo: a vacuum pack of cooked abalone meat"><img src="images/ka-abalone-meat.jpg" alt="A vacuum pack of cooked abalone meat" width="675" height="900" loading="lazy" decoding="async"></button><figcaption>Cooked abalone meat, heat and serve. Zero cooking required — the King approves.</figcaption></figure></li>
-      <li class="reveal"><figure><button class="ph" type="button" aria-label="Open photo: a laksa stall advertising fortune abalone"><img src="images/ka-abalone-laksa.jpg" alt="A laksa stall advertising fortune abalone, 3 for $2" width="675" height="900" loading="lazy" decoding="async"></button><figcaption>Fortune abalone at Geylang Laksa, 3 for $2. Even the laksa stall pays tribute.</figcaption></figure></li>
+      <li class="reveal"><figure><button class="ph" type="button" aria-label="Open photo: a walking route map"><img class="crop" src="images/ka-walk.jpg" alt="Phone map of a 7.86 km outdoor walk, with a scribble of circles" width="414" height="900" loading="lazy" decoding="async"></button><figcaption>7.86 km walk. Mostly circles. The King was drawing a crown.</figcaption></figure></li>
+      <li class="reveal"><figure><button class="ph" type="button" aria-label="Open photo: a packet of potato chips"><img src="images/ka-chips.jpg" alt="A packet of Oishi potato chips held up in a supermarket aisle" width="675" height="900" loading="lazy" decoding="async"></button><figcaption>Snack research. The chips agreed to terms.</figcaption></figure></li>
+      <li class="reveal"><figure><button class="ph" type="button" aria-label="Open photo: in a Tesla cap and polo"><img src="images/ka-tesla.jpg" alt="Kwan Ann in a Tesla cap and polo in front of a glass display" width="675" height="900" loading="lazy" decoding="async"></button><figcaption>Sells Teslas on the side. The side is mostly abalone.</figcaption></figure></li>
+      <li class="reveal"><figure><button class="ph" type="button" aria-label="Open photo: eyes closed against a wooden wall"><img src="images/ka-sauna.jpg" alt="Kwan Ann with eyes closed against a wood-panelled wall, wearing a Tesla polo" width="675" height="900" loading="lazy" decoding="async"></button><figcaption>Sauna mode: off. Abalone mode: always on.</figcaption></figure></li>
     </ul>
   </section>
 
   <section id="contact" aria-labelledby="h-contact">
     <div class="invite reveal">
       <h2 id="h-contact"><span class="grad">Say hi to the King.</span></h2>
-      <p>Abalone tips, laksa stalls selling 3-for-$2 abalone, or anything else — the King answers his own email. Tributes in abalone form are also accepted. Messages from parallel universes also accepted.</p>
+      <p>Abalone tips, laksa stalls selling 3-for-$2 abalone, or anything else: the King answers his own email, usually after a brief braising. Tributes in abalone form are also accepted. Messages from parallel universes are welcome; please state which universe (it is abalone).</p>
       <ul class="hero-actions">
         <li><a class="btn primary" href="mailto:tankan7@gmail.com?subject=Abalone%20business"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>Say hi</a></li>
         <li><button class="btn" type="button" data-copy="tankan7@gmail.com" data-done="Copied. Now it’s your move."><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>Copy email</button></li>
@@ -505,7 +605,7 @@
 
 <footer>
   <div class="wrap">
-    <span>© 2026 Tan Kwan Ann (<span lang="zh-Hans">鲍鱼王</span>, the Abalone Sovereign) · Built with AI as my pair programmer, fuelled by snacks. Long live the King — in every universe.</span>
+    <span>© 2026 Tan Kwan Ann (<span lang="zh-Hans">鲍鱼王</span>, the Abalone Sovereign) · All abalone reserved. Built with AI as my pair programmer, fuelled by abalone. <span lang="zh-Hans">鲍鱼王万岁</span>, in every universe.</span>
     <span class="foot-links"><a href="mailto:tankan7@gmail.com">Email</a><a href="https://www.linkedin.com/in/tan-kwan-ann" rel="noopener">LinkedIn</a><a href="https://github.com/tankan7-max" rel="noopener">GitHub</a><a href="Tan_Kwan_Ann_Resume.pdf" download>Resume (PDF)</a><a href="ka.html">Serious version →</a><a href="#top">Back to top ↑</a></span>
   </div>
 </footer>
@@ -534,23 +634,28 @@
   $$('[data-copy]').forEach(b => b.addEventListener('click', async () => toast(await copyText(b.dataset.copy) ? (b.dataset.done || 'Copied') : 'Could not copy — please select the text instead.')));
   $$('[data-toast]').forEach(b => b.addEventListener('click', () => toast(b.dataset.toast)));
 
+  // ----- A shower of emoji (skipped for people who asked for less motion) -----
+  function shower(list, count) {
+    if (reduce) return;
+    const box = document.createElement('div'); box.className = 'rain'; box.setAttribute('aria-hidden', 'true');
+    for (let i = 0; i < count; i++) {
+      const s = document.createElement('span'); s.textContent = list[i % list.length];
+      s.style.left = Math.random() * 100 + '%'; s.style.animationDelay = Math.random() * .9 + 's'; s.style.fontSize = 16 + Math.random() * 20 + 'px'; s.style.setProperty('--dx', Math.random() * 90 - 45 + 'px');
+      box.appendChild(s);
+    }
+    document.body.appendChild(box); setTimeout(() => box.remove(), 3800);
+  }
+
   // ----- The Abalone King (a.k.a. the Abalone Sovereign) -----
   const hails = ['👑 All hail the Abalone Sovereign', '🌌 Universe 8Z5G: it is abalone.', '🥫 Universe 2-for-$11.95: it is abalone.', '🍜 Universe 3-for-$2: it is abalone.', '🍲 Universe Braised: it is abalone.', '👑 In every universe, the King reigns.'];
   let hailI = 0;
   $('#king').addEventListener('click', () => {
     toast(hails[hailI % hails.length]); hailI++;
-    if (reduce) return;
-    const box = document.createElement('div'); box.className = 'rain'; box.setAttribute('aria-hidden', 'true');
-    for (let i = 0; i < 60; i++) {
-      const s = document.createElement('span'); s.textContent = ['👑', '🐚', '✨', '🥫'][i % 4];
-      s.style.left = Math.random() * 100 + '%'; s.style.animationDelay = Math.random() * .9 + 's'; s.style.fontSize = 16 + Math.random() * 20 + 'px'; s.style.setProperty('--dx', Math.random() * 90 - 45 + 'px');
-      box.appendChild(s);
-    }
-    document.body.appendChild(box); setTimeout(() => box.remove(), 3800);
+    shower(['👑', '🐚', '✨', '🥫'], 60);
   });
 
   // ----- Rolling line under the name -----
-  const words = ['defeat abalone', 'rule the abalone kingdom', 'collect abalone like trophies', 'crown every abalone', 'scout abalone on weekends', 'braise abalone', 'buy abalone two for $11.95', 'rule every universe', 'conquer the abalone multiverse', 'defeat abalone in all timelines'];
+  const words = ['defeat abalone', 'rule the abalone kingdom', 'crown every abalone', 'negotiate with abalone (they declined)', 'file taxes in abalone', 'knight the abalone, then eat it', 'rule every universe', 'become one with the abalone', 'out-abalone the abalone', 'audit the abalone treaty', 'defeat abalone in all timelines', 'scout abalone on weekends'];
   const wordEl = $('#word');
   if (!reduce) { let i = 0; setInterval(() => { if (document.hidden) return; wordEl.classList.add('out'); setTimeout(() => { i = (i + 1) % words.length; wordEl.textContent = words[i]; wordEl.classList.remove('out'); }, 320); }, 2700); }
 
@@ -585,6 +690,7 @@
   function makeRing(root) {
     const [back, front] = $$('canvas', root), cb = back.getContext('2d'), cf = front.getContext('2d'), N = 26, TAU = Math.PI * 2;
     // Proportions follow the real structure (ring axis up): QmcA sits inside and lower, YbbJ outside and higher. Opened up a little to leave room for the portrait.
+    const GLYPH = '"PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", "WenQuanYi Zen Hei", sans-serif';
     const R1 = .66, R2 = 1, H1 = -.11, H2 = .2, A = [], B = [];
     for (let k = 0; k < N; k++) { const t = k / N * TAU, c = Math.cos(t), s = Math.sin(t); A.push([c * R1, H1, s * R1]); B.push([c * R2, H2, s * R2]); }
     function draw(ay, ax) {
@@ -599,7 +705,7 @@
         const pt = it.e ? it.e[0] : it.dot[0], fade = it.z >= 0 ? clamp((Math.hypot(pt.x - W / 2, pt.y - H / 2) - W * .27) / (W * .07), .12, 1) : 1;   // anything in front of the portrait fades, so it never covers the face
         depth *= fade;
         if (it.e) { ctx.strokeStyle = `rgba(255,255,255,${(it.link ? .14 : .05) + depth * (it.link ? .5 : .2)})`; ctx.lineWidth = d * (it.link ? 1.3 : 1); ctx.beginPath(); ctx.moveTo(it.e[0].x, it.e[0].y); ctx.lineTo(it.e[1].x, it.e[1].y); ctx.stroke(); }
-        else [[it.dot[0], '94,234,212', .8], [it.dot[1], '167,139,250', 1]].forEach(([q, col, size]) => { ctx.shadowColor = `rgba(${col},${depth})`; ctx.shadowBlur = it.z > 0 ? 14 * d * depth : 0; ctx.fillStyle = `rgba(${col},${.3 + depth * .7})`; ctx.beginPath(); ctx.arc(q.x, q.y, R * .034 * size * q.s * (.8 + depth * .5), 0, 7); ctx.fill(); ctx.shadowBlur = 0; });
+        else [[it.dot[0], '鲍', '245,194,107', .85], [it.dot[1], '鱼', '251,159,107', 1]].forEach(([q, ch, col, size]) => { ctx.shadowColor = `rgba(${col},${depth})`; ctx.shadowBlur = it.z > 0 ? 14 * d * depth : 0; ctx.fillStyle = `rgba(${col},${.3 + depth * .7})`; ctx.font = `700 ${Math.max(6, Math.round(R * .105 * size * q.s * (.8 + depth * .5)))}px ${GLYPH}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(ch, q.x, q.y); ctx.shadowBlur = 0; });
       }
     }
     const ring = turner(root, { yaw: .3, tilt: .95, tiltSwing: .1, auto: .32, draw });
@@ -628,7 +734,7 @@
   addEventListener('scroll', () => { if (ticking) return; ticking = true; requestAnimationFrame(() => { const d = document.documentElement; bar.style.transform = `scaleX(${clamp(d.scrollTop / ((d.scrollHeight - d.clientHeight) || 1), 0, 1)})`; ticking = false; }); }, { passive: true });
   const links = $$('nav ul a'), map = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
   const spy = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; links.forEach(a => a.removeAttribute('aria-current')); const a = map.get(e.target.id); if (a) { a.setAttribute('aria-current', 'true'); if (innerWidth <= 820) a.scrollIntoView({ inline: 'center', block: 'nearest' }); } }), { rootMargin: '-45% 0px -50% 0px' });
-  ['about', 'pantry', 'multiverse', 'outside', 'contact'].forEach(id => { const n = document.getElementById(id); if (n) spy.observe(n); });
+  ['about', 'pantry', 'arena', 'decrees', 'resume', 'multiverse', 'outside', 'contact'].forEach(id => { const n = document.getElementById(id); if (n) spy.observe(n); });
 
   // ----- Parts fade in as they scroll into view -----
   if ('IntersectionObserver' in window && !reduce) {
@@ -645,6 +751,49 @@
   $('.lb-prev').onclick = () => show(cur - 1); $('.lb-next').onclick = () => show(cur + 1); $('.lb-close').onclick = () => lb.close();
   lb.addEventListener('click', e => { if (e.target === lb) lb.close(); });
   lb.addEventListener('keydown', e => { if (e.key === 'ArrowLeft') show(cur - 1); else if (e.key === 'ArrowRight') show(cur + 1); });
+
+  // ----- The Arena: a small idle game about defeating abalone -----
+  const RANKS = [[0, 'Abalone Apprentice'], [10, 'Shell Squire'], [25, 'Braising Knight'], [50, 'Duke of Dim Sum'], [100, 'Chancellor of Canned Goods'], [200, 'Abalone King'], [500, 'Abalone Sovereign'], [1000, 'Emperor of the Multiverse'], [2500, 'Abalone, Promoted to Abalone'], [5000, 'You Have Become the Abalone']];
+  const UPS = { stall: { base: 30, rate: 1 }, uni: { base: 200, rate: 10 } };
+  const GAME_KEY = 'ka2-abalone-arena-v1', num = v => Math.max(0, Math.min(1e12, Math.floor(+v || 0)));
+  let game = { n: 0, stall: 0, uni: 0 };
+  try { const o = JSON.parse(localStorage.getItem(GAME_KEY) || '{}'); game = { n: num(o.n), stall: num(o.stall), uni: num(o.uni) }; } catch (e) {}
+  const saveGame = () => { try { localStorage.setItem(GAME_KEY, JSON.stringify(game)); } catch (e) {} };
+  const cost = k => Math.ceil(UPS[k].base * Math.pow(1.25, game[k])), perSec = () => game.stall * UPS.stall.rate + game.uni * UPS.uni.rate;
+  const rankAt = n => RANKS.reduce((r, x, i) => n >= x[0] ? i : r, 0), fmt = n => n.toLocaleString('en-SG');
+  const ladder = $('#ranks');
+  ladder.innerHTML = RANKS.map(r => `<li><span>${r[1]}</span><small>${fmt(r[0])}</small></li>`).join('');
+  let shownRank = rankAt(game.n);
+  function paintGame() {
+    const r = rankAt(game.n), nxt = RANKS[r + 1];
+    $('#score').textContent = fmt(game.n); $('#rank').textContent = RANKS[r][1];
+    const pct = nxt ? Math.round((game.n - RANKS[r][0]) / (nxt[0] - RANKS[r][0]) * 100) : 100;
+    $('#meterfill').style.width = pct + '%'; $('#meter').setAttribute('aria-valuenow', pct);
+    $('#nextline').textContent = nxt ? `${fmt(nxt[0] - game.n)} more for “${nxt[1]}”.` : 'The ladder is over. The abalone is you.';
+    [...ladder.children].forEach((li, i) => { li.classList.toggle('got', i <= r); li.classList.toggle('cur', i === r); });
+    for (const k of ['stall', 'uni']) { const b = $('#up-' + k); b.disabled = game.n < cost(k); $('#up-' + k + '-t').textContent = `defeats ${UPS[k].rate} abalone a second · cost ${fmt(cost(k))} · owned ${game[k]}`; }
+    $('#cps').textContent = perSec() ? `The realm is defeating ${fmt(perSec())} abalone a second.` : '';
+  }
+  function gain(k) {
+    game.n = num(game.n + k); const r = rankAt(game.n);
+    if (r > shownRank) { shownRank = r; toast('👑 Promoted: ' + RANKS[r][1]); shower(['👑', '🐚', '✨'], 36); }
+    paintGame(); saveGame();
+  }
+  $('#defeat').addEventListener('click', () => gain(1));
+  for (const k of ['stall', 'uni']) $('#up-' + k).addEventListener('click', () => { if (game.n < cost(k)) return; game.n -= cost(k); game[k]++; toast(k === 'stall' ? '🍜 A laksa stall now defeats abalone for you.' : '🌌 A parallel universe is now defeating abalone. It is abalone.'); paintGame(); saveGame(); });
+  $('#reset').addEventListener('click', () => { game = { n: 0, stall: 0, uni: 0 }; shownRank = 0; paintGame(); saveGame(); toast('A new reign begins. The abalone are nervous.'); });
+  setInterval(() => { if (!document.hidden && perSec()) gain(perSec()); }, 1000);
+  paintGame();
+
+  // ----- Visit a random universe -----
+  const pick = a => a[Math.floor(Math.random() * a.length)];
+  const U1 = ['gravity is', 'Monday is', 'the moon is', 'Wi-Fi is', 'every cat is', 'the MRT is', 'tax is', 'physics is', 'the laksa is', 'the Wednesday meeting is'], U2 = ['made of braised abalone', 'a canned abalone in disguise', 'officially a shell', 'three for $2', 'run by a very small king', 'defeated by the King (again)', 'dipped in sambal', 'two for $11.95', 'legally abalone', 'fully 鲍鱼'];
+  $('#roll').addEventListener('click', () => { $('#uni-out').textContent = `Universe #${Math.floor(1000 + Math.random() * 9000)}: ${pick(U1)} ${pick(U2)}. All abalone.`; });
+
+  // ----- Small secrets -----
+  const title0 = document.title; document.addEventListener('visibilitychange', () => { document.title = document.hidden ? '🐚 The abalone misses you…' : title0; });
+  let typed = ''; addEventListener('keydown', e => { if (e.key.length !== 1 || e.ctrlKey || e.metaKey || e.altKey) return; typed = (typed + e.key.toLowerCase()).slice(-7); if (typed === 'abalone') { typed = ''; toast('🐚 You said the word. The King hears everything.'); shower(['👑', '🐚', '🥫', '✨', '鲍', '鱼'], 70); } });
+  if (!reduce && matchMedia('(pointer: fine)').matches) { let lastTrail = 0; document.addEventListener('pointermove', e => { const t = performance.now(); if (t - lastTrail < 120) return; lastTrail = t; const s = document.createElement('span'); s.className = 'trail'; s.setAttribute('aria-hidden', 'true'); s.textContent = '🐚'; s.style.left = e.clientX + 'px'; s.style.top = e.clientY + 'px'; document.body.appendChild(s); setTimeout(() => s.remove(), 900); }, { passive: true }); }
 })();
 </script>
 </body>
