@@ -5,7 +5,7 @@ QmcA-YbbJ complex, Qiao Z. and Gao Y.G. et al., released 2024), from the wwPDB /
 Protein Data Bank, whose data are free to reuse (CC0).
 
     curl -O https://files.rcsb.org/download/8Z5G.cif.gz
-    python3 tools/make-structure.py 8Z5G.cif.gz ka-8z5g.bin
+    python3 tools/make-structure.py 8Z5G.cif.gz data/ka-8z5g.bin
 
 What it keeps: one point per amino acid (the C-alpha atom) of all 52 chains, moved so the
 ring's 26-fold axis points up, in tenths of an angstrom. It also stores which chain is
