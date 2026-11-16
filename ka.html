@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tan Kwan Ann — R&amp;D Scientist</title>
+<title>Tan Kwan Ann 👑 — R&amp;D Scientist</title>
 <meta name="description" content="Enzyme engineer and structural biologist in Singapore, also known as 鲍鱼王, the Abalone Sovereign. Also: hiking and a 3D snack shop. Open to collaborations.">
 <meta name="theme-color" content="#060608">
 <meta name="color-scheme" content="dark">
@@ -76,10 +76,11 @@
   .hero .wrap { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 40px; align-items: center; padding-top: 84px; padding-bottom: 92px; }
   .eyebrow { display: inline-flex; align-items: center; gap: 10px; margin: 0 0 20px; font: 500 12px/1 var(--mono); letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
   h1 { font: 700 clamp(46px, 9.4vw, 112px)/.94 var(--display); letter-spacing: -.045em; margin: 0 0 22px; background: linear-gradient(180deg, #fff 35%, #9d9da8 120%); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .king { display: inline-flex; align-items: center; gap: 11px; margin: 0 0 22px; padding: 9px 16px 9px 12px; border: 1px solid rgba(245,194,107,.35); border-radius: 999px; background: rgba(245,194,107,.07); color: var(--ink); font: 500 13.5px/1 var(--sans); cursor: pointer; transition: background .2s, transform .2s, border-color .2s; }
+  .king { display: inline-flex; align-items: center; gap: 13px; margin: 0 0 24px; padding: 12px 22px 12px 16px; border: 1px solid rgba(245,194,107,.55); border-radius: 999px; background: linear-gradient(100deg, rgba(245,194,107,.16), rgba(251,159,107,.1)); color: var(--ink); font: 500 14.5px/1 var(--sans); cursor: pointer; transition: background .2s, transform .2s, border-color .2s; animation: kingglow 3s ease-in-out infinite; }
+  @keyframes kingglow { 0%, 100% { box-shadow: 0 0 0 0 rgba(245,194,107,.22); } 50% { box-shadow: 0 0 26px 5px rgba(245,194,107,.35); } }
   .king:hover { background: rgba(245,194,107,.14); border-color: rgba(245,194,107,.6); transform: translateY(-1px) rotate(-1deg); }
-  .king .crown { font-size: 22px; line-height: 1; }
-  .king b { font: 700 24px/1 var(--cjk); letter-spacing: .04em; background: linear-gradient(100deg, #f5c26b, #fb9f6b); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .king .crown { font-size: 30px; line-height: 1; }
+  .king b { font: 700 30px/1 var(--cjk); letter-spacing: .04em; background: linear-gradient(100deg, #f5c26b, #fb9f6b); -webkit-background-clip: text; background-clip: text; color: transparent; }
   .king .titles { display: flex; flex-direction: column; gap: 3px; text-align: left; }
   .king .titles span { font: 600 14px/1.1 var(--sans); }
   .king .titles em { font: 500 11.5px/1.1 var(--mono); font-style: normal; color: var(--muted); letter-spacing: .01em; }
@@ -146,6 +147,7 @@
   .num > span { display: block; margin-top: 9px; color: var(--muted); font-size: 13.5px; line-height: 1.45; }
   .num.fun { border-style: dashed; border-color: rgba(245,194,107,.35); }
   .num.fun b { background: linear-gradient(100deg, var(--a3), #fb7185); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .num.wide { grid-column: 1 / -1; }
   .wink { display: inline-block; margin-top: 9px; padding: 3px 8px; border-radius: 999px; background: rgba(245,194,107,.12); color: var(--a3); font: 500 10.5px/1.2 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
 
   /* Feature panels: featured structure and the side project */
@@ -308,7 +310,7 @@
   @media (max-width: 420px) { .nums { grid-template-columns: 1fr 1fr; gap: 10px; } .num { padding: 16px 14px; } .gallery { column-gap: 12px; } .gallery li { margin-bottom: 12px; } .gallery figure { padding: 6px 6px 10px; } .gallery figcaption { font-size: 12.5px; margin: 9px 3px 0; } }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
-    .hero::before, .portrait::before, .status i, .eyebrow i, .marquee .track { animation: none; }
+    .hero::before, .portrait::before, .status i, .eyebrow i, .marquee .track, .king { animation: none; }
     .marquee { -webkit-mask-image: none; mask-image: none; } .marquee .track { width: auto; } .marquee ul { flex-wrap: wrap; justify-content: center; } .marquee ul[aria-hidden] { display: none; }
     .js .reveal { opacity: 1; transform: none; transition: none; }
     .gallery figure, .gallery li:nth-child(n) figure { transform: none; }
@@ -383,7 +385,7 @@
         <span class="crown" aria-hidden="true">👑</span><b lang="zh-Hans">鲍鱼王</b><span class="titles"><span>the Abalone King</span><em>a.k.a. the Abalone Sovereign</em></span><small aria-hidden="true">(press me)</small>
       </button>
       <p class="roll"><span class="sr">I engineer enzymes and solve protein structures.</span><span aria-hidden="true">I <span class="word grad" id="word">engineer enzymes</span></span></p>
-      <p class="lede">PhD in structural biology, now making enzymes work in industry. Weekdays I make enzymes <b>behave</b>. Weekends: hiking, snack research, and vibe-coding a <b>3D snack shop</b>.</p>
+      <p class="lede">PhD in structural biology, now making enzymes work in industry. Weekdays I make enzymes <b>behave</b>. Weekends: hiking, snack research, abalone scouting, and vibe-coding a <b>3D snack shop</b>.</p>
       <ul class="hero-actions">
         <li class="print-ok"><a class="btn primary" href="mailto:tankan7@gmail.com"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>tankan7@gmail.com</a></li>
         <li class="print-ok"><a class="btn" href="https://www.linkedin.com/in/tan-kwan-ann" rel="noopener"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 10v7M8 7v.01M12 17v-4a2 2 0 0 1 4 0v4M12 10v7"/></svg>LinkedIn</a></li>
@@ -405,10 +407,10 @@
 <div class="marquee" aria-hidden="true">
   <div class="track">
     <ul>
-      <li>Directed evolution</li><li>Cryo-EM</li><li>Golden Gate</li><li class="fun">Abalone appreciation</li><li class="fun" lang="zh-Hans">鲍鱼王</li><li>HPLC</li><li>Cofactor recycling</li><li>Python</li><li class="fun">Snack research</li><li>Lyophilization</li><li>Gibson Assembly</li><li>MALDI-TOF/TOF</li><li class="fun">Apprentice vibe-coder</li><li>Assay development</li><li>Saturation mutagenesis</li><li class="fun">Hiking</li>
+      <li>Directed evolution</li><li>Cryo-EM</li><li>Golden Gate</li><li class="fun">Abalone appreciation</li><li class="fun" lang="zh-Hans">鲍鱼王</li><li class="fun">Canned abalone sommelier</li><li>HPLC</li><li>Cofactor recycling</li><li>Python</li><li class="fun">Snack research</li><li class="fun">3 for $2</li><li>Lyophilization</li><li>Gibson Assembly</li><li>MALDI-TOF/TOF</li><li class="fun">Apprentice vibe-coder</li><li>Assay development</li><li>Saturation mutagenesis</li><li class="fun">Hiking</li>
     </ul>
     <ul aria-hidden="true">
-      <li>Directed evolution</li><li>Cryo-EM</li><li>Golden Gate</li><li class="fun">Abalone appreciation</li><li class="fun" lang="zh-Hans">鲍鱼王</li><li>HPLC</li><li>Cofactor recycling</li><li>Python</li><li class="fun">Snack research</li><li>Lyophilization</li><li>Gibson Assembly</li><li>MALDI-TOF/TOF</li><li class="fun">Apprentice vibe-coder</li><li>Assay development</li><li>Saturation mutagenesis</li><li class="fun">Hiking</li>
+      <li>Directed evolution</li><li>Cryo-EM</li><li>Golden Gate</li><li class="fun">Abalone appreciation</li><li class="fun" lang="zh-Hans">鲍鱼王</li><li class="fun">Canned abalone sommelier</li><li>HPLC</li><li>Cofactor recycling</li><li>Python</li><li class="fun">Snack research</li><li class="fun">3 for $2</li><li>Lyophilization</li><li>Gibson Assembly</li><li>MALDI-TOF/TOF</li><li class="fun">Apprentice vibe-coder</li><li>Assay development</li><li>Saturation mutagenesis</li><li class="fun">Hiking</li>
     </ul>
   </div>
 </div>
@@ -423,6 +425,7 @@
         <li class="num"><b class="grad"><span data-count="26" data-dec="0">26</span></b><span>heterodimers in that cage</span></li>
         <li class="num"><b class="grad"><span data-count="60" data-dec="0">60</span>%</b><span>activity my best GDH mutant kept at 60% DMSO (wild type: &lt;10%)</span></li>
         <li class="num fun"><b><span data-count="7.86" data-dec="2">7.86</span> km</b><span>one walk, mostly in circles</span><em class="wink" style="font-style:normal">less serious</em></li>
+        <li class="num fun wide"><b>∞</b><span>abalone defeated — and counting</span><em class="wink" style="font-style:normal">royal record</em></li>
       </ul>
     </div>
   </section>
@@ -594,6 +597,9 @@
       <li class="reveal"><figure><button class="ph" type="button" aria-label="Open photo: a packet of potato chips"><img src="ka-chips.jpg" alt="A packet of Oishi potato chips held up in a supermarket aisle" width="675" height="900" loading="lazy" decoding="async"></button><figcaption>Snack research. Very serious work.</figcaption></figure></li>
       <li class="reveal"><figure><button class="ph" type="button" aria-label="Open photo: in a Tesla cap and polo"><img src="ka-tesla.jpg" alt="Kwan Ann in a Tesla cap and polo in front of a glass display" width="675" height="900" loading="lazy" decoding="async"></button><figcaption>Sells Teslas on the side.</figcaption></figure></li>
       <li class="reveal"><figure><button class="ph" type="button" aria-label="Open photo: eyes closed against a wooden wall"><img src="ka-sauna.jpg" alt="Kwan Ann with eyes closed against a wood-panelled wall, wearing a Tesla polo" width="675" height="900" loading="lazy" decoding="async"></button><figcaption>Sauna mode: off.</figcaption></figure></li>
+      <li class="reveal"><figure><button class="ph" type="button" aria-label="Open photo: shelves of canned baby abalone"><img src="ka-abalone-cans.jpg" alt="Shelves of canned baby abalone: black truffle, mushroom and sambal chilli" width="675" height="900" loading="lazy" decoding="async"></button><figcaption>The royal pantry. Black truffle baby abalone, two for $11.95.</figcaption></figure></li>
+      <li class="reveal"><figure><button class="ph" type="button" aria-label="Open photo: a vacuum pack of cooked abalone meat"><img src="ka-abalone-meat.jpg" alt="A vacuum pack of cooked abalone meat" width="675" height="900" loading="lazy" decoding="async"></button><figcaption>Cooked abalone meat, heat and serve. Zero cooking required — the King approves.</figcaption></figure></li>
+      <li class="reveal"><figure><button class="ph" type="button" aria-label="Open photo: a laksa stall advertising fortune abalone"><img src="ka-abalone-laksa.jpg" alt="A laksa stall advertising fortune abalone, 3 for $2" width="675" height="900" loading="lazy" decoding="async"></button><figcaption>Fortune abalone at Geylang Laksa, 3 for $2. Even the laksa stall pays tribute.</figcaption></figure></li>
     </ul>
   </section>
 
@@ -645,8 +651,8 @@
     toast('👑 All hail the Abalone Sovereign');
     if (reduce) return;
     const box = document.createElement('div'); box.className = 'rain'; box.setAttribute('aria-hidden', 'true');
-    for (let i = 0; i < 30; i++) {
-      const s = document.createElement('span'); s.textContent = ['👑', '🐚', '✨'][i % 3];
+    for (let i = 0; i < 40; i++) {
+      const s = document.createElement('span'); s.textContent = ['👑', '🐚', '✨', '🥫'][i % 4];
       s.style.left = Math.random() * 100 + '%'; s.style.animationDelay = Math.random() * .9 + 's'; s.style.fontSize = 16 + Math.random() * 20 + 'px'; s.style.setProperty('--dx', Math.random() * 90 - 45 + 'px');
       box.appendChild(s);
     }
@@ -654,7 +660,7 @@
   });
 
   // ----- Rolling line under the name -----
-  const words = ['engineer enzymes', 'solve protein structures', 'screen variants for a living', 'vibe-code (apprentice)', 'go hiking', 'do serious snack research', 'defeat abalone', 'rule the abalone kingdom'];
+  const words = ['engineer enzymes', 'solve protein structures', 'screen variants for a living', 'vibe-code (apprentice)', 'go hiking', 'do serious snack research', 'defeat abalone', 'rule the abalone kingdom', 'collect abalone like trophies', 'crown every abalone'];
   const wordEl = $('#word');
   if (!reduce) { let i = 0; setInterval(() => { if (document.hidden) return; wordEl.classList.add('out'); setTimeout(() => { i = (i + 1) % words.length; wordEl.textContent = words[i]; wordEl.classList.remove('out'); }, 320); }, 2700); }
 
