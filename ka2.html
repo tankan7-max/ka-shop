@@ -139,6 +139,42 @@
   .outside button.uni { all: unset; display: flex; gap: 16px; align-items: flex-start; width: 100%; cursor: pointer; text-align: left; }
   .outside button.uni .e { font-size: 22px; line-height: 1.2; }
   .outside button.uni:hover b { color: var(--a1); }
+  .boss-arena { position: relative; overflow: hidden; border: 1px solid var(--line); border-radius: 24px; padding: 22px 22px 18px; background: radial-gradient(600px 300px at 50% -10%, rgba(245,194,107,.14), transparent 70%), radial-gradient(500px 260px at 85% 110%, rgba(94,234,212,.10), transparent 70%), #0a0a0c; }
+  .hp-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 8px; }
+  .hp-name { display: block; font: 600 12px/1.4 var(--mono); letter-spacing: .08em; color: var(--muted); margin-bottom: 6px; }
+  .hp-bar { height: 12px; border-radius: 999px; background: rgba(255,255,255,.08); overflow: hidden; }
+  .hp-bar i { display: block; height: 100%; width: 100%; border-radius: 999px; transition: width .25s ease; }
+  .boss-hp .hp-bar i { background: linear-gradient(90deg, #f59e0b, #ef4444); }
+  .player-hp .hp-bar i { background: linear-gradient(90deg, #34d399, #5eead4); }
+  .hp-bar.low i { background: linear-gradient(90deg, #ef4444, #b91c1c); }
+  .hp-num { display: block; margin-top: 5px; font: 500 11px/1 var(--mono); color: var(--faint); }
+  .boss-stage { position: relative; height: 300px; }
+  .boss-btn { all: unset; position: absolute; left: 50%; top: 18px; transform: translateX(-50%); cursor: pointer; }
+  .boss-btn:focus-visible { outline: 2px solid var(--a1); outline-offset: 6px; border-radius: 50%; }
+  .boss-img { display: block; width: 180px; height: 180px; object-fit: cover; border-radius: 50%; border: 3px solid rgba(245,194,107,.8); box-shadow: 0 0 40px rgba(245,194,107,.25); animation: bossbob 2.6s ease-in-out infinite; }
+  @keyframes bossbob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+  .boss-btn.hit .boss-img { animation: bossshake .18s ease; }
+  @keyframes bossshake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-7px) rotate(-3deg); } 75% { transform: translateX(7px) rotate(3deg); } }
+  .boss-btn.charging .boss-img { box-shadow: 0 0 60px rgba(239,68,68,.7); filter: saturate(1.4); }
+  .boss-btn.dead .boss-img { animation: bossfall 1s ease forwards; filter: grayscale(.7); }
+  @keyframes bossfall { to { transform: translateY(60px) rotate(24deg); opacity: .25; } }
+  .boss-crown { position: absolute; top: -16px; left: 50%; transform: translateX(-50%); font-size: 34px; }
+  .sausage { position: absolute; left: 50%; bottom: 6px; transform: translateX(-50%); font-size: 72px; line-height: 1; }
+  .sausage.lunge { animation: lunge .28s ease; }
+  @keyframes lunge { 40% { transform: translate(-50%, -130px) rotate(-24deg) scale(1.15); } }
+  .sausage.hurt { animation: sausagehurt .3s ease; }
+  @keyframes sausagehurt { 25% { transform: translateX(calc(-50% - 10px)) rotate(-8deg); } 75% { transform: translateX(calc(-50% + 10px)) rotate(8deg); } }
+  .blob { position: absolute; left: 50%; top: 130px; font-size: 26px; z-index: 3; transform: translate(-50%, 0); transition: transform .5s ease-in; pointer-events: none; }
+  .dmg { position: absolute; left: 50%; top: 10px; transform: translateX(-50%); font: 700 22px/1 var(--sans); color: #fca5a5; text-shadow: 0 2px 8px rgba(0,0,0,.7); z-index: 4; animation: dmgup .9s ease forwards; pointer-events: none; }
+  .dmg.crit { color: #fbbf24; font-size: 28px; }
+  @keyframes dmgup { to { transform: translate(-50%, -70px); opacity: 0; } }
+  .boss-log { min-height: 22px; margin: 10px 0 14px; text-align: center; color: var(--muted); font-size: 14.5px; }
+  .boss-controls { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .boss-controls [hidden], .boss-over[hidden] { display: none; }
+  .boss-over { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center; background: rgba(5,5,5,.82); backdrop-filter: blur(3px); z-index: 5; padding: 20px; }
+  .boss-over h3 { margin: 0; font-size: clamp(26px, 6vw, 40px); letter-spacing: -.02em; }
+  .boss-over p { margin: 0; color: var(--muted); max-width: 420px; }
+  @media (max-width: 560px) { .hp-row { grid-template-columns: 1fr; gap: 10px; } .boss-img { width: 150px; height: 150px; } .sausage { font-size: 60px; } }
 
   /* ---------- Sections ---------- */
   main { counter-reset: sec; padding-bottom: 8px; }
@@ -328,6 +364,7 @@
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     .hero::before, .portrait::before, .status i, .eyebrow i, .marquee .track, .king, .king .crown, .shells span { animation: none; }
+    .boss-img, .sausage, .blob, .dmg { animation: none; }
     .marquee { -webkit-mask-image: none; mask-image: none; } .marquee .track { width: auto; } .marquee ul { flex-wrap: wrap; justify-content: center; } .marquee ul[aria-hidden] { display: none; }
     .js .reveal { opacity: 1; transform: none; transition: none; }
     .gallery figure, .gallery li:nth-child(n) figure { transform: none; }
@@ -352,7 +389,7 @@
     .hero-actions { gap: 0 12pt; } .btn, .btn.primary { background: none; border: 0; color: #111; padding: 0; font-size: 8.5pt; gap: 3pt; border-radius: 0; }
     .btn[download] { display: none; } svg.i { width: 9pt; height: 9pt; }
     .orbit { --orb: 62pt; } .portrait { width: 100%; } .portrait::before { display: none; } .portrait img { border: 1pt solid #999; }
-    section { padding-top: 9pt; } .label { margin-bottom: 5pt; font-size: 7pt; gap: 8pt; } .label::before { display: none; } .kicker { display: none; }
+    section { padding-top: 9pt; } .label { margin-bottom: 5pt; font-size: 7pt; gap: 8pt; } .label::before { display: none; } .kicker { display: none; } #boss { display: none; }
     .about { display: block; } .summary-text { font-size: 9.5pt !important; line-height: 1.4 !important; max-width: none !important; }
     h2 { font-size: 12pt; } h3 { font-size: 10.5pt; }
     .timeline { padding-left: 14pt; } .timeline::before { left: 3pt; width: 1pt; background: #999; } .role::before { left: -14pt; top: 4pt; width: 6pt; height: 6pt; box-shadow: none !important; }
@@ -437,6 +474,7 @@
       <li><a href="#decrees">Decrees</a></li>
       <li><a href="#resume">Résumé</a></li>
       <li><a href="#multiverse">Multiverse</a></li>
+      <li><a href="#boss">Boss Fight</a></li>
       <li><a href="#outside">Photos</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
@@ -569,6 +607,31 @@
       <li><button class="uni" type="button" data-toast="🧊 Universe Heat-and-Serve: cooked abalone meat, zero cooking. Defeated."><span class="e">🧊</span><div><b>Universe Heat-and-Serve</b><span>Cooked abalone meat, zero cooking. Defeated.</span></div></button></li>
       <li><button class="uni" type="button" data-toast="👑 Universe The King: you are here. The King reigns in all of them."><span class="e">👑</span><div><b>Universe The King</b><span>You are here. The King reigns in all of them.</span></div></button></li>
     </ul>
+  </section>
+
+  <section id="boss" aria-labelledby="h-boss">
+    <h2 class="label reveal" id="h-boss">Boss Fight</h2>
+    <p class="kicker reveal">The final boss. Tap the abalone and the giant sausage strikes. Defeat it before it splashes you.</p>
+    <div class="boss-arena reveal" id="bossArena">
+      <div class="hp-row">
+        <div class="hp boss-hp"><span class="hp-name">👑 Abalone Sovereign</span><div class="hp-bar"><i id="bossFill"></i></div><span class="hp-num" id="bossNum">100 / 100</span></div>
+        <div class="hp player-hp"><span class="hp-name">🌭 Giant Sausage</span><div class="hp-bar"><i id="playerFill"></i></div><span class="hp-num" id="playerNum">100 / 100</span></div>
+      </div>
+      <div class="boss-stage" id="bossStage">
+        <button class="boss-btn" id="bossBtn" type="button" aria-label="Strike the abalone boss">
+          <img class="boss-img" id="bossImg" src="images/ka-abalone.jpg" alt="The giant abalone boss, braised and glistening" width="675" height="900">
+          <span class="boss-crown" aria-hidden="true">👑</span>
+        </button>
+        <div class="sausage" id="sausage" aria-hidden="true">🌭</div>
+      </div>
+      <p class="boss-log" id="bossLog" aria-live="polite">The abalone floats, smug and braised. Strike first.</p>
+      <div class="boss-controls">
+        <button class="btn primary" id="strikeBtn" type="button">⚔️ Strike!</button>
+        <button class="btn" id="soundBtn" type="button" aria-pressed="true">🔊 Sound on</button>
+        <button class="btn" id="againBtn" type="button" hidden>Fight again</button>
+      </div>
+      <div class="boss-over" id="bossOver" hidden></div>
+    </div>
   </section>
 
   <section id="outside" aria-labelledby="h-out">
@@ -734,7 +797,7 @@
   addEventListener('scroll', () => { if (ticking) return; ticking = true; requestAnimationFrame(() => { const d = document.documentElement; bar.style.transform = `scaleX(${clamp(d.scrollTop / ((d.scrollHeight - d.clientHeight) || 1), 0, 1)})`; ticking = false; }); }, { passive: true });
   const links = $$('nav ul a'), map = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
   const spy = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; links.forEach(a => a.removeAttribute('aria-current')); const a = map.get(e.target.id); if (a) { a.setAttribute('aria-current', 'true'); if (innerWidth <= 820) a.scrollIntoView({ inline: 'center', block: 'nearest' }); } }), { rootMargin: '-45% 0px -50% 0px' });
-  ['about', 'pantry', 'arena', 'decrees', 'resume', 'multiverse', 'outside', 'contact'].forEach(id => { const n = document.getElementById(id); if (n) spy.observe(n); });
+  ['about', 'pantry', 'arena', 'decrees', 'resume', 'multiverse', 'boss', 'outside', 'contact'].forEach(id => { const n = document.getElementById(id); if (n) spy.observe(n); });
 
   // ----- Parts fade in as they scroll into view -----
   if ('IntersectionObserver' in window && !reduce) {
@@ -751,6 +814,118 @@
   $('.lb-prev').onclick = () => show(cur - 1); $('.lb-next').onclick = () => show(cur + 1); $('.lb-close').onclick = () => lb.close();
   lb.addEventListener('click', e => { if (e.target === lb) lb.close(); });
   lb.addEventListener('keydown', e => { if (e.key === 'ArrowLeft') show(cur - 1); else if (e.key === 'ArrowRight') show(cur + 1); });
+  // ----- Boss fight: the giant sausage vs the Abalone Sovereign -----
+  const arena = $('#bossArena');
+  if (arena) {
+    const stage = $('#bossStage'), bossBtn = $('#bossBtn'), sausage = $('#sausage');
+    const bossFill = $('#bossFill'), playerFill = $('#playerFill'), bossNum = $('#bossNum'), playerNum = $('#playerNum');
+    const log = $('#bossLog'), strikeBtn = $('#strikeBtn'), soundBtn = $('#soundBtn'), againBtn = $('#againBtn'), over = $('#bossOver');
+    const BOSS_MAX = 100, PLAYER_MAX = 100, ATK_MS = 3200;
+    let bossHp = BOSS_MAX, playerHp = PLAYER_MAX, combo = 0, lastHit = 0, hits = 0;
+    let atkTimer = 0, started = false, finished = false, startTime = 0, soundOn = true, actx = null;
+    const setHp = () => {
+      bossFill.style.width = Math.max(0, bossHp / BOSS_MAX * 100) + '%';
+      playerFill.style.width = Math.max(0, playerHp / PLAYER_MAX * 100) + '%';
+      bossNum.textContent = Math.max(0, bossHp) + ' / ' + BOSS_MAX;
+      playerNum.textContent = Math.max(0, playerHp) + ' / ' + PLAYER_MAX;
+      bossFill.parentElement.classList.toggle('low', bossHp <= 25);
+      playerFill.parentElement.classList.toggle('low', playerHp <= 25);
+    };
+    const say = m => { log.textContent = m; };
+    const beep = (f, d = .07, type = 'square', g = .04) => {
+      if (!soundOn) return;
+      try {
+        actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+        const o = actx.createOscillator(), gn = actx.createGain();
+        o.type = type; o.frequency.value = f; gn.gain.value = g;
+        o.connect(gn); gn.connect(actx.destination); o.start(); o.stop(actx.currentTime + d);
+      } catch (e) {}
+    };
+    const floatText = (txt, cls, top) => {
+      if (reduce) return;
+      const s = document.createElement('span');
+      s.className = 'dmg' + (cls ? ' ' + cls : ''); s.textContent = txt;
+      s.style.left = (50 + (Math.random() * 24 - 12)) + '%'; s.style.top = top + 'px';
+      stage.appendChild(s); setTimeout(() => s.remove(), 950);
+    };
+    const strike = () => {
+      if (finished) return;
+      if (!started) {
+        started = true; startTime = Date.now();
+        atkTimer = setInterval(bossAttack, ATK_MS);
+        say('The fight is on! The abalone splashes back every few seconds — keep striking!');
+      }
+      const now = Date.now();
+      combo = (now - lastHit < 1200) ? combo + 1 : 1; lastHit = now; hits++;
+      const bonus = Math.min(3, Math.floor(combo / 10));
+      const crit = Math.random() < .12;
+      let dmg = (2 + Math.floor(Math.random() * 2)) + bonus; if (crit) dmg *= 3;
+      bossHp = Math.max(0, bossHp - dmg);
+      sausage.classList.remove('lunge'); void sausage.offsetWidth; sausage.classList.add('lunge');
+      bossBtn.classList.remove('hit'); void bossBtn.offsetWidth; bossBtn.classList.add('hit');
+      setTimeout(() => bossBtn.classList.remove('hit'), 200);
+      floatText(crit ? 'CRIT -' + dmg + '!' : '-' + dmg, crit ? 'crit' : '', 10);
+      beep(crit ? 660 : 220, crit ? .12 : .06);
+      say(crit ? 'CRITICAL! The sausage smashed the abalone for ' + dmg + ' damage!'
+          : (combo >= 10 ? 'Combo x' + combo + '! The sausage struck for ' + dmg + ' damage.'
+                         : 'The sausage struck for ' + dmg + ' damage.'));
+      setHp();
+      if (bossHp <= 0) endFight(true);
+    };
+    const bossAttack = () => {
+      if (finished || !started || document.hidden) return;
+      bossBtn.classList.add('charging');
+      setTimeout(() => {
+        bossBtn.classList.remove('charging');
+        if (finished) return;
+        const dmg = 4 + Math.floor(Math.random() * 5);
+        const blob = document.createElement('span');
+        blob.className = 'blob'; blob.textContent = '💧'; blob.setAttribute('aria-hidden', 'true');
+        stage.appendChild(blob);
+        beep(140, .15, 'sawtooth', .05);
+        requestAnimationFrame(() => { blob.style.transform = 'translate(-50%, 105px)'; });
+        setTimeout(() => {
+          blob.remove();
+          if (finished) return;
+          playerHp = Math.max(0, playerHp - dmg);
+          sausage.classList.remove('hurt'); void sausage.offsetWidth; sausage.classList.add('hurt');
+          floatText('-' + dmg, '', 232);
+          say('💧 The abalone splashed you for ' + dmg + ' damage!');
+          setHp();
+          if (playerHp <= 0) endFight(false);
+        }, 620);
+      }, 600);
+    };
+    const endFight = won => {
+      finished = true; clearInterval(atkTimer);
+      const secs = Math.round((Date.now() - startTime) / 1000);
+      if (won) {
+        bossBtn.classList.add('dead');
+        [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => beep(f, .14, 'triangle', .05), i * 130));
+        over.innerHTML = '<h3>👑 BOSS DEFEATED!</h3><p>The Abalone Sovereign has fallen. Defeated in ' + hits + ' strikes and ' + secs + ' seconds.<br>Loot: 1× braised abalone · 3× canned abalone · the King\'s respect.</p>';
+        say('👑 The abalone is defeated! Long live the King.');
+      } else {
+        [330, 262, 196].forEach((f, i) => setTimeout(() => beep(f, .18, 'sawtooth', .04), i * 160));
+        over.innerHTML = '<h3>🌭 The sausage has fallen…</h3><p>The abalone reigns — for now. The King demands a rematch.</p>';
+        say('The sausage has been defeated. The abalone floats on, smug as ever.');
+      }
+      over.hidden = false; againBtn.hidden = false;
+    };
+    const reset = () => {
+      bossHp = BOSS_MAX; playerHp = PLAYER_MAX; combo = 0; lastHit = 0; hits = 0;
+      started = false; finished = false; clearInterval(atkTimer);
+      bossBtn.classList.remove('dead', 'hit', 'charging');
+      over.hidden = true; againBtn.hidden = true;
+      say('The abalone floats, smug and braised. Strike first.');
+      setHp();
+    };
+    bossBtn.addEventListener('click', strike);
+    strikeBtn.addEventListener('click', strike);
+    againBtn.addEventListener('click', reset);
+    soundBtn.addEventListener('click', () => { soundOn = !soundOn; soundBtn.textContent = soundOn ? '🔊 Sound on' : '🔇 Sound off'; soundBtn.setAttribute('aria-pressed', String(soundOn)); });
+    setHp();
+  }
+
 
   // ----- The Arena: a small idle game about defeating abalone -----
   const RANKS = [[0, 'Abalone Apprentice'], [10, 'Shell Squire'], [25, 'Braising Knight'], [50, 'Duke of Dim Sum'], [100, 'Chancellor of Canned Goods'], [200, 'Abalone King'], [500, 'Abalone Sovereign'], [1000, 'Emperor of the Multiverse'], [2500, 'Abalone, Promoted to Abalone'], [5000, 'You Have Become the Abalone']];
