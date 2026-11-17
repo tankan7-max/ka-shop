@@ -124,7 +124,7 @@
       },
       "texture": {
         "description": "Twisties BBQ corn snack pack photo",
-        "image_url": "https://huawei-food-cms.grab.com/compressed_webp/items/SGITE2025022012442890124/detail/menueditor_item_f1a44926169648a49206d11650af1508_1740055420200819186.webp",
+        "image_url": "./images/twisties-bbq.png",
         "source_url": "https://mart.grab.com/sg/en/merchant/grabmart-grocer-mini-s-mart-booze-beachroad-sultan-gate-place/4-C4EGC7T3NYAXAJ/twisties-bbq-curry/SGITE20250221022450177288",
         "type": "image"
       },
