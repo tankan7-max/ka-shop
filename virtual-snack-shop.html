@@ -469,6 +469,9 @@ const PRODUCTS = db.products.map(p => {
     width: m.width || p.width || 0.5, height: m.height || p.height || 0.5, depth: m.depth || p.depth || 0.2,
     photoUrl: tex.image_url || p.texture_url || null, photo: null,
     photoFills: tex.fit === 'cover',                    // the photo is the whole pack front (flat artwork), not a picture of the pack
+    texScale: Number.isFinite(tex.scale) ? Math.min(4, Math.max(0.25, tex.scale)) : 1,   // texture fit, set in the product editor (1 = as drawn)
+    texOffX: Number.isFinite(tex.offset_x) ? Math.min(1, Math.max(-1, tex.offset_x)) : 0,
+    texOffY: Number.isFinite(tex.offset_y) ? Math.min(1, Math.max(-1, tex.offset_y)) : 0,
     modelUrl: typeof m.glb_url === 'string' && m.glb_url ? m.glb_url : null,   // an uploaded 3D model (.glb) used instead of the built-in shape
     hash: hashOf(id), search: `${p.name} ${p.category} ${p.pack}`.toLowerCase(),
   };
@@ -537,6 +540,10 @@ function drawPack(ctx, p, x, y, w, h) {
   // Top and bottom bands.
   ctx.fillStyle = shade(p.color, -0.28); ctx.fillRect(0, 0, w, h * 0.055); ctx.fillRect(0, h * 0.945, w, h * 0.055);
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  // Texture fit, set in the product editor: scale the photo or label on the face and slide it around. 1 / 0 / 0 is the pack as drawn before.
+  const ts = p.texScale || 1, tx = p.texOffX || 0, ty = p.texOffY || 0;
+  ctx.save();
+  if (ts !== 1 || tx || ty) { ctx.translate(w / 2 + tx * w, h / 2 + ty * h); ctx.scale(ts, ts); ctx.translate(-w / 2, -h / 2); }
   if (p.photo && p.photoFills) {
     // The photo is the artwork itself: stretch it over the whole front, cropping what doesn't fit.
     const s = Math.max(w / p.photo.naturalWidth, h / p.photo.naturalHeight), pw = p.photo.naturalWidth * s, ph = p.photo.naturalHeight * s;
@@ -563,6 +570,7 @@ function drawPack(ctx, p, x, y, w, h) {
       ctx.fillStyle = '#1c1c1c'; ctx.font = `700 ${fs}px ${FONT}`; ctx.fillText(label, w / 2, h * 0.82 + 1);
     }
   }
+  ctx.restore();
   // Soft shine from top to bottom.
   const g = ctx.createLinearGradient(0, 0, w, h); g.addColorStop(0, 'rgba(255,255,255,.2)'); g.addColorStop(0.5, 'rgba(255,255,255,0)'); g.addColorStop(1, 'rgba(0,0,0,.16)');
   ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);

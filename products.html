@@ -70,6 +70,10 @@
   #preview-canvas { display: block; width: 100%; height: 260px; touch-action: none; cursor: grab; }
   #preview-canvas.dragging { cursor: grabbing; }
   #preview-status { position: absolute; left: 10px; bottom: 8px; right: 10px; font-size: 12px; font-weight: 400; color: rgba(255,255,255,.8); }
+  .texfit { display: grid; grid-template-columns: 104px 1fr 48px; gap: 6px 10px; align-items: center; margin-top: 8px; }
+  .texfit label { font-weight: 600; }
+  .texfit output { font-weight: 400; text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .texfit input[type="range"] { width: 100%; accent-color: var(--brand); }
   .dialog-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; align-items: center; }
   .dialog-btns .spacer { flex: 1; }
   #status { color: var(--muted); font-size: 14px; }
@@ -179,6 +183,14 @@
         <small>If copying is refused, save the picture to your computer and upload it with “Choose file” above.</small>
       </div>
       <label class="check"><input id="f-cover" type="checkbox"> The photo is the flat artwork — wrap it across the whole pack front</label>
+      <div class="field" id="texfit">Texture fit
+        <div class="texfit">
+          <label for="f-tex-scale">Scale</label><input id="f-tex-scale" type="range" min="0.5" max="2" step="0.05" value="1" aria-label="Texture scale"><output id="f-tex-scale-out">100%</output>
+          <label for="f-tex-ox">Slide right</label><input id="f-tex-ox" type="range" min="-0.5" max="0.5" step="0.05" value="0" aria-label="Texture horizontal offset"><output id="f-tex-ox-out">0%</output>
+          <label for="f-tex-oy">Slide down</label><input id="f-tex-oy" type="range" min="-0.5" max="0.5" step="0.05" value="0" aria-label="Texture vertical offset"><output id="f-tex-oy-out">0%</output>
+        </div>
+        <small id="texfit-note">Zooms the photo or label on the pack face and slides it around, so you can fit it to cover the face. 100% is the pack as the shop draws it today.</small>
+      </div>
 
       <div class="field">3D model (optional)
         <div class="file-line">
@@ -374,6 +386,10 @@ function pvDrawPack(ctx, p, x, y, w, h) {
   }
   ctx.fillStyle = pvShade(p.color, -0.28); ctx.fillRect(0, 0, w, h * 0.055); ctx.fillRect(0, h * 0.945, w, h * 0.055);
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  // Texture fit, set in the product editor: scale the photo or label on the face and slide it around. 1 / 0 / 0 is the pack as drawn before.
+  const ts = p.texScale || 1, tx = p.texOffX || 0, ty = p.texOffY || 0;
+  ctx.save();
+  if (ts !== 1 || tx || ty) { ctx.translate(w / 2 + tx * w, h / 2 + ty * h); ctx.scale(ts, ts); ctx.translate(-w / 2, -h / 2); }
   if (p.photo && p.photoFills) {
     const s = Math.max(w / p.photo.naturalWidth, h / p.photo.naturalHeight), pw = p.photo.naturalWidth * s, ph = p.photo.naturalHeight * s;
     ctx.drawImage(p.photo, (w - pw) / 2, (h - ph) / 2, pw, ph);
@@ -397,6 +413,7 @@ function pvDrawPack(ctx, p, x, y, w, h) {
       ctx.fillStyle = '#1c1c1c'; ctx.font = `700 ${fs}px ${PV_FONT}`; ctx.fillText(label, w / 2, h * 0.82 + 1);
     }
   }
+  ctx.restore();
   const g = ctx.createLinearGradient(0, 0, w, h); g.addColorStop(0, 'rgba(255,255,255,.2)'); g.addColorStop(0.5, 'rgba(255,255,255,0)'); g.addColorStop(1, 'rgba(0,0,0,.16)');
   ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
   ctx.restore();
@@ -526,6 +543,7 @@ function pvProduct() {
     kind: shape, round: ROUND.includes(shape),
     width: num('f-w', 0.05, 0.8, size[0]), height: num('f-h', 0.05, 0.6, size[1]), depth: num('f-d', 0.03, 0.5, size[2]),
     photoFills: $('f-cover').checked, photo: pv.photoImg,
+    texScale: Number($('f-tex-scale').value) || 1, texOffX: Number($('f-tex-ox').value) || 0, texOffY: Number($('f-tex-oy').value) || 0,
     hash: pvHashOf($('f-name').value.trim() || 'new-snack'),
   };
 }
@@ -604,7 +622,7 @@ function pvRebuild() {
   pv.group.rotation.y = pv.rotY; pv.group.rotation.x = pv.rotX;
   pv.scene.add(pv.group);
   pvFit();
-  window.__previewInfo = { ready: pv.ready, kind: p.kind, width: p.width, height: p.height, depth: p.depth, color: p.color, name: p.name, hasPhoto: !!p.photo, photoFills: p.photoFills, hasModel: !!modelKey, modelLoaded: !!pv.modelGltf, meshes: pv.group.children.length, status: pv.status };
+  window.__previewInfo = { ready: pv.ready, kind: p.kind, width: p.width, height: p.height, depth: p.depth, color: p.color, name: p.name, hasPhoto: !!p.photo, photoFills: p.photoFills, texScale: p.texScale, texOffX: p.texOffX, texOffY: p.texOffY, hasModel: !!modelKey, modelLoaded: !!pv.modelGltf, meshes: pv.group.children.length, status: pv.status };
 }
 let pvPrevT = 0;
 function pvTick(now) {
@@ -674,6 +692,7 @@ function pvStop() { if (pv.raf) { cancelAnimationFrame(pv.raf); pv.raf = 0; } }
 function pvSchedule() { clearTimeout(pv.timer); pv.timer = setTimeout(pvRebuild, 150); }
 ['f-name', 'f-pack', 'f-w', 'f-h', 'f-d', 'f-color'].forEach(id => $(id).addEventListener('input', pvSchedule));
 ['f-shape', 'f-cover'].forEach(id => $(id).addEventListener('change', pvSchedule));
+['f-tex-scale', 'f-tex-ox', 'f-tex-oy'].forEach(id => $(id).addEventListener('input', () => { texfitOut(); pvSchedule(); }));
 $('editor').addEventListener('close', pvStop);
 
 // --- The editor ---
@@ -686,6 +705,17 @@ function fillCategories(selected) {
 }
 $('f-category').onchange = () => { $('f-newcat-wrap').hidden = $('f-category').value !== '\u0000new'; if (!$('f-newcat-wrap').hidden) $('f-newcat').focus(); };
 $('f-shape').onchange = () => { const s = SIZES[$('f-shape').value]; if (s) [$('f-w').value, $('f-h').value, $('f-d').value] = s; };
+// Texture fit readouts: show the slider values as percentages, and grey the
+// settings out while a 3D model is set (a model brings its own textures).
+function texfitOut() {
+  const pct = (v, signed) => { const n = Math.round(v * 100); return (signed && n > 0 ? '+' : '') + n + '%'; };
+  $('f-tex-scale-out').textContent = pct(Number($('f-tex-scale').value));
+  $('f-tex-ox-out').textContent = pct(Number($('f-tex-ox').value), true);
+  $('f-tex-oy-out').textContent = pct(Number($('f-tex-oy').value), true);
+  const hasModel = !!(draft && (draft.modelUrl || draft.modelFile));
+  ['f-tex-scale', 'f-tex-ox', 'f-tex-oy'].forEach(id => $(id).disabled = hasModel);
+  $('texfit-note').textContent = hasModel ? 'A 3D model is set, so it brings its own textures — these settings apply when the built-in pack shape is used instead.' : 'Zooms the photo or label on the pack face and slides it around, so you can fit it to cover the face. 100% is the pack as the shop draws it today.';
+}
 function showFiles() {
   $('photo-preview').style.backgroundImage = draft.photoPreview ? `url("${draft.photoPreview}")` : '';
   $('photo-remove').hidden = !draft.photoPreview;
@@ -694,6 +724,7 @@ function showFiles() {
   $('model-remove').hidden = !(draft.modelUrl || draft.modelFile);
   $('model-info').textContent = draft.modelFile ? `Chosen: ${draft.modelFile.name} (${(draft.modelFile.size / 1048576).toFixed(1)} MB) — uploaded when you save.` : draft.modelUrl ? 'This product has a 3D model. Choose a file to replace it.' : 'A .glb file up to 8 MB, without Draco compression. Keep it low-poly: every pack on the shelf is a copy.';
   pvSchedule();
+  texfitOut();
 }
 function openEditor(p) {
   editing = p || null;
@@ -706,6 +737,7 @@ function openEditor(p) {
   $('f-shape').value = shape; $('f-color').value = hex(m.color === undefined ? 0x2a9d8f : m.color);
   $('f-w').value = m.width || size[0]; $('f-h').value = m.height || size[1]; $('f-d').value = m.depth || size[2];
   $('f-cover').checked = t.fit === 'cover'; $('f-active').checked = p ? !!p.active : true;
+  $('f-tex-scale').value = t.scale === undefined ? 1 : t.scale; $('f-tex-ox').value = t.offset_x || 0; $('f-tex-oy').value = t.offset_y || 0;
   $('f-photo').value = ''; $('f-model').value = '';
   draft = { photoUrl: t.image_url || '', photoPreview: t.image_url || '', photoBlob: null, modelUrl: m.glb_url || '', modelFile: null };
   showFiles();
@@ -785,6 +817,10 @@ $('editor-form').addEventListener('submit', async e => {
     const texture = { ...((editing && editing.texture) || {}) };
     if (photoUrl) { texture.type = 'image'; texture.image_url = photoUrl; if ($('f-cover').checked) texture.fit = 'cover'; else delete texture.fit; }
     else { delete texture.image_url; delete texture.fit; texture.type = 'generated'; }
+    const ts = Number($('f-tex-scale').value), tx = Number($('f-tex-ox').value), ty = Number($('f-tex-oy').value);
+    if (Number.isFinite(ts) && ts !== 1) texture.scale = Math.round(Math.min(2, Math.max(0.5, ts)) * 100) / 100; else delete texture.scale;
+    if (Number.isFinite(tx) && tx !== 0) texture.offset_x = Math.round(Math.min(0.5, Math.max(-0.5, tx)) * 100) / 100; else delete texture.offset_x;
+    if (Number.isFinite(ty) && ty !== 0) texture.offset_y = Math.round(Math.min(0.5, Math.max(-0.5, ty)) * 100) / 100; else delete texture.offset_y;
     const row = { id, name, category, price_sgd: Math.round(price * 100) / 100, pack: $('f-pack').value.trim(), model, texture, active: $('f-active').checked };
     if (!editing) row.sort = products.reduce((m, p) => Math.max(m, p.sort || 0), 0) + 1;
     if (!categories.some(c => c.name === category)) await api('categories', { method: 'POST', prefer: 'return=minimal', body: { name: category, sort: categories.reduce((m, c) => Math.max(m, c.sort || 0), 0) + 1 } });
