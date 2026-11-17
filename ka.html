@@ -14,7 +14,7 @@
 <meta property="og:image" content="https://tankan7-max.github.io/ka-shop/images/ka-og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Tan Kwan Ann, R&amp;D scientist, with a ring of glowing dots orbiting a portrait">
+<meta property="og:image:alt" content="Tan Kwan Ann, R&amp;D scientist">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%235eead4'/%3E%3Cstop offset='1' stop-color='%23a78bfa'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='9' fill='%23060608'/%3E%3Ctext x='16' y='22' font-family='Arial,sans-serif' font-size='14' font-weight='800' text-anchor='middle' fill='url(%23g)'%3EKA%3C/text%3E%3C/svg%3E">
 <link rel="preload" href="fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -78,9 +78,8 @@
   h1 { font: 700 clamp(40px, 5.2vw, 88px)/.94 var(--display); letter-spacing: -.045em; margin: 0 0 22px; background: linear-gradient(180deg, #fff 35%, #9d9da8 120%); -webkit-background-clip: text; background-clip: text; color: transparent; }
   /* The name must stay on one line: size it to its column (15% of the column fits "Tan Kwan Ann" at 6.35em wide). The vw size above is the fallback for older browsers. */
   @supports (width: 1cqw) { .hero .wrap > div:first-child { container-type: inline-size; } h1 { font-size: clamp(40px, 15cqw, 92px); } }
-  .roll { margin: 0 0 16px; min-height: 1.35em; font: 600 clamp(22px, 3.2vw, 34px)/1.25 var(--display); letter-spacing: -.02em; }
-  .word { display: inline-block; transition: opacity .3s ease, transform .3s ease; }
-  .word.out { opacity: 0; transform: translateY(.45em); }
+  .me { --me: 300px; width: var(--me); aspect-ratio: 4 / 5; flex: none; padding: 2px; border-radius: 22px; background: linear-gradient(150deg, rgba(94,234,212,.55), rgba(255,255,255,.08) 45%, rgba(167,139,250,.45)); box-shadow: 0 30px 80px rgba(0,0,0,.5); }
+  .me img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 20px; }
   .lede { font-size: clamp(17px, 1.9vw, 19.5px); line-height: 1.6; color: var(--muted); max-width: 33em; margin: 0 0 28px; }
   .lede b { color: var(--ink); font-weight: 600; }
   .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 0; padding: 0; list-style: none; }
@@ -89,32 +88,12 @@
   .btn.primary { background: var(--ink); color: #060608; border-color: var(--ink); }
   .btn.primary:hover { background: #fff; box-shadow: 0 0 0 5px rgba(94,234,212,.18), 0 10px 40px rgba(94,234,212,.25); }
   .status { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin: 26px 0 0; padding: 9px 15px; border-radius: 18px; line-height: 1.35 !important; border: 1px solid rgba(94,234,212,.25); background: rgba(94,234,212,.06); color: var(--a1); font: 500 12.5px/1 var(--mono); }
-  .status i, .eyebrow i { width: 8px; height: 8px; margin-right: 0; border-radius: 50%; background: var(--a1); box-shadow: 0 0 0 0 rgba(94,234,212,.6); animation: pulse 2.4s infinite; flex: none; }
+  .status i, .eyebrow i { display: none; width: 8px; height: 8px; margin-right: 0; border-radius: 50%; background: var(--a1); box-shadow: 0 0 0 0 rgba(94,234,212,.6); animation: pulse 2.4s infinite; flex: none; }
   .status span { color: var(--muted); }
   @keyframes pulse { 70% { box-shadow: 0 0 0 9px rgba(94,234,212,0); } 100% { box-shadow: 0 0 0 0 rgba(94,234,212,0); } }
 
-  /* A ring of 26 pairs orbits the portrait. Drag it. */
-  .orbit { --orb: 440px; position: relative; width: var(--orb); height: var(--orb); flex: none; cursor: grab; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
-  .orbit.drag { cursor: grabbing; }
-  .orbit canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-  .orbit .front { z-index: 3; }
-  .orbit::before { content: ""; position: absolute; inset: 14%; border-radius: 50%; background: radial-gradient(circle, rgba(94,234,212,.2), rgba(167,139,250,.12) 55%, transparent 72%); filter: blur(10px); }
-  .portrait { position: absolute; left: 50%; top: 50%; width: 52%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; z-index: 2; }
-  .portrait::before { content: ""; position: absolute; inset: -3px; border-radius: 50%; background: conic-gradient(var(--a1), var(--a2), var(--a3), var(--a1)); animation: spin 9s linear infinite; }
-  .portrait img { position: relative; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; border: 4px solid var(--bg); display: block; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .orbit-hint { position: absolute; left: 0; right: 0; bottom: -4px; text-align: center; font: 500 11px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); z-index: 4; pointer-events: none; }
 
   /* ---------- Ticker ---------- */
-  .marquee { overflow: hidden; border-block: 1px solid var(--line); background: rgba(255,255,255,.015); -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent); mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent); }
-  .marquee .track { display: flex; width: max-content; animation: marq 46s linear infinite; }
-  .marquee:hover .track { animation-play-state: paused; }
-  .marquee ul { display: flex; gap: 10px; margin: 0; padding: 16px 5px; list-style: none; }
-  .marquee li { display: inline-flex; align-items: center; gap: 9px; white-space: nowrap; padding: 7px 15px; border: 1px solid var(--line); border-radius: 999px; font: 500 13px/1 var(--mono); color: var(--muted); }
-  .marquee li::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--a1); }
-  .marquee li:nth-child(3n+2)::before { background: var(--a2); } .marquee li:nth-child(3n)::before { background: var(--a3); }
-  .marquee li.fun { border-style: dashed; color: var(--ink); }
-  @keyframes marq { to { transform: translateX(-50%); } }
 
   /* ---------- Sections ---------- */
   main { counter-reset: sec; padding-bottom: 8px; }
@@ -122,8 +101,7 @@
   .label { display: flex; align-items: center; gap: 14px; margin: 0 0 14px; font: 500 12px/1 var(--mono); letter-spacing: .2em; text-transform: uppercase; color: var(--faint); }
   .label::before { counter-increment: sec; content: counter(sec, decimal-leading-zero); color: var(--a1); }
   .label::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line-strong), transparent); }
-  .kicker { margin: 0 0 34px; color: var(--muted); font-size: 15.5px; }
-  .label + :not(.kicker) { margin-top: 30px; }
+  .label + * { margin-top: 30px; }
   h2 { font: 650 clamp(28px, 3.6vw, 40px)/1.12 var(--display); letter-spacing: -.035em; margin: 0 0 8px; }
   h3 { font: 600 20px/1.3 var(--display); letter-spacing: -.015em; margin: 0; }
   .spot { position: relative; isolation: isolate; }
@@ -181,8 +159,6 @@
   .role header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; }
   .when { font: 500 12.5px/1 var(--mono); color: var(--faint); white-space: nowrap; font-variant-numeric: tabular-nums; }
   .where { margin: 4px 0 14px; color: var(--muted); font-weight: 500; font-size: 15px; }
-  .tldr { margin: 0 0 14px; padding: 10px 14px; border-left: 2px solid var(--a2); background: linear-gradient(90deg, rgba(167,139,250,.09), transparent); border-radius: 0 10px 10px 0; color: var(--ink); font-size: 15px; }
-  .tldr b { margin-right: 8px; font: 600 11px/1 var(--mono); letter-spacing: .1em; color: var(--a2); }
   .role ul { margin: 0; padding-left: 18px; color: var(--muted); }
   .role li { margin-bottom: 9px; }
   .role li::marker { color: var(--faint); }
@@ -258,7 +234,7 @@
     nav .resume { margin-left: auto; }
     section { padding-top: 76px; scroll-margin-top: 30px; }
     .hero .wrap { grid-template-columns: 1fr; padding-top: 36px; padding-bottom: 64px; gap: 22px; }
-    .orbit { --orb: min(86vw, 360px); margin: 0 auto; order: -1; }
+    .me { --me: min(62vw, 250px); margin: 0 auto; order: -1; }
     .about, .two, .feature, .project { grid-template-columns: 1fr; }
     .about { gap: 36px; } .two { gap: 0; } .two > div + div { margin-top: 76px; }
     .feature, .project { padding: 20px; gap: 24px; }
@@ -269,22 +245,21 @@
   @media (max-width: 420px) { .num { gap: 14px; padding: 16px 16px; } .num b { min-width: 92px; } }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
-    .hero::before, .portrait::before, .status i, .eyebrow i, .marquee .track { animation: none; }
-    .marquee { -webkit-mask-image: none; mask-image: none; } .marquee .track { width: auto; } .marquee ul { flex-wrap: wrap; justify-content: center; } .marquee ul[aria-hidden] { display: none; }
+    .hero::before, .status i, .eyebrow i { animation: none; }
     .js .reveal { opacity: 1; transform: none; transition: none; }
-    .word { transition: none; } .toast { transition: none; }
+    .toast { transition: none; }
   }
 
-  @media (forced-colors: active) { h1, .grad { -webkit-text-fill-color: CanvasText; color: CanvasText; background: none; } .portrait::before { display: none; } }
+  @media (forced-colors: active) { h1, .grad { -webkit-text-fill-color: CanvasText; color: CanvasText; background: none; } }
 
   /* Printing gives a clean, compact paper resume */
   @media print {
     :root { --bg: #fff; --panel: #fff; --panel-2: #fff; --ink: #111; --muted: #333; --faint: #555; --line: #ccc; --line-strong: #999; --a1: #0f5c53; --a2: #4c3d99; --a3: #7a5a1c; }
     @page { size: A4; margin: 11mm 13mm; }
     html { background: #fff; color-scheme: light; }
-    body { font-size: 9pt; line-height: 1.38; overflow: visible; } body::before, .hero::before, .hero::after, .orbit::before { display: none; }
+    body { font-size: 9pt; line-height: 1.38; overflow: visible; } body::before, .hero::before, .hero::after { display: none; }
     .wrap { max-width: none; padding: 0; }
-    .skip, nav, .progress, .marquee, .orbit canvas, .orbit-hint, .status, .roll, .nums, .about .nums, #structure, #contact, .shot, .project .chips, .toast, footer, .pub-actions, .hero-actions li:not(.print-ok), .tldr { display: none !important; }
+    .skip, nav, .progress, .status, .nums, .about .nums, #structure, #contact, .shot, .project .chips, .toast, footer, .pub-actions, .hero-actions li:not(.print-ok) { display: none !important; }
     .print-only { display: block; margin: 3pt 0 0; font-size: 8.5pt; color: #111; }
     h1 { font-size: 25pt; margin-bottom: 4pt; background: none; color: #111; -webkit-text-fill-color: #111; }
     .grad { background: none; color: #111; -webkit-text-fill-color: #111; }
@@ -293,7 +268,6 @@
     .lede { color: #222; font-size: 9.5pt; margin-bottom: 5pt; max-width: none; } .lede b { color: #111; }
     .hero-actions { gap: 0 12pt; } .btn, .btn.primary { background: none; border: 0; color: #111; padding: 0; font-size: 8.5pt; gap: 3pt; border-radius: 0; }
     .btn[download] { display: none; } svg.i { width: 9pt; height: 9pt; }
-    .orbit { --orb: 62pt; } .portrait { width: 100%; } .portrait::before { display: none; } .portrait img { border: 1pt solid #999; }
     section { padding-top: 9pt; } .label { margin-bottom: 5pt; font-size: 7pt; gap: 8pt; } .label::before { display: none; } .kicker { display: none; }
     .about { display: block; } .summary-text { font-size: 9.5pt !important; line-height: 1.4 !important; max-width: none !important; }
     h2 { font-size: 12pt; } h3 { font-size: 10.5pt; }
@@ -307,9 +281,9 @@
     .two { gap: 18pt; } .list li { padding: 3pt 0; border: 0; } .list h3 { font-size: 9.5pt; } .list p { font-size: 8.5pt; margin-top: 0; }
     .feature, .project { display: block; padding: 0; border: 0; border-radius: 0; background: none; } .feature p { margin-top: 2pt; max-width: none; } .links { margin-top: 2pt !important; font-size: 8.5pt; }
     .js .reveal { opacity: 1 !important; transform: none !important; }
+    .me { --me: 58pt !important; order: 0 !important; margin: 0 !important; padding: 0 !important; background: none !important; box-shadow: none !important; } .me img { border: 1pt solid #999; border-radius: 3pt !important; }
     /* Paper is narrow, so browsers apply the phone layout when printing. Keep the wide arrangement instead. */
     .hero .wrap { grid-template-columns: 1fr auto !important; align-items: start; padding: 0 0 7pt !important; gap: 14pt !important; }
-    .orbit { order: 0 !important; margin: 0 !important; --orb: 62pt !important; }
     .two { grid-template-columns: 1fr 1fr !important; gap: 18pt !important; } .two > div + div { margin-top: 0 !important; }
     section { padding-top: 9pt !important; }
   }
@@ -338,44 +312,27 @@
 <header class="hero" id="top">
   <div class="wrap">
     <div>
-      <p class="eyebrow"><i></i>R&amp;D Scientist · Singapore</p>
+      <p class="eyebrow">R&amp;D Scientist · Singapore</p>
       <h1>Tan Kwan Ann</h1>
-      <p class="roll"><span class="sr">I engineer enzymes and solve protein structures.</span><span aria-hidden="true">I <span class="word grad" id="word">engineer enzymes</span></span></p>
-      <p class="lede">R&amp;D scientist with a PhD in structural biology, engineering enzymes for industrial use.</p>
+      <p class="lede">PhD in structural biology. Engineering enzymes for industrial use.</p>
       <ul class="hero-actions">
         <li class="print-ok"><a class="btn primary" href="mailto:tankan7@gmail.com"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>tankan7@gmail.com</a></li>
         <li class="print-ok"><a class="btn" href="https://www.linkedin.com/in/tan-kwan-ann" rel="noopener"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 10v7M8 7v.01M12 17v-4a2 2 0 0 1 4 0v4M12 10v7"/></svg>LinkedIn</a></li>
         <li class="print-ok"><a class="btn" href="https://github.com/tankan7-max" rel="noopener"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 19c-4 1.300-4-2-6-2.500M15 21v-3.400a3 3 0 0 0-.800-2.300c2.800-.300 5.800-1.400 5.800-6.200a4.800 4.800 0 0 0-1.300-3.300 4.500 4.500 0 0 0-.100-3.300s-1.100-.300-3.500 1.300a12 12 0 0 0-6.200 0C6.500 1.700 5.400 2 5.400 2a4.500 4.500 0 0 0-.100 3.300A4.800 4.800 0 0 0 4 8.600c0 4.800 3 5.900 5.800 6.200A3 3 0 0 0 9 17.100V21"/></svg>GitHub</a></li>
         <li><a class="btn" href="Tan_Kwan_Ann_Resume.pdf" download><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 20h14"/></svg>Resume (PDF)</a></li>
       </ul>
-      <p class="status"><i></i>Open to collaborations <span>· Singapore Citizen</span></p>
+      <p class="status">Open to collaborations <span>· Singapore Citizen</span></p>
       <p class="print-only">Singapore · Singapore Citizen</p>
     </div>
-    <div class="orbit" id="orbit" role="img" aria-label="Portrait of Tan Kwan Ann with a ring of 26 glowing pairs of dots orbiting it, echoing the 26 protein pairs of the structure solved during the PhD. Drag to spin.">
-      <canvas class="back" aria-hidden="true"></canvas>
-      <div class="portrait"><img src="images/ka-photo.jpg" alt="" width="230" height="230" fetchpriority="high"></div>
-      <canvas class="front" aria-hidden="true"></canvas>
-      <span class="orbit-hint" aria-hidden="true">26 pairs · drag to spin</span>
-    </div>
+    <div class="me"><img src="images/ka-portrait.jpg" alt="Tan Kwan Ann" width="640" height="800" fetchpriority="high"></div>
   </div>
 </header>
-
-<div class="marquee" aria-hidden="true">
-  <div class="track">
-    <ul>
-      <li>Directed evolution</li><li>Cryo-EM</li><li>Golden Gate</li><li>HPLC</li><li>Cofactor recycling</li><li>Python</li><li>Lyophilization</li><li>Gibson Assembly</li><li>MALDI-TOF/TOF</li><li>Assay development</li><li>Saturation mutagenesis</li>
-    </ul>
-    <ul aria-hidden="true">
-      <li>Directed evolution</li><li>Cryo-EM</li><li>Golden Gate</li><li>HPLC</li><li>Cofactor recycling</li><li>Python</li><li>Lyophilization</li><li>Gibson Assembly</li><li>MALDI-TOF/TOF</li><li>Assay development</li><li>Saturation mutagenesis</li>
-    </ul>
-  </div>
-</div>
 
 <main class="wrap" id="main">
   <section id="about" aria-labelledby="h-about">
     <h2 class="label reveal" id="h-about">About</h2>
     <div class="about">
-      <p class="summary-text reveal">R&amp;D scientist (PhD, structural biology) with industrial experience in enzyme engineering, biocatalyst development and protein process development. At Allozymes, part of a two-person core team on two industrial enzyme-engineering projects, including a DMSO-tolerant glucose dehydrogenase that keeps working where the wild type fails. Covers the full loop from variant design and cloning to screening, expression, formulation and lyophilization, backed by a 2.9 Å cryo-EM structure and peer-reviewed publications.</p>
+      <p class="summary-text reveal">R&amp;D scientist with a PhD in structural biology and industrial experience in enzyme engineering, biocatalyst development and protein process development. At Allozymes, part of a two-person core team on two industrial enzyme-engineering projects.</p>
       <ul class="nums reveal" aria-label="Some numbers">
         <li class="num"><b class="grad"><span data-count="2.9" data-dec="1">2.9</span> Å</b><span>cryo-EM resolution of the QmcA–YbbJ complex</span></li>
         <li class="num"><b class="grad"><span data-count="26" data-dec="0">26</span></b><span>heterodimers in the 26-pair ring</span></li>
@@ -386,39 +343,33 @@
 
   <section id="experience" aria-labelledby="h-exp">
     <h2 class="label reveal" id="h-exp">Experience</h2>
-    <p class="kicker reveal">Roles, responsibilities and results.</p>
     <ol class="timeline">
       <li class="role now reveal">
         <header><h3>Scientist I</h3><span class="when">Nov 2025 – Present</span></header>
         <p class="where">Allozymes Pte Ltd · Singapore</p>
-        <p class="tldr"><b>Summary</b>Engineering industrial enzymes for solvent tolerance and stability, from variant design to lyophilized formulation.</p>
         <ul>
-          <li>On the core team (of two) for two confidential industrial enzyme-engineering projects: one improving glucose dehydrogenase (GDH) activity and solvent tolerance for cofactor recycling, the other targeting a separate industrial application.</li>
-          <li>Developed and validated high-throughput screening workflows (UV-Vis plate reader, GC, HPLC), and characterized activity, stability, solvent tolerance and cofactor specificity under industrially relevant conditions.</li>
-          <li>Built and screened large variant libraries to engineer DMSO-tolerant GDH; the lead mutant kept working where the wild type gave up (60% activity at 60% DMSO, versus &lt;10%).</li>
-          <li>Designed cloning workflows (Golden Gate, Gibson, site-directed mutagenesis) and optimized recombinant expression, induction and cultivation conditions.</li>
-          <li>Developed and transferred a lyophilized-protein stability assay (reconstituted GDH activity via NADH formation) to track week-by-week activity retention; lyophilized powder kept at least 75% activity after 22 days at both 4&nbsp;°C and −20&nbsp;°C.</li>
-          <li>Contributed to downstream process development (lysis optimization, formulation, lyophilization workflows) and authored SOPs to support reproducibility and knowledge transfer.</li>
+          <li>Core team (of two) on two confidential industrial enzyme-engineering projects, including glucose dehydrogenase (GDH) engineering for activity and solvent tolerance in cofactor recycling.</li>
+          <li>Built and screened large variant libraries; the lead DMSO-tolerant GDH mutant kept 60% activity at 60% DMSO (wild type: &lt;10%).</li>
+          <li>Developed and validated high-throughput screening workflows (UV-Vis plate reader, GC, HPLC) to characterize activity, stability, solvent tolerance and cofactor specificity.</li>
+          <li>Developed a lyophilized-protein stability assay; powder retained at least 75% activity after 22 days at 4&nbsp;°C and −20&nbsp;°C.</li>
+          <li>Designed cloning workflows (Golden Gate, Gibson, site-directed mutagenesis); optimized expression, lysis, formulation and lyophilization; authored SOPs.</li>
         </ul>
       </li>
       <li class="role reveal">
         <header><h3>Postgraduate Researcher</h3><span class="when">Aug 2021 – Aug 2025</span></header>
         <p class="where">Nanyang Technological University (NTU) · Singapore</p>
-        <p class="tldr"><b>Summary</b>Solved a 2.9 Å cryo-EM structure of a 26-heterodimer membrane protein complex; guided four junior researchers.</p>
         <ul>
-          <li>Led a multi-year structural biology project on membrane protein complexes, solving a 2.9 Å cryo-EM structure of the QmcA–YbbJ complex, a 26-heterodimer cage (co-first author, <i>Structure</i>, 2024).</li>
-          <li>Optimized recombinant expression and purification workflows to improve throughput and sample quality; applied cryo-EM and MALDI-TOF/TOF for structural characterization.</li>
-          <li>Planned experiments, delegated work and guided 4 junior researchers through execution and troubleshooting; presented findings to scientific stakeholders.</li>
-          <li>Supported 2 classes of 30+ students, training them in Python.</li>
+          <li>Led a multi-year structural biology project on membrane protein complexes; solved a 2.9 Å cryo-EM structure of the QmcA–YbbJ complex, a 26-heterodimer cage (co-first author, <i>Structure</i>, 2024).</li>
+          <li>Optimized recombinant expression and purification workflows; applied cryo-EM and MALDI-TOF/TOF for structural characterization.</li>
+          <li>Guided 4 junior researchers and presented findings to scientific stakeholders; supported 2 classes of 30+ students in Python.</li>
         </ul>
       </li>
       <li class="role reveal">
         <header><h3>Research Assistant</h3><span class="when">Jul 2020 – Jul 2021</span></header>
         <p class="where">Nanyang Technological University (NTU) · Singapore</p>
-        <p class="tldr"><b>Summary</b>Built bioinformatics pipelines and ran MALDI-MS enzyme activity screens.</p>
         <ul>
           <li>Built bioinformatics data-mining pipelines and biological databases.</li>
-          <li>Conducted MALDI-MS-based enzymatic activity screening; supported laboratory operations, safety compliance and project execution.</li>
+          <li>Ran MALDI-MS enzymatic activity screening; supported laboratory operations and safety compliance.</li>
         </ul>
       </li>
       <li class="role reveal">
@@ -431,7 +382,6 @@
 
   <section id="expertise" aria-labelledby="h-exp2">
     <h2 class="label reveal" id="h-exp2">Core technical expertise</h2>
-    <p class="kicker reveal">Methods and tools used in day-to-day work.</p>
     <div class="skills">
       <div class="skill spot reveal"><h3><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3c0 6 10 6 10 12s-10 3-10 6M17 3c0 6-10 6-10 12s10 3 10 6M8.500 7h7M8.500 17h7"/></svg>Protein &amp; enzyme engineering</h3>
         <ul class="chips"><li>Directed evolution</li><li>Rational design</li><li>Site-directed mutagenesis</li><li>Saturation mutagenesis</li></ul></div>
@@ -467,8 +417,8 @@
       <div>
         <span class="tag">PDB 8Z5G · Cryo-EM · 2.9 Å</span>
         <h3 style="font-size:clamp(26px,3.2vw,36px);letter-spacing:-.035em">The QmcA–YbbJ complex</h3>
-        <p>A membrane protein cage built from 26 heterodimers of the SPFH-family protein QmcA and its NfeD partner YbbJ, from <i>E. coli</i>. Solved during doctoral research at NTU and published in <i>Structure</i> (2024), where I am co-first author.</p>
-        <p class="how">How to read it: every line is a protein chain with one point per amino acid, and the little coils are helices. 52 chains, 11,024 amino acids, 26 identical pairs round a ring about 26&nbsp;nm across.</p>
+        <p>A membrane protein cage of 26 QmcA–YbbJ heterodimers from <i>E. coli</i>, solved by cryo-EM at 2.9 Å. Published in <i>Structure</i> (2024); co-first author.</p>
+        <p class="how">52 chains, 11,024 amino acids; the ring is about 26&nbsp;nm across.</p>
         <p class="links"><a href="https://www.rcsb.org/structure/8Z5G" rel="noopener">View on the Protein Data Bank →</a><a href="https://www.rcsb.org/3d-view/8Z5G" rel="noopener">Turn it around in 3D →</a><a href="https://doi.org/10.1016/j.str.2024.07.022" rel="noopener">Read the paper →</a></p>
       </div>
     </div>
@@ -476,7 +426,6 @@
 
   <section id="papers" aria-labelledby="h-papers">
     <h2 class="label reveal" id="h-papers">Publications</h2>
-    <p class="kicker reveal">Two publications, both 2024.</p>
     <ul class="pubs">
       <li class="pub spot reveal">
         <span class="tag">Research article · Co-first author</span>
@@ -521,23 +470,22 @@
 
   <section id="project" aria-labelledby="h-shop">
     <h2 class="label reveal" id="h-shop">Selected project</h2>
-    <p class="kicker reveal">A personal project in web development.</p>
     <div class="feature project spot reveal">
       <a class="shot" href="virtual-snack-shop.html" aria-label="Open the Virtual Snack Shop"><img src="images/ka-shop.jpg" alt="Inside the Virtual Snack Shop: 3D shelves of snacks, a mini map and another shopper walking past" width="1040" height="585" loading="lazy"></a>
       <div>
         <span class="tag">Personal project</span>
         <h3 style="font-size:clamp(26px,3.2vw,36px);letter-spacing:-.035em">Virtual Snack Shop</h3>
-        <p>A first-person 3D online shop that runs in the browser, built with AI-assisted coding. Customers walk the aisles, inspect products, and check out with PayNow. A Supabase back end keeps stock live and holds items during checkout; a separate owner page manages products and orders.</p>
-        <ul class="chips"><li>First-person 3D in the browser</li><li>Live stock</li><li>Orders held at checkout</li><li>See other shoppers</li><li>Product &amp; stock manager</li><li>three.js</li><li>Supabase</li></ul>
-        <p class="links"><a href="virtual-snack-shop.html">Walk into the shop →</a><a href="https://github.com/tankan7-max/ka-shop" rel="noopener">See the code →</a></p>
+        <p>A first-person 3D online shop built with AI-assisted coding, with live stock and PayNow checkout.</p>
+        <ul class="chips"><li>three.js</li><li>Supabase</li><li>Live stock</li></ul>
+        <p class="links"><a href="virtual-snack-shop.html">Open the shop →</a><a href="https://github.com/tankan7-max/ka-shop" rel="noopener">See the code →</a></p>
       </div>
     </div>
   </section>
 
   <section id="contact" aria-labelledby="h-contact">
     <div class="invite reveal">
-      <h2 id="h-contact"><span class="grad">Let’s collaborate.</span></h2>
-      <p>Enzyme engineering, structural biology, or work that combines the bench with code: I would be glad to hear about it. Collaboration enquiries are especially welcome.</p>
+      <h2 id="h-contact"><span class="grad">Get in touch</span></h2>
+      <p>Open to collaborations in enzyme engineering and structural biology.</p>
       <ul class="hero-actions">
         <li><a class="btn primary" href="mailto:tankan7@gmail.com?subject=Collaboration"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>Get in touch</a></li>
         <li><button class="btn" type="button" data-copy="tankan7@gmail.com" data-done="Copied. Now it’s your move."><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>Copy email</button></li>
@@ -571,12 +519,7 @@
   }
   $$('[data-copy]').forEach(b => b.addEventListener('click', async () => toast(await copyText(b.dataset.copy) ? (b.dataset.done || 'Copied') : 'Could not copy — please select the text instead.')));
 
-  // ----- Rolling line under the name -----
-  const words = ['engineer enzymes', 'solve protein structures', 'screen variants at scale', 'develop biocatalysts'];
-  const wordEl = $('#word');
-  if (!reduce) { let i = 0; setInterval(() => { if (document.hidden) return; wordEl.classList.add('out'); setTimeout(() => { i = (i + 1) % words.length; wordEl.textContent = words[i]; wordEl.classList.remove('out'); }, 320); }, 2700); }
-
-  // ----- Shared by the halo and the structure: a drag-to-turn 3D view that only draws while it is on screen -----
+  // ----- Drag-to-turn 3D view for the structure that only draws while it is on screen -----
   function turner(root, opts) {
     // opts: { yaw, tilt, tiltSwing, auto, pitchSign, minGap, draw(yaw, pitch) }
     let yaw = opts.yaw ?? 0, pitch = opts.tilt, vy = 0, vx = 0, drag = null, idle = 9, raf = 0, last = 0, visible = true, clock = 0, since = 0;
@@ -603,30 +546,6 @@
     new ResizeObserver(size).observe(canvases[0]); size();
   }
 
-  // ----- The halo around the portrait: 26 pairs in a ring, like the 26 QmcA–YbbJ pairs of the real structure -----
-  function makeRing(root) {
-    const [back, front] = $$('canvas', root), cb = back.getContext('2d'), cf = front.getContext('2d'), N = 26, TAU = Math.PI * 2;
-    // Proportions follow the real structure (ring axis up): QmcA sits inside and lower, YbbJ outside and higher. Opened up a little to leave room for the portrait.
-    const R1 = .66, R2 = 1, H1 = -.11, H2 = .2, A = [], B = [];
-    for (let k = 0; k < N; k++) { const t = k / N * TAU, c = Math.cos(t), s = Math.sin(t); A.push([c * R1, H1, s * R1]); B.push([c * R2, H2, s * R2]); }
-    function draw(ay, ax) {
-      const W = back.width, H = back.height, d = W / (back.clientWidth || 1), R = Math.min(W, H) / 2 * .9, ca = Math.cos(ay), sa = Math.sin(ay), cx = Math.cos(ax), sx = Math.sin(ax);
-      const pr = v => { const x1 = v[0] * ca + v[2] * sa, z1 = -v[0] * sa + v[2] * ca, y2 = v[1] * cx - z1 * sx, z2 = v[1] * sx + z1 * cx, s = 3.6 / (3.6 - z2); return { x: W / 2 + x1 * R * s, y: H / 2 - y2 * R * s, z: z2, s }; };
-      cb.clearRect(0, 0, W, H); cf.clearRect(0, 0, W, H);
-      const a = A.map(pr), b = B.map(pr), items = [];
-      for (let k = 0; k < N; k++) { const n = (k + 1) % N; items.push({ z: (a[k].z + b[k].z) / 2, e: [a[k], b[k]], link: true }, { z: (a[k].z + a[n].z) / 2, e: [a[k], a[n]] }, { z: (b[k].z + b[n].z) / 2, e: [b[k], b[n]] }, { z: Math.max(a[k].z, b[k].z), dot: [a[k], b[k]] }); }
-      items.sort((p, q) => p.z - q.z);
-      for (const it of items) {
-        const ctx = it.z >= 0 ? cf : cb; let depth = clamp((it.z + 1.1) / 2.2, 0, 1);
-        const pt = it.e ? it.e[0] : it.dot[0], fade = it.z >= 0 ? clamp((Math.hypot(pt.x - W / 2, pt.y - H / 2) - W * .27) / (W * .07), .12, 1) : 1;   // anything in front of the portrait fades, so it never covers the face
-        depth *= fade;
-        if (it.e) { ctx.strokeStyle = `rgba(255,255,255,${(it.link ? .14 : .05) + depth * (it.link ? .5 : .2)})`; ctx.lineWidth = d * (it.link ? 1.3 : 1); ctx.beginPath(); ctx.moveTo(it.e[0].x, it.e[0].y); ctx.lineTo(it.e[1].x, it.e[1].y); ctx.stroke(); }
-        else [[it.dot[0], '94,234,212', .8], [it.dot[1], '167,139,250', 1]].forEach(([q, col, size]) => { ctx.shadowColor = `rgba(${col},${depth})`; ctx.shadowBlur = it.z > 0 ? 14 * d * depth : 0; ctx.fillStyle = `rgba(${col},${.3 + depth * .7})`; ctx.beginPath(); ctx.arc(q.x, q.y, R * .034 * size * q.s * (.8 + depth * .5), 0, 7); ctx.fill(); ctx.shadowBlur = 0; });
-      }
-    }
-    const ring = turner(root, { yaw: .3, tilt: .95, tiltSwing: .1, auto: .32, draw });
-    fitCanvases([back, front], () => { const [y, p] = ring.now(); draw(y, p); ring.kick(); });
-  }
 
   // ----- The real structure: the protein backbone (one point per amino acid) of PDB 8Z5G -----
   function parseStructure(buf) {
@@ -680,7 +599,6 @@
       const [y, p] = view.now(); draw(y, p); view.kick();
     }));
   }
-  makeRing($('#orbit'));
   showStructure($('#art'));
 
   // ----- Numbers count up when they arrive -----
