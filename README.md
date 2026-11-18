@@ -68,7 +68,7 @@ python sync-products.py
   on the back wall and in order messages.
 - **Products**: each has an `id` (unique, never change it), `name`,
   `category`, `price_sgd`, `pack` and a `model` (size and colour of the pack).
-  The pack shape (bag, box, bar, carton, can, tube, cup, bottle) is worked out from
+  The pack shape (bag, box, bar, roll, hex, carton, can, tube, cup, bottle) is worked out from
   the `pack` text; add `"shape"` to `model` to choose it yourself.
 - **Photos**: set `texture.image_url` to a pack photo. Without one, the shop
   draws the pack from the product's name and colour.
@@ -90,7 +90,7 @@ python sync-products.py
     `products.json` is only the fallback (use **Download backup** now and
     then, upload the file and run `python sync-products.py`).
   - **Add a product**: name, price, pack, shelf, starting stock, pack shape
-    (bag, box, bar, drink packet, can, bottle, tube, cup), size and colour.
+    (bag, box, bar, sweet roll, hexagonal tub, drink packet, can, bottle, tube, cup), size and colour.
   - **Photo of the pack front**: uploaded to the database's file storage and
     shown on the 3D pack. Tick "the photo is the flat artwork" to wrap it
     across the whole front.

@@ -204,7 +204,8 @@
       <legend>How the pack looks</legend>
       <div class="grid">
         <label class="field">Pack shape<select id="f-shape">
-          <option value="bag">Bag (chips, sweets)</option><option value="box">Box</option><option value="bar">Bar or roll (flow-wrap)</option>
+          <option value="bag">Bag (chips, sweets)</option><option value="box">Box</option><option value="bar">Bar (flow-wrapped)</option><option value="roll">Roll on its side (Mentos)</option>
+          <option value="hex">Tall hex tub (Hello Panda)</option>
           <option value="carton">Drink packet</option><option value="can">Can</option><option value="bottle">Bottle</option>
           <option value="tube">Tube (stacked crisps)</option><option value="cup">Cup (noodles)</option>
         </select></label>
@@ -270,7 +271,7 @@ const $ = id => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const n = Object.assign(document.createElement(tag), props); n.append(...kids); return n; };
 const BUCKET = 'product-files';
 // Typical size of each pack shape, in shop units (width, height, depth).
-const SIZES = { bag: [0.5, 0.55, 0.18], box: [0.5, 0.35, 0.22], bar: [0.5, 0.2, 0.12], carton: [0.2, 0.34, 0.13], can: [0.2, 0.36, 0.2], bottle: [0.22, 0.5, 0.22], tube: [0.26, 0.52, 0.26], cup: [0.32, 0.3, 0.32] };
+const SIZES = { roll: [0.36, 0.1, 0.1], hex: [0.22, 0.42, 0.19], bag: [0.5, 0.55, 0.18], box: [0.5, 0.35, 0.22], bar: [0.5, 0.2, 0.12], carton: [0.2, 0.34, 0.13], can: [0.2, 0.36, 0.2], bottle: [0.22, 0.5, 0.22], tube: [0.26, 0.52, 0.26], cup: [0.32, 0.3, 0.32] };
 const ROUND = ['can', 'bottle', 'tube', 'cup'];
 
 let DB_URL = '', DB_KEY = '', session = null, fileDb = null;
@@ -512,7 +513,34 @@ const pvDisc = (r, y, up = true) => new T.CircleGeometry(r, 28).rotateX(up ? -Ma
 const pvDrum = (rTop, rBottom, y0, y1) => new T.CylinderGeometry(rTop, rBottom, y1 - y0, 28).translate(0, (y0 + y1) / 2, 0);
 const pvBlock = (w, h, d, x, y, z) => new T.BoxGeometry(w, h, d).translate(x, y, z);
 const PV_BOX_FACES = [PV_SIDE, PV_SIDE, PV_SIDE, PV_SIDE, PV_ART, PV_ART];
+// A roll of sweets lying on its side: a wrapper tube with twisted, flattened ends. The art runs along the length, once on
+// the front and once on the back (two half-tubes, so each reads the right way up).
+function pvRollTube(L, r, y) {
+  const N = 14, pos = [], nor = [], uv = [], idx = [];
+  [[-Math.PI / 2, false], [Math.PI / 2, true]].forEach(([th0, back]) => {
+    const base = pos.length / 3;
+    for (let i = 0; i <= N; i++) {
+      const t = i / N, th = th0 + t * Math.PI, c = Math.cos(th), s = Math.sin(th);
+      for (let j = 0; j <= 1; j++) { pos.push(j ? L / 2 : -L / 2, y + r * s, r * c); nor.push(0, s, c); uv.push(back ? 1 - j : j, back ? 1 - t : t); }
+    }
+    for (let i = 0; i < N; i++) { const a = base + i * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
+  });
+  const g = new T.BufferGeometry();
+  g.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); g.setAttribute('normal', new T.Float32BufferAttribute(nor, 3)); g.setAttribute('uv', new T.Float32BufferAttribute(uv, 2)); g.setIndex(idx);
+  return g;
+}
+// A six-sided prism with one face to the front. Its width is corner to corner; sz stretches it front to back.
+function pvHexPrism(rad, y0, y1, sz, open) {
+  const g = new T.CylinderGeometry(rad, rad, y1 - y0, 6, 1, !!open).rotateY(-Math.PI / 6).translate(0, (y0 + y1) / 2, 0);
+  g.scale(1, 1, sz); return g;
+}
 const pvLabelShare = p => (p.kind === 'bottle' ? 0.56 : 1);
+// The size, in shop units, of the flat area the pack art is drawn for (so it is not stretched).
+function pvFaceSize(p) {
+  if (p.kind === 'roll') return [p.width * 0.9, Math.PI * Math.min(p.height, p.depth) / 2];
+  if (p.kind === 'hex') return [p.width / 2, p.height * 0.92];
+  return [p.round ? Math.PI * p.width / 2 : p.width, p.height * pvLabelShare(p)];
+}
 function pvPackGeometry(p, w, d) {
   const h = p.height, r = w / 2, top = h / 2, bot = -h / 2;
   switch (p.kind) {
@@ -542,6 +570,22 @@ function pvPackGeometry(p, w, d) {
         { geo: pvTurned([[r * 0.9, bot], [r, bot + h * 0.03], [r, waist]]), mat: PV_ART },
         { geo: pvTurned([[r, waist], [r, waist + h * 0.06], [r * 0.5, top - h * 0.2], [r * 0.36, top - h * 0.16], [r * 0.36, top - h * 0.08]]), mat: PV_SIDE },
         { geo: pvDrum(r * 0.42, r * 0.42, top - h * 0.085, top), mat: PV_WHITE }, { geo: pvDisc(r * 0.9, bot, false), mat: PV_SIDE },
+      ]);
+    }
+    case 'roll': {   // roll of sweets on its side, wrapper twisted shut at both ends
+      const rr = Math.min(h, d) / 2, lt = w * 0.9, fin = w * 0.05, y = bot + rr;
+      return pvJoinParts([
+        { geo: pvRollTube(lt, rr, y), mat: PV_ART },
+        { geo: new T.CircleGeometry(rr, 20).rotateY(Math.PI / 2).translate(lt / 2, y, 0), mat: PV_SIDE }, { geo: new T.CircleGeometry(rr, 20).rotateY(-Math.PI / 2).translate(-lt / 2, y, 0), mat: PV_SIDE },
+        { geo: pvBlock(fin, rr * 1.7, rr * 0.3, lt / 2 + fin / 2, y, 0), mat: PV_SIDE }, { geo: pvBlock(fin, rr * 1.7, rr * 0.3, -lt / 2 - fin / 2, y, 0), mat: PV_SIDE },
+      ]);
+    }
+    case 'hex': {    // tall hexagonal tub: six flat sides, each with the art, and a plastic lid
+      const rad = w / 2, sz = d / (w * 0.866);
+      return pvJoinParts([
+        { geo: pvHexPrism(rad, bot + h * 0.015, top - h * 0.065, sz, true), mat: PV_ART },
+        { geo: pvHexPrism(rad * 1.04, top - h * 0.065, top, sz, false), mat: PV_WHITE },
+        { geo: pvHexPrism(rad * 1.01, bot, bot + h * 0.015, sz, false), mat: PV_SIDE },
       ]);
     }
     case 'carton':
@@ -574,10 +618,11 @@ function pvModelParts(gltf, w, h, d) {
 }
 const pvStd = (color, opts = {}) => new T.MeshStandardMaterial({ color, roughness: 0.8, ...opts });
 function pvPackTexture(p) {
-  const faceW = p.round ? Math.PI * p.width / 2 : p.width;
-  const W = 320, H = Math.round(pvClamp(W * p.height * pvLabelShare(p) / faceW, 96, 640));
+  const [faceW, faceH] = pvFaceSize(p);
+  const W = 320, H = Math.round(pvClamp(W * faceH / faceW, 96, p.kind === 'hex' ? 1280 : 640));
   const tex = pvCanvasTexture(p.round ? W * 2 : W, H, ctx => { pvDrawPack(ctx, p, 0, 0, W, H); if (p.round) pvDrawPack(ctx, p, W, 0, W, H); });
   if (p.round) { tex.wrapS = T.RepeatWrapping; tex.offset.x = 0.25; }
+  if (p.kind === 'hex') { tex.wrapS = T.RepeatWrapping; tex.repeat.x = 6; }   // the same art on all six sides
   return tex;
 }
 // --- The preview itself ---
