@@ -104,6 +104,13 @@
   .totals.grand { border-top: 1px solid #e5e0d5; padding-top: 8px; }
   #free-delivery-hint { margin: -4px 0 10px; }
   .totals b { font-size: 20px; }
+  .fdbar { height: 6px; margin: -2px 0 12px; border-radius: 99px; background: #e5e0d5; overflow: hidden; }
+  .fdbar i { display: block; height: 100%; width: 0; border-radius: inherit; background: linear-gradient(90deg, var(--brand), #6fd3c5); transition: width .3s ease; }
+  .cart-item .contents { font-size: 12px; line-height: 1.35; color: var(--muted); margin: 1px 0 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .tips { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; list-style: none; margin: 14px 0 0; padding: 0; }
+  .tips li { padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: #f8fbfb; font-size: 13px; line-height: 1.38; color: var(--muted); }
+  .tips b { display: block; margin-bottom: 2px; font-size: 13.5px; color: var(--ink); }
+  @media (max-width: 520px) { .tips { grid-template-columns: 1fr; } }
   .row-btns { display: flex; gap: 8px; }
   .row-btns .primary { flex: 1; }
   .line-total { font-weight: 700; text-align: right; }
@@ -120,7 +127,10 @@
   #card-pack { font-size: 13px; color: var(--muted); }
   #card-price { font-size: 20px; font-weight: 800; color: var(--price); margin: 4px 0 8px; }
   #card-price small { font-size: 12px; color: var(--muted); font-weight: 600; margin-left: 6px; }
-  #card .acts { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  #card .acts { display: grid; grid-template-columns: auto 1fr; gap: 8px; align-items: center; }
+  #card-add { grid-column: 2; }
+  #card .acts2 { grid-column: 1 / -1; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 8px; }
+  #card .acts2:not(:has(button:not([hidden]))) { display: none; }
   #card-close { position: absolute; right: 6px; top: 6px; }
 
   /* Mini map and walk controls */
@@ -140,21 +150,33 @@
   #people-colors button[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--ink); }
   #toast { position: fixed; left: 50%; top: calc(var(--bar-h) + 12px); transform: translateX(-50%); z-index: 20; background: rgba(20,26,30,.92); color: #fff; padding: 8px 16px; border-radius: 999px; font-size: 14px; pointer-events: none; max-width: calc(100vw - 30px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-  /* Inspect view: one pack on its own, Resident Evil style — drag to turn it. */
-  #inspect { position: fixed; inset: 0; z-index: 26; display: grid; grid-template-rows: 1fr auto; background: radial-gradient(120% 90% at 50% 38%, #2e404a 0%, #162025 68%, #0d1215 100%); color: #fff; }
-  #inspect-view { position: relative; touch-action: none; cursor: grab; min-height: 0; }
+  /* Inspect view: one pack on its own, Resident Evil style — drag to turn it. A bundle shows its snacks riding glowing rings. */
+  #inspect { position: fixed; inset: 0; z-index: 26; display: grid; grid-template-rows: minmax(0, 1fr) auto; grid-template-columns: minmax(0, 1fr); justify-items: center; background: radial-gradient(120% 90% at 50% 38%, #2e404a 0%, #162025 68%, #0d1215 100%); color: #fff; animation: inspect-fade .3s ease both; }
+  @keyframes inspect-fade { from { opacity: 0; } }
+  @keyframes inspect-rise { from { opacity: 0; transform: translateY(16px); } }
+  #inspect-view { position: relative; width: 100%; touch-action: none; cursor: grab; min-height: 0; }
   #inspect-view.dragging { cursor: grabbing; }
   #inspect-view canvas { display: block; width: 100%; height: 100%; touch-action: none; }
-  #inspect-info { padding: 10px 16px calc(16px + var(--safe-b)); text-align: center; background: linear-gradient(transparent, rgba(0,0,0,.4)); }
-  #inspect-name { font-size: 19px; font-weight: 800; }
-  #inspect-meta { color: #cfd8dc; font-size: 14px; margin: 2px 0 4px; }
-  #inspect-price { font-size: 20px; font-weight: 800; color: #ffd54f; }
-  #inspect-hint { font-size: 13px; color: #9fb0b8; margin: 6px 0 10px; }
-  #inspect-info .acts { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
-  #inspect-info .acts button { min-width: 120px; }
-  #inspect-info .acts button:not(.primary) { color: var(--ink); } /* the overlay text is white; a plain button needs dark text */
+  #inspect-info { min-width: 0; width: min(620px, calc(100% - 20px)); margin: 0 0 calc(14px + var(--safe-b)); padding: 14px 18px 16px; text-align: center; border-radius: 22px; background: rgba(14,22,26,.58); border: 1px solid rgba(255,255,255,.13); backdrop-filter: blur(16px) saturate(1.3); -webkit-backdrop-filter: blur(16px) saturate(1.3); box-shadow: 0 16px 48px rgba(0,0,0,.4); animation: inspect-rise .4s .08s cubic-bezier(.2,.8,.2,1) both; }
+  #inspect-badge { display: inline-block; margin-bottom: 6px; padding: 3px 11px; border-radius: 999px; font-size: 11.5px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: #3b2a00; background: linear-gradient(100deg, #ffd54f, #ffb74d); }
+  #inspect-name { font-size: 21px; font-weight: 800; letter-spacing: -.01em; line-height: 1.2; }
+  #inspect-meta { color: #cfd8dc; font-size: 14px; margin: 3px 0 0; }
+  #inspect-items { display: flex; gap: 6px; justify-content: safe center; margin: 12px 0 0; padding: 0 0 2px; list-style: none; overflow-x: auto; scrollbar-width: none; }
+  #inspect-items::-webkit-scrollbar { display: none; }
+  #inspect-items .chip { flex: none; display: inline-flex; align-items: center; gap: 7px; min-height: 34px; padding: 3px 12px 3px 4px; border-radius: 999px; font-size: 12.5px; font-weight: 600; color: #fff; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.16); transition: background .15s, transform .15s; }
+  #inspect-items .chip:hover { background: rgba(255,255,255,.2); transform: translateY(-1px); }
+  #inspect-items .chip span { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #inspect-items .chip img { width: 26px; height: 26px; object-fit: contain; border-radius: 50%; background: #fff; padding: 2px; }
+  #inspect-hint { font-size: 12.5px; color: #9fb0b8; margin: 10px 0 12px; }
+  #inspect-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px 16px; flex-wrap: wrap; }
+  #inspect-price { font-size: 24px; font-weight: 800; color: #ffd54f; font-variant-numeric: tabular-nums; }
+  #inspect-foot .acts { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; flex: 1 1 auto; justify-content: flex-end; }
+  #inspect-foot .acts button { min-width: 120px; }
+  #inspect-foot .acts button:not(.primary) { color: var(--ink); } /* the overlay text is white; a plain button needs dark text */
   #inspect-close { position: absolute; top: calc(10px + env(safe-area-inset-top, 0px)); right: 12px; background: rgba(255,255,255,.16); color: #fff; border-color: transparent; }
   #inspect-close:hover { background: rgba(255,255,255,.3); }
+  @media (max-width: 520px) { #inspect-foot { justify-content: center; } #inspect-foot .acts { justify-content: center; width: 100%; } #inspect-foot .acts button { flex: 1; } #inspect-name { font-size: 19px; } }
+  @media (prefers-reduced-motion: reduce) { #inspect, #inspect-info { animation: none; } }
 
   dialog { border: 0; border-radius: 18px; padding: 0; width: min(480px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); box-shadow: var(--shadow); color: var(--ink); }
   dialog::backdrop { background: rgba(20,30,35,.45); }
@@ -254,6 +276,7 @@
     <div class="totals"><span>Delivery</span><b id="delivery">—</b></div>
     <div class="totals grand"><span id="count">0 items</span><b id="total">S$0.00</b></div>
     <p id="free-delivery-hint" class="fine" hidden></p>
+    <div id="free-delivery-bar" class="fdbar" hidden><i></i></div>
     <div class="row-btns"><button id="checkout-btn" class="primary" type="button">Checkout</button><button id="clear-btn" type="button">Clear</button></div>
   </footer>
 </aside>
@@ -269,8 +292,8 @@
     <div class="acts">
       <span class="stepper"><button type="button" id="card-minus" aria-label="One fewer">−</button><output id="card-qty">1</output><button type="button" id="card-plus" aria-label="One more">+</button></span>
       <button id="card-add" class="primary" type="button">Add to cart</button>
-      <button id="card-inspect" class="needs3d" type="button" aria-label="Inspect this snack up close">Inspect</button>
-      <button id="card-find" class="needs3d" type="button" aria-label="Walk to this snack in the shop">Find</button>
+      <span class="acts2"><button id="card-inspect" class="needs3d" type="button" aria-label="Inspect this snack up close">Inspect</button>
+      <button id="card-find" class="needs3d" type="button" aria-label="Walk to this snack in the shop">Find</button></span>
     </div>
   </div>
 </section>
@@ -278,13 +301,17 @@
 <section id="inspect" aria-label="Inspect this snack" hidden>
   <div id="inspect-view"></div>
   <div id="inspect-info">
+    <span id="inspect-badge" hidden></span>
     <div id="inspect-name"></div>
     <div id="inspect-meta"></div>
-    <div id="inspect-price"></div>
+    <ul id="inspect-items" aria-label="What is in the box" hidden></ul>
     <p id="inspect-hint">Drag to turn it around · Scroll or pinch to zoom</p>
-    <div class="acts">
-      <button id="inspect-add" class="primary" type="button">Add to cart</button>
-      <button id="inspect-close2" type="button">Back to shop</button>
+    <div id="inspect-foot">
+      <div id="inspect-price"></div>
+      <div class="acts">
+        <button id="inspect-add" class="primary" type="button">Add to cart</button>
+        <button id="inspect-close2" type="button">Back to shop</button>
+      </div>
     </div>
   </div>
   <button id="inspect-close" class="icon quiet" type="button" aria-label="Close inspect view">×</button>
@@ -313,10 +340,12 @@
       <dt>Tap the floor</dt><dd>Walk to that spot</dd>
       <dt>Tap a snack</dt><dd>See it, turn it around with Inspect, and add it to your cart</dd>
     </dl>
-    <p class="fine">In a hurry? <b>Browse</b> lists every snack — search it, add straight to your cart, or press <b>Find</b> to be walked to the right shelf.</p>
-    <p class="fine">Sold-out snacks are marked “Out of stock” on the shelf and in the list.</p>
-    <p class="fine">At checkout, scan the PayNow QR to pay, tick “I’ve paid”, then send your order on WhatsApp.</p>
-    <p class="fine">Delivery is free over S$15, otherwise S$1.00 — add your delivery address at checkout. The Bundles table by the entrance has ready-made boxes of snacks.</p>
+    <ul class="tips">
+      <li><b>Browse</b>Search every snack, add it to your cart, or press Find to be walked to its shelf.</li>
+      <li><b>Bundles</b>Ready-made boxes on the table by the entrance. Inspect one to watch the snacks orbit.</li>
+      <li><b>Delivery</b>Free over S$15, otherwise S$1.00. Add your address at checkout.</li>
+      <li><b>Pay</b>Scan the PayNow QR, tick “I’ve paid”, then send your order on WhatsApp.</li>
+    </ul>
     <div class="dialog-btns"><button class="primary" type="button" data-close-dialog>Start shopping</button></div>
     <p style="text-align:center;margin-top:16px"><a href="ka.html" style="color:var(--brand);font-weight:600">Built by Tan Kwan Ann →</a></p>
   </div>
@@ -327,7 +356,7 @@
     <h2 id="checkout-title">Your order</h2>
     <ul id="order-lines"></ul>
     <label>Your name (optional)<input id="order-name" autocomplete="name" maxlength="80"></label>
-    <label>Delivery address<textarea id="order-address" rows="2" maxlength="300" placeholder="Block and street, unit number — where should we bring your snacks?" autocomplete="street-address"></textarea></label>
+    <label>Delivery address (required)<textarea id="order-address" rows="2" maxlength="300" placeholder="Block and street, unit number — where should we bring your snacks?" autocomplete="street-address"></textarea></label>
     <p class="fine">Delivery is free for orders of S$15 and over, otherwise S$1.00.</p>
     <label>Note for the shop (optional)<textarea id="order-note" rows="2" maxlength="400" placeholder="Anything else — gate code, a time that suits you…"></textarea></label>
     <div id="paynow-box" hidden>
@@ -441,7 +470,16 @@ const stockOf = p => {
   return Object.prototype.hasOwnProperty.call(INVENTORY, p.id) ? INVENTORY[p.id] : Infinity;
 };
 const inStock = p => stockOf(p) > 0;
-const maxQty = p => Math.min(99, stockOf(p));       // the most of one snack a cart can hold
+// A bundle uses one of each snack inside it, so the cart is checked against the stock of every snack
+// it needs: a box and the same snack bought on its own can never add up to more than is on the shelf.
+const cartDemand = skip => { const d = new Map(); cart.forEach((q, p) => { if (p !== skip) (p.isBundle ? p.items : [p]).forEach(x => d.set(x, (d.get(x) || 0) + q)); }); return d; };
+const maxQty = p => {                                 // the most of this line the cart can hold, given everything else in it
+  const others = cartDemand(p), per = new Map();
+  (p.isBundle ? p.items : [p]).forEach(x => per.set(x, (per.get(x) || 0) + 1));
+  let most = 99;
+  per.forEach((n, x) => { const have = Object.prototype.hasOwnProperty.call(INVENTORY, x.id) ? INVENTORY[x.id] : Infinity; most = Math.min(most, Math.floor((have - (others.get(x) || 0)) / n)); });
+  return Math.max(0, most);
+};
 const stockNote = p => { const n = stockOf(p); return n <= 0 ? 'Out of stock' : n <= LOW_STOCK ? `Only ${n} left` : ''; };
 if (usingFallback) {
   $('data-note').textContent = 'Showing the built-in product list because products.json could not be read. Changes to products.json will not appear until the shop is opened from a web server (not straight from a file).';
@@ -705,7 +743,7 @@ function setQty(p, q) { showCartNote([]); if (q <= 0) cart.delete(p); else cart.
 function addToCart(p, n = 1) {
   if (!inStock(p)) { showToast(`${p.name} is out of stock`); return; }
   const have = cart.get(p) || 0, room = maxQty(p) - have;
-  if (room <= 0) { showToast(stockOf(p) < 99 ? `Only ${stockOf(p)} in stock — all in your cart` : 'That is the most per order'); return; }
+  if (room <= 0) { showToast(stockOf(p) < 99 ? `Only ${stockOf(p)} in stock — all of them are in your cart` : 'That is the most per order'); return; }
   const adding = Math.min(n, room);
   setQty(p, have + adding);
   showToast(`Added ${adding > 1 ? adding + ' × ' : ''}${p.name}` + (adding < n ? ` (only ${stockOf(p)} in stock)` : ''));
@@ -723,7 +761,7 @@ function renderCart() {
   cart.forEach((qty, p) => {
     const remove = el('button', { type: 'button', className: 'quiet', textContent: 'Remove', onclick: () => setQty(p, 0) }); remove.setAttribute('aria-label', `Remove ${p.name}`);
     list.append(el('div', { className: 'item cart-item' }, thumbBox(p),
-      el('div', {}, el('div', { className: 'name', textContent: p.name }), el('div', { className: 'meta', textContent: `${money(p.price)} each` + (qty >= stockOf(p) ? ` · all ${qty} in stock` : '') }), el('div', { className: 'acts' }, stepper(p, qty), remove)),
+      el('div', {}, el('div', { className: 'name', textContent: p.name }), el('div', { className: 'meta', textContent: `${money(p.price)} each` + (qty >= maxQty(p) && maxQty(p) < 99 ? (qty >= stockOf(p) ? ` · all ${qty} in stock` : ' · the rest are in your cart') : '') }), p.isBundle ? el('div', { className: 'contents', textContent: p.items.map(x => x.name).join(' · ') }) : '', el('div', { className: 'acts' }, stepper(p, qty), remove)),
       el('div', { className: 'line-total', textContent: money(qty * p.price) })));
   });
   const { subtotal, delivery, total, count } = cartTotals();
@@ -734,6 +772,7 @@ function renderCart() {
   const hint = $('free-delivery-hint');
   if (count && subtotal < FREE_DELIVERY_AT) { hint.textContent = `Add ${money(FREE_DELIVERY_AT - subtotal)} more for free delivery.`; hint.hidden = false; }
   else hint.hidden = true;
+  $('free-delivery-bar').hidden = !count || subtotal >= FREE_DELIVERY_AT; $('free-delivery-bar').firstElementChild.style.width = Math.min(100, subtotal / FREE_DELIVERY_AT * 100) + '%';
   $('cart-count').textContent = count; $('cart-sum').textContent = count ? money(total) : '';
   $('cart-btn').setAttribute('aria-label', `Cart: ${count} item${count === 1 ? '' : 's'}, ${money(total)}`);
   $('checkout-btn').disabled = $('clear-btn').disabled = !count;
@@ -772,7 +811,7 @@ function updateCard() {
   $('card-add').textContent = !stocked ? 'Out of stock' : room <= 0 ? 'All in your cart' : cardQty > 1 ? `Add ${cardQty} · ${money(cardQty * selected.price)}` : 'Add to cart';
   $('card-add').disabled = room <= 0;
   $('card-minus').disabled = cardQty <= 1; $('card-plus').disabled = cardQty >= room;
-  $('card-inspect').hidden = !stocked || !!selected.isBundle;   // a box is not inspected up close
+  $('card-inspect').hidden = !stocked; $('card-inspect').setAttribute('aria-label', selected.isBundle ? 'Inspect this bundle up close' : 'Inspect this snack up close');
   $('card-find').hidden = !stocked;
 }
 function selectProduct(p) {
@@ -811,7 +850,7 @@ function applyListFilter() {
   $('no-results').textContent = q ? `No snacks match "${q}" — try another search or choose All.` : 'No snacks in this category yet.';
   $('no-results').hidden = anyVisible;
 }
-[['All', PRODUCTS.length], ...CATS.map(c => [c.name, c.items.length])].forEach(([name, n]) => {
+[['All', PRODUCTS.length + BUNDLES.length], ...(BUNDLES.length ? [['Bundles', BUNDLES.length]] : []), ...CATS.map(c => [c.name, c.items.length])].forEach(([name, n]) => {
   const b = el('button', { type: 'button', textContent: `${name} (${n})` }); b.setAttribute('aria-pressed', String(name === 'All'));
   b.onclick = () => { activeCat = name; $('chips').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); applyListFilter(); };
   $('chips').appendChild(b);
@@ -835,7 +874,8 @@ CATS.forEach(cat => {
 // Bundles first: ready-made boxes, with a Find that walks to the Bundles table.
 if (BUNDLES.length) {
   const dot = el('span', { className: 'dot' }); dot.style.background = '#2a9d8f';
-  const section = el('section', {}, el('div', { className: 'cat-head' }, el('h3', {}, dot, 'Bundles')));
+  const go = el('button', { type: 'button', className: 'needs3d', textContent: 'Walk to table', onclick: () => { closeDrawersOnSmallScreens(); world.goToBundles(); } });
+  const section = el('section', {}, el('div', { className: 'cat-head' }, el('h3', {}, dot, 'Bundles'), go));
   section.dataset.cat = 'Bundles';
   BUNDLES.forEach(b => {
     const find = el('button', { type: 'button', className: 'needs3d', textContent: 'Find', onclick: () => { closeDrawersOnSmallScreens(); world.findProduct(b); } }); find.setAttribute('aria-label', `Find ${b.name} in the shop`);
@@ -1689,6 +1729,7 @@ function startWorld(THREE) {
       p.shelf.meshes.forEach(m => { m.count = n; m.visible = n > 0; });
       p.shelf.tags.forEach(t => { t.visible = n > 0; }); p.shelf.soldTag.visible = n <= 0;
     });
+    BUNDLES.forEach(b => { if (b.plate) b.plate.paint(); });    // a bundle is gone when any of its snacks is
     placeOutline(hoverBox);
     if (selectedItem && selected && selectedItem.index >= stockOf(selected)) placeOutline(selectBox);   // the outlined pack is gone
     redraw();
@@ -1711,7 +1752,7 @@ function startWorld(THREE) {
     [[new THREE.BoxGeometry(3.6, 0.9, 1.2), std(0x2f6f68), 0, 0.45], [new THREE.BoxGeometry(3.8, 0.06, 1.35), std(0xcaa776, { roughness: 0.5 }), 0, 0.93]]
       .forEach(([geo, material, x, y]) => { const m = new THREE.Mesh(geo, material); m.position.set(x, y, 0); bundleTable.add(m); clickable.push(m); });
     const bundleSign = new THREE.Sprite(new THREE.SpriteMaterial({ map: signTexture('Bundles', '#2a9d8f', 512, 140) }));
-    bundleSign.scale.set(1.6, 0.44, 1); bundleSign.position.set(0, 2.35, 0); bundleTable.add(bundleSign);
+    bundleSign.scale.set(2.2, 0.6, 1); bundleSign.position.set(0, 2.55, 0); bundleTable.add(bundleSign);
     shelfGlow(BUNDLE_TABLE.x, 2.6, BUNDLE_TABLE.z, 14, 8);
     const BOX_W = 1.7, BOX_D = 0.95, BOX_H = 0.15, BOX_T = 0.05;
     BUNDLES.forEach((b, bi) => {
@@ -1731,6 +1772,26 @@ function startWorld(THREE) {
         mesh.instanceMatrix.needsUpdate = true;
         mesh.userData.bundle = b; box.add(mesh); clickable.push(mesh);
       });
+      // A name card leaning in front of each box: what it is, what it costs, what you save, and when it is gone.
+      const cv = document.createElement('canvas'); cv.width = 640; cv.height = 190;
+      const plateTex = new THREE.CanvasTexture(cv); plateTex.colorSpace = THREE.SRGBColorSpace; plateTex.anisotropy = maxAniso;
+      const paint = () => {
+        const g = cv.getContext('2d'), w = cv.width, h = cv.height, out = !inStock(b), left = stockOf(b);
+        g.clearRect(0, 0, w, h); g.fillStyle = '#fffdf6'; roundRect(g, 0, 0, w, h, 24); g.fill();
+        g.fillStyle = out ? '#9aa4a9' : '#2a9d8f'; g.save(); roundRect(g, 0, 0, w, h, 24); g.clip(); g.fillRect(0, 0, 16, h); g.restore();
+        g.textBaseline = 'middle'; g.textAlign = 'left'; g.fillStyle = out ? '#7a8389' : '#1d2327';
+        fitOneLine(g, b.name, w - 64, 56, '800'); g.fillText(b.name, 40, 50);
+        g.font = `600 27px ${FONT}`; g.fillStyle = out ? '#7a8389' : '#5f6b70';
+        g.fillText(out ? 'Out of stock' : `${b.items.length} snacks${b.save > 0 ? ` · save ${money(b.save)}` : ''}`, 40, 112);
+        if (!out && left <= LOW_STOCK) { g.fillStyle = '#c62828'; g.font = `700 25px ${FONT}`; g.fillText(`Only ${left} left`, 40, 152); }
+        const price = money(b.price); g.font = `800 50px ${FONT}`; const pw = g.measureText(price).width + 36;
+        g.fillStyle = out ? '#e3e6e8' : '#ffd54f'; roundRect(g, w - pw - 24, h - 92, pw, 70, 16); g.fill();
+        g.fillStyle = out ? '#7a8389' : '#b71c1c'; g.textAlign = 'center'; g.fillText(price, w - pw / 2 - 24, h - 55);
+        plateTex.needsUpdate = true;
+      };
+      const plate = new THREE.Mesh(new THREE.PlaneGeometry(0.84, 0.249), new THREE.MeshBasicMaterial({ map: plateTex, transparent: true }));
+      plate.position.set(0, 0.1, BOX_D / 2 + 0.15); plate.rotation.x = -0.85; plate.userData.bundle = b; box.add(plate); clickable.push(plate);
+      b.plate = { paint }; paint();
       box.updateMatrixWorld(true);
     });
     bundleTable.updateMatrixWorld(true); addObstacle(bundleTable); floorShadow(BUNDLE_TABLE.x, BUNDLE_TABLE.z, 4.4, 2.0);
@@ -1842,6 +1903,11 @@ function startWorld(THREE) {
     if (!inStock(b)) { selectProduct(b); return; }
     const spot = nearestFree(BUNDLE_TABLE.x, BUNDLE_TABLE.z + 2.1);
     selectProduct(b);
+    walkTo(spot, lookAtFrom(spot, { x: BUNDLE_TABLE.x, y: 1.2, z: BUNDLE_TABLE.z }));
+  }
+  function goToBundles() {
+    if (!BUNDLES.length) return;
+    const spot = nearestFree(BUNDLE_TABLE.x, BUNDLE_TABLE.z + 2.1);
     walkTo(spot, lookAtFrom(spot, { x: BUNDLE_TABLE.x, y: 1.2, z: BUNDLE_TABLE.z }));
   }
   function showSelection(p, it) { placeOutline(selectBox, p, it); selectProduct(p); }
@@ -1987,6 +2053,7 @@ function startWorld(THREE) {
   const inspectEl = $('inspect'), inspectView = $('inspect-view');
   let inspectRenderer = null, inspectScene = null, inspectCamera = null, inspectPack = null, inspectRaf = 0, inspectPrevT = 0;
   let inspectRotY = 0.5, inspectRotX = 0.15, inspectZoom = 1, inspectBase = 1, inspectLastTouch = 0;
+  let inspectRings = null, inspectClock = 0, inspectPulse = null, inspectRadius = 0;   // a bundle: its snacks riding rings
   const inspectPointers = new Map();
   let inspectPinchD = 0;
 
@@ -1995,6 +2062,10 @@ function startWorld(THREE) {
     const w = inspectView.clientWidth || 1, h = inspectView.clientHeight || 1;
     inspectRenderer.setSize(w, h, false);
     inspectCamera.aspect = w / h; inspectCamera.updateProjectionMatrix();
+    if (inspectRadius) {   // the rings must fit across as well as up: use the narrower of the two views
+      const half = Math.min(THREE.MathUtils.degToRad(20), Math.atan(Math.tan(THREE.MathUtils.degToRad(20)) * w / h));
+      inspectBase = inspectRadius * 0.92 / Math.sin(half);
+    }
   }
   function inspectDisposePack() {
     if (!inspectPack) return;
@@ -2010,8 +2081,9 @@ function startWorld(THREE) {
     if (!inspectP) return;
     const dt = inspectPrevT ? Math.min(0.05, (now - inspectPrevT) / 1000) : 0;
     inspectPrevT = now;
-    if (!inspectPointers.size && now - inspectLastTouch > 2500) inspectRotY += dt * 0.45;
+    if (!inspectPointers.size && now - inspectLastTouch > 2500 && !reduceMotion) inspectRotY += dt * (inspectRings ? 0.16 : 0.45);
     if (inspectPack) { inspectPack.rotation.y = inspectRotY; inspectPack.rotation.x = inspectRotX; }
+    if (inspectRings) tickRings(dt, now);
     inspectCamera.position.set(0, inspectBase * 0.25, inspectBase * inspectZoom);
     inspectCamera.lookAt(0, 0, 0);
     inspectRenderer.render(inspectScene, inspectCamera);
@@ -2053,6 +2125,93 @@ function startWorld(THREE) {
     inspectZoom = clamp(inspectZoom * (1 + e.deltaY * 0.001), 0.6, 2.2);
     inspectLastTouch = performance.now();
   }
+  // --- Bundles: every snack rides its own glowing ring, and the rings spin and tilt round a bright core,
+  // like the Ten Rings. Each ring leaves a fading comet trail behind its snack. Drag still turns the lot.
+  const RING_SNACK = 0.62;                                 // how tall each snack looks on its ring
+  const RING_SPEED = 0.5, RING_FIRST = 0.95, RING_STEP = 0.2;
+  function ringTexture(mirror) {                           // a band that is brightest at its head and fades away behind it, with engraved ticks
+    const c = document.createElement('canvas'); c.width = 1024; c.height = 64; const g = c.getContext('2d');
+    for (let x = 0; x < c.width; x++) {
+      const a = 0.22 + 0.78 * Math.pow(1 - x / c.width, 2.2);
+      g.fillStyle = `rgba(255,255,255,${a * 0.5})`; g.fillRect(x, 0, 1, 64);
+      g.fillStyle = `rgba(255,255,255,${a})`; g.fillRect(x, 0, 1, 5); g.fillRect(x, 59, 1, 5);
+    }
+    g.globalCompositeOperation = 'destination-out'; g.fillStyle = 'rgba(0,0,0,0.5)';
+    for (let k = 0; k < 96; k++) g.fillRect(k * (c.width / 96), 12, 3, 40);
+    const t = new THREE.CanvasTexture(c); t.wrapS = THREE.RepeatWrapping; t.colorSpace = THREE.SRGBColorSpace;
+    if (mirror) { t.repeat.x = -1; t.offset.x = 0.25; } else t.offset.x = -0.25;   // the head sits where the snack is
+    return t;
+  }
+  function glowTexture() {
+    const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'), r = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+    r.addColorStop(0, 'rgba(255,255,255,1)'); r.addColorStop(0.25, 'rgba(255,255,255,.45)'); r.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = r; g.fillRect(0, 0, 128, 128);
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+  }
+  function inspectObjectFor(p) {                           // one pack, built the same way as on the shelf
+    if (p.customParts) {   // the uploaded 3D model: its materials are shared with the shelf, so they are not thrown away afterwards
+      const g = new THREE.Group();
+      p.customParts.forEach(({ geo, material }) => { const m = new THREE.Mesh(geo.clone(), material); m.userData.shared = true; g.add(m); });
+      return g;
+    }
+    const m = packMesh(p, p.width, p.depth, 1); m.setMatrixAt(0, new THREE.Matrix4()); m.instanceMatrix.needsUpdate = true; return m;
+  }
+  function buildRings(b) {
+    const sys = new THREE.Group(), count = Math.min(b.items.length, 6), rings = [];
+    const additive = { transparent: true, depthWrite: false, blending: THREE.AdditiveBlending };
+    for (let i = 0; i < count; i++) {
+      const colour = new THREE.Color(shade(b.items[i].color, 0.3)), r = RING_FIRST + i * RING_STEP, dir = i % 2 ? -1 : 1;
+      const holder = new THREE.Group(); holder.rotation.set(0.45 + (i % 3) * 0.32, i * 2.4, 0, 'YXZ'); sys.add(holder);   // each ring is tilted its own way
+      const spin = new THREE.Group(); holder.add(spin);
+      spin.add(new THREE.Mesh(new THREE.CylinderGeometry(r, r, 0.11, 160, 1, true), new THREE.MeshBasicMaterial({ map: ringTexture(dir < 0), color: colour, side: THREE.DoubleSide, ...additive })));
+      [-0.055, 0.055].forEach(y => spin.add(new THREE.Mesh(new THREE.TorusGeometry(r, 0.005, 6, 160).rotateX(Math.PI / 2).translate(0, y, 0), new THREE.MeshBasicMaterial({ color: colour, opacity: 0.55, ...additive }))));
+      rings.push({ holder, spin, r, speed: dir * (RING_SPEED + 0.1 * i), phase: i * 2.1, packs: [] });
+    }
+    b.items.forEach((p, j) => {
+      const ring = rings[j % count], slot = new THREE.Group(), arm = new THREE.Group(), pack = new THREE.Group(), k = RING_SNACK / Math.max(p.width, p.height, p.depth, 0.05);
+      slot.rotation.y = Math.floor(j / count) * Math.PI;    // a seventh snack and beyond ride opposite the first
+      arm.position.set(ring.r, 0, 0); pack.scale.setScalar(k); pack.add(inspectObjectFor(p));
+      arm.add(pack); slot.add(arm); ring.spin.add(slot); ring.packs.push({ slot, pack, r: ring.r, k, j });
+    });
+    // The core: a small bright sun with a soft halo, and a little drifting dust to give the space some depth.
+    sys.add(new THREE.Mesh(new THREE.SphereGeometry(0.1, 24, 16), new THREE.MeshBasicMaterial({ color: 0xfff1d0 })));
+    const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTexture(), color: 0xffd28a, opacity: 0.9, ...additive })); halo.scale.set(1.5, 1.5, 1); sys.add(halo);
+    let seed = hashOf(b.id); const rnd = () => { seed = Math.imul(seed ^ seed >>> 15, 2246822507) >>> 0; return seed / 2 ** 32; };
+    const dust = new Float32Array(90 * 3);
+    for (let i = 0; i < 90; i++) { const a = rnd() * Math.PI * 2, c = rnd() * 2 - 1, d = 0.5 + rnd() * (count * RING_STEP + 1.1), sn = Math.sqrt(1 - c * c); dust.set([d * sn * Math.cos(a), d * c, d * sn * Math.sin(a)], i * 3); }
+    const dg = new THREE.BufferGeometry(); dg.setAttribute('position', new THREE.BufferAttribute(dust, 3));
+    sys.add(new THREE.Points(dg, new THREE.PointsMaterial({ color: 0xffe2a8, size: 0.03, opacity: 0.55, ...additive })));
+    inspectRadius = RING_FIRST + (count - 1) * RING_STEP + RING_SNACK * 0.6;
+    inspectRings = { rings, sys };
+    return sys;
+  }
+  const _rq = new THREE.Quaternion(), _ry = new THREE.Quaternion(), _rv = new THREE.Vector3(), _up = new THREE.Vector3(0, 1, 0);
+  function tickRings(dt, now) {
+    inspectClock += dt * (reduceMotion ? 0.15 : 1);
+    const pulse = inspectPulse ? Math.sin(Math.PI * clamp((now - inspectPulse.t0) / 1100, 0, 1)) * 0.4 : 0;
+    inspectRings.rings.forEach(R => {
+      R.spin.rotation.y = R.phase + R.speed * inspectClock;
+      R.packs.forEach(pk => {
+        // Packs stay upright and face away from the core, whichever way their ring is tilted.
+        _rq.copy(R.holder.quaternion).multiply(R.spin.quaternion).multiply(pk.slot.quaternion);
+        _rv.set(pk.r, 0, 0).applyQuaternion(_rq);
+        _ry.setFromAxisAngle(_up, Math.atan2(_rv.x, _rv.z));
+        pk.pack.quaternion.copy(_rq.invert().multiply(_ry));
+        pk.pack.scale.setScalar(pk.k * (1 + (inspectPulse && inspectPulse.j === pk.j ? pulse : 0)));
+      });
+    });
+    if (inspectPulse && now - inspectPulse.t0 > 1100) inspectPulse = null;
+  }
+  function fillInspectChips(b) {
+    const ul = $('inspect-items'); ul.textContent = '';
+    b.items.forEach((p, j) => {
+      const img = new Image(); img.alt = ''; img.src = p.thumbDirect || thumbUrl(p);
+      const chip = el('button', { type: 'button', className: 'chip', title: `${p.name} · ${money(p.price)}`, onclick: () => { inspectPulse = { j, t0: performance.now() }; inspectLastTouch = performance.now(); } }, img, el('span', { textContent: p.name }));
+      chip.setAttribute('aria-label', `Show ${p.name} in the rings`);
+      ul.append(el('li', {}, chip));
+    });
+    ul.hidden = false;
+  }
   function setInspectAdd() {
     const room = maxQty(inspectP) - (cart.get(inspectP) || 0);
     $('inspect-add').disabled = room <= 0;
@@ -2083,20 +2242,25 @@ function startWorld(THREE) {
       $('inspect-add').onclick = () => { if (inspectP) { addToCart(inspectP, cardQty); cardQty = 1; updateCard(); setInspectAdd(); } };
     }
     inspectDisposePack();
-    if (p.customParts) {   // the uploaded 3D model: its materials are shared with the shelf, so they are not thrown away afterwards
-      inspectPack = new THREE.Group();
-      p.customParts.forEach(({ geo, material }) => { const m = new THREE.Mesh(geo.clone(), material); m.userData.shared = true; inspectPack.add(m); });
+    inspectRings = null; inspectRadius = 0; inspectPulse = null; inspectClock = 0;
+    $('inspect-items').hidden = true; $('inspect-badge').hidden = true;
+    if (p.isBundle) {
+      inspectPack = buildRings(p);
+      inspectRotY = 0.4; inspectRotX = 0.3; inspectZoom = 1;
+      fillInspectChips(p);
+      $('inspect-badge').textContent = `Bundle · ${p.items.length} snacks` + (p.save > 0 ? ` · save ${money(p.save)}` : ''); $('inspect-badge').hidden = false;
+      $('inspect-meta').textContent = p.blurb || p.pack;
+      $('inspect-hint').textContent = 'Drag to spin the rings · Scroll or pinch to zoom · Tap a snack below to spotlight it';
     } else {
-      inspectPack = packMesh(p, p.width, p.depth, 1);
-      inspectPack.setMatrixAt(0, new THREE.Matrix4());
-      inspectPack.instanceMatrix.needsUpdate = true;
+      inspectPack = inspectObjectFor(p);
+      const size = Math.max(p.width, p.height, p.depth);
+      inspectBase = (size * 0.62) / Math.tan(THREE.MathUtils.degToRad(20));
+      inspectRotY = 0.5; inspectRotX = 0.15; inspectZoom = 1;
+      $('inspect-meta').textContent = `${p.category} · ${p.pack}`;
+      $('inspect-hint').textContent = 'Drag to turn it around · Scroll or pinch to zoom';
     }
     inspectScene.add(inspectPack);
-    const size = Math.max(p.width, p.height, p.depth);
-    inspectBase = (size * 0.62) / Math.tan(THREE.MathUtils.degToRad(20));
-    inspectRotY = 0.5; inspectRotX = 0.15; inspectZoom = 1;
     $('inspect-name').textContent = p.name;
-    $('inspect-meta').textContent = `${p.category} · ${p.pack}`;
     $('inspect-price').textContent = money(p.price);
     setInspectAdd();
     inspectEl.hidden = false;
@@ -2108,7 +2272,7 @@ function startWorld(THREE) {
   }
   function closeInspect() {
     if (!inspectP) return;
-    inspectP = null;
+    inspectP = null; inspectRings = null; inspectRadius = 0; inspectPulse = null;
     cancelAnimationFrame(inspectRaf);
     inspectPrevT = 0;
     inspectDisposePack();
@@ -2274,7 +2438,7 @@ function startWorld(THREE) {
   applyStock();
   loadModels();
   frame();
-  return { applyStock, findProduct, selectedPack: () => selectedItem, goToCategory, resetView, clearSelection: () => placeOutline(selectBox), inspect: openInspect, closeInspect, inspectOpen: () => inspectP !== null };
+  return { applyStock, findProduct, goToBundles, selectedPack: () => selectedItem, goToCategory, resetView, clearSelection: () => placeOutline(selectBox), inspect: openInspect, closeInspect, inspectOpen: () => inspectP !== null };
 }
 
 try {
