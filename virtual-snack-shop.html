@@ -444,10 +444,10 @@ document.title = SHOP.name;
 $('brand-name').textContent = $('splash-title').textContent = SHOP.name;
 
 // What kind of pack is it? Decides the 3D shape. Set "shape" in a product's "model" to choose
-// yourself (bag, box, bar, carton, can, tube, cup or bottle); otherwise it is worked out from the pack text.
+// yourself (bag, box, bar, roll, hex, carton, can, tube, cup or bottle); otherwise it is worked out from the pack text.
 const ROUND_KINDS = ['can', 'tube', 'cup', 'bottle'];
 function packKind(p, m) {
-  const known = ['bag', 'box', 'bar', 'carton', 'can', 'tube', 'cup', 'bottle'];
+  const known = ['bag', 'box', 'bar', 'roll', 'hex', 'carton', 'can', 'tube', 'cup', 'bottle'];
   if (known.includes(m.shape)) return m.shape;
   const pack = (p.pack || '').toLowerCase();
   if (m.type === 'cylinder') return /bottle/.test(pack) ? 'bottle' : /tube/.test(pack) ? 'tube' : /cup|bowl|tub/.test(pack) ? 'cup' : 'can';
@@ -1308,12 +1308,19 @@ function startWorld(THREE) {
     }
     geo.computeVertexNormals(); return geo;
   }
+  // The size, in shop units, of the flat area the pack art is drawn for (so it is not stretched).
+  function faceSize(p) {
+    if (p.kind === 'roll') return [p.width * 0.9, Math.PI * Math.min(p.height, p.depth) / 2];
+    if (p.kind === 'hex') return [p.width / 2, p.height * 0.92];
+    return [p.round ? Math.PI * p.width / 2 : p.width, p.height * labelShare(p)];
+  }
   function packTexture(p) {
     // Cans, tubes and cups have the art twice around; everything else has it on the front and back.
-    const faceW = p.round ? Math.PI * p.width / 2 : p.width;
-    const W = 320, H = Math.round(clamp(W * p.height * labelShare(p) / faceW, 96, 640));
+    const [faceW, faceH] = faceSize(p);
+    const W = 320, H = Math.round(clamp(W * faceH / faceW, 96, p.kind === 'hex' ? 1280 : 640));
     const tex = canvasTexture(p.round ? W * 2 : W, H, ctx => { drawPack(ctx, p, 0, 0, W, H); if (p.round) drawPack(ctx, p, W, 0, W, H); });
     if (p.round) { tex.wrapS = THREE.RepeatWrapping; tex.offset.x = 0.25; }
+    if (p.kind === 'hex') { tex.wrapS = THREE.RepeatWrapping; tex.repeat.x = 6; }   // the same art on all six sides
     // When the product's photo arrives, every pack picture still in use is drawn again.
     const repaint = () => { const ctx = tex.image.getContext('2d'); drawPack(ctx, p, 0, 0, W, H); if (p.round) drawPack(ctx, p, W, 0, W, H); tex.needsUpdate = true; redraw(); };
     p.repaints = p.repaints || new Set(); p.repaints.add(repaint);
@@ -1350,6 +1357,28 @@ function startWorld(THREE) {
   const drum = (rTop, rBottom, y0, y1) => new THREE.CylinderGeometry(rTop, rBottom, y1 - y0, 28).translate(0, (y0 + y1) / 2, 0);
   const block = (w, h, d, x, y, z) => new THREE.BoxGeometry(w, h, d).translate(x, y, z);
   const BOX_FACES = [SIDE, SIDE, SIDE, SIDE, ART, ART];      // a box has the art on its front and back
+
+  // A roll of sweets lying on its side: a wrapper tube with twisted, flattened ends. The art runs along the length, once on
+  // the front and once on the back (two half-tubes, so each reads the right way up).
+  function rollTube(L, r, y) {
+    const N = 14, pos = [], nor = [], uv = [], idx = [];
+    [[-Math.PI / 2, false], [Math.PI / 2, true]].forEach(([th0, back]) => {
+      const base = pos.length / 3;
+      for (let i = 0; i <= N; i++) {
+        const t = i / N, th = th0 + t * Math.PI, c = Math.cos(th), s = Math.sin(th);
+        for (let j = 0; j <= 1; j++) { pos.push(j ? L / 2 : -L / 2, y + r * s, r * c); nor.push(0, s, c); uv.push(back ? 1 - j : j, back ? 1 - t : t); }
+      }
+      for (let i = 0; i < N; i++) { const a = base + i * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
+    });
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); g.setIndex(idx);
+    return g;
+  }
+  // A six-sided prism with one face to the front. Its width is corner to corner; sz stretches it front to back.
+  function hexPrism(rad, y0, y1, sz, open) {
+    const g = new THREE.CylinderGeometry(rad, rad, y1 - y0, 6, 1, !!open).rotateY(-Math.PI / 6).translate(0, (y0 + y1) / 2, 0);
+    g.scale(1, 1, sz); return g;
+  }
   // How much of the pack's height the printed label covers (the art is drawn to fit that).
   const labelShare = p => (p.kind === 'bottle' ? 0.56 : 1);
 
@@ -1382,6 +1411,22 @@ function startWorld(THREE) {
           { geo: turned([[r * 0.9, bot], [r, bot + h * 0.03], [r, waist]]), mat: ART },
           { geo: turned([[r, waist], [r, waist + h * 0.06], [r * 0.5, top - h * 0.2], [r * 0.36, top - h * 0.16], [r * 0.36, top - h * 0.08]]), mat: SIDE },
           { geo: drum(r * 0.42, r * 0.42, top - h * 0.085, top), mat: WHITE }, { geo: disc(r * 0.9, bot, false), mat: SIDE },
+        ]);
+      }
+      case 'roll': {   // roll of sweets on its side, wrapper twisted shut at both ends
+        const rr = Math.min(h, d) / 2, lt = w * 0.9, fin = w * 0.05, y = bot + rr;
+        return joinParts([
+          { geo: rollTube(lt, rr, y), mat: ART },
+          { geo: new THREE.CircleGeometry(rr, 20).rotateY(Math.PI / 2).translate(lt / 2, y, 0), mat: SIDE }, { geo: new THREE.CircleGeometry(rr, 20).rotateY(-Math.PI / 2).translate(-lt / 2, y, 0), mat: SIDE },
+          { geo: block(fin, rr * 1.7, rr * 0.3, lt / 2 + fin / 2, y, 0), mat: SIDE }, { geo: block(fin, rr * 1.7, rr * 0.3, -lt / 2 - fin / 2, y, 0), mat: SIDE },
+        ]);
+      }
+      case 'hex': {    // tall hexagonal tub: six flat sides, each with the art, and a plastic lid
+        const rad = w / 2, sz = d / (w * 0.866);
+        return joinParts([
+          { geo: hexPrism(rad, bot + h * 0.015, top - h * 0.065, sz, true), mat: ART },
+          { geo: hexPrism(rad * 1.04, top - h * 0.065, top, sz, false), mat: WHITE },
+          { geo: hexPrism(rad * 1.01, bot, bot + h * 0.015, sz, false), mat: SIDE },
         ]);
       }
       case 'carton':     // drink packet: brick with a folded top seam and a straw on the side
