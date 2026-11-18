@@ -55,7 +55,7 @@
   .field input:not([type="checkbox"]):not([type="color"]):not([type="file"]), .field select { display: block; width: 100%; height: 42px; padding: 0 10px; margin-top: 4px; font-size: 16px; font-weight: 400; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
   .field small, .hint { display: block; font-weight: 400; color: var(--muted); font-size: 13px; }
   .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0 12px; }
-  fieldset { border: 1px solid var(--line); border-radius: 12px; margin: 14px 0 0; padding: 4px 14px 12px; }
+  fieldset { min-width: 0; border: 1px solid var(--line); border-radius: 12px; margin: 14px 0 0; padding: 4px 14px 12px; }
   legend { font-weight: 700; padding: 0 6px; }
   .check { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-weight: 600; }
   .check input { width: 20px; height: 20px; accent-color: var(--brand); }
@@ -65,16 +65,54 @@
   .warn .row-btns { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
   .badge.ext { background: #fff1d6; color: #7a5200; }
   #photo-preview { width: 84px; height: 84px; border-radius: 10px; border: 1px solid var(--line); background: #eef1f2 center / contain no-repeat; }
-  /* Live 3D preview of the pack being edited. */
-  #preview-wrap { position: relative; margin-top: 6px; border-radius: 12px; overflow: hidden; background: radial-gradient(120% 140% at 50% 0%, #33414a 0%, #171c1f 70%); }
-  #preview-canvas { display: block; width: 100%; height: 260px; touch-action: none; cursor: grab; }
+  /* Editor: the live 3D preview stays in view while you change the form. */
+  #editor { border-radius: 20px; }
+  #editor::backdrop { background: rgba(12,18,22,.55); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
+  .ed-fields, .file-line > div { min-width: 0; } input[type="file"] { max-width: 100%; }
+  .ed-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; align-items: start; }
+  .stage { position: sticky; top: 0; z-index: 4; margin: 0 -20px 4px; padding: 8px 20px 10px; background: linear-gradient(var(--card) 84%, rgba(255,255,255,0)); }
+  #preview-wrap { position: relative; border-radius: 18px; overflow: hidden; isolation: isolate; background: radial-gradient(90% 75% at 50% 30%, #2e3d47 0%, #161d21 58%, #0b0f12 100%); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 10px 30px rgba(15,25,30,.28); }
+  #preview-wrap::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit; background: radial-gradient(120% 100% at 50% 40%, transparent 55%, rgba(0,0,0,.35)); }
+  #preview-canvas { display: block; width: 100%; height: 210px; touch-action: none; cursor: grab; outline: none; }
   #preview-canvas.dragging { cursor: grabbing; }
-  #preview-status { position: absolute; left: 10px; bottom: 8px; right: 10px; font-size: 12px; font-weight: 400; color: rgba(255,255,255,.8); }
+  #preview-canvas:focus-visible { box-shadow: inset 0 0 0 3px var(--brand); border-radius: 18px; }
+  .pv-chip { position: absolute; z-index: 2; left: 12px; top: 12px; padding: 4px 10px; border-radius: 999px; font: 600 11.5px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .02em; color: rgba(255,255,255,.9); background: rgba(18,24,28,.55); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,.1); font-variant-numeric: tabular-nums; }
+  .pv-chip:empty { display: none; }
+  #preview-status { position: absolute; z-index: 2; left: 12px; right: 12px; top: 46px; width: fit-content; max-width: calc(100% - 24px); padding: 5px 11px; border-radius: 12px; font-size: 12px; line-height: 1.4; font-weight: 500; color: rgba(255,255,255,.92); background: rgba(18,24,28,.62); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,.1); }
+  #preview-status:empty { display: none; }
+  #preview-status.busy::before { content: ""; display: inline-block; width: 10px; height: 10px; margin-right: 8px; border: 2px solid rgba(255,255,255,.35); border-top-color: #fff; border-radius: 50%; animation: pvspin .8s linear infinite; vertical-align: -1px; }
+  @keyframes pvspin { to { transform: rotate(360deg); } }
+  .pv-bar { position: absolute; z-index: 2; left: 50%; bottom: 12px; transform: translateX(-50%); display: flex; align-items: center; gap: 2px; padding: 4px; border-radius: 999px; white-space: nowrap; background: rgba(18,24,28,.58); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,.12); }
+  .pv-seg { display: flex; gap: 1px; padding-right: 3px; margin-right: 2px; border-right: 1px solid rgba(255,255,255,.14); }
+  .pv-bar button { min-height: 30px; padding: 0 11px; border: 0; border-radius: 999px; background: transparent; color: rgba(255,255,255,.82); font-size: 12.5px; font-weight: 600; transition: background .15s, color .15s; }
+  .pv-bar button:hover { background: rgba(255,255,255,.12); color: #fff; }
+  .pv-bar button[aria-pressed="true"] { background: rgba(255,255,255,.2); color: #fff; }
+  .pv-bar button:focus-visible { outline: 2px solid #8fe3d6; outline-offset: 0; }
+  .pv-bar .pv-icon { width: 30px; padding: 0; display: grid; place-items: center; }
+  .pv-bar svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .pv-hint { display: none; margin: 8px 2px 0; font-size: 12px; color: var(--muted); text-align: center; }
+  .tf-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
   .texfit { display: grid; grid-template-columns: 104px 1fr 48px; gap: 6px 10px; align-items: center; margin-top: 8px; }
   .texfit label { font-weight: 600; }
   .texfit output { font-weight: 400; text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; }
-  .texfit input[type="range"] { width: 100%; accent-color: var(--brand); }
-  .dialog-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; align-items: center; }
+  .texfit input[type="range"] { width: 100%; height: 24px; background: transparent; -webkit-appearance: none; appearance: none; cursor: pointer; }
+  .texfit input[type="range"]::-webkit-slider-runnable-track { height: 4px; border-radius: 4px; background: #d8e0df; }
+  .texfit input[type="range"]::-moz-range-track { height: 4px; border-radius: 4px; background: #d8e0df; }
+  .texfit input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; margin-top: -7px; border-radius: 50%; background: var(--brand); border: 3px solid #fff; box-shadow: 0 1px 4px rgba(20,30,35,.4); }
+  .texfit input[type="range"]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--brand); border: 3px solid #fff; box-shadow: 0 1px 4px rgba(20,30,35,.4); }
+  .texfit input[type="range"]:disabled { opacity: .4; cursor: default; }
+  .dialog-btns { position: sticky; bottom: 0; z-index: 5; margin: 18px -20px -18px; padding: 12px 20px; background: var(--card); border-top: 1px solid var(--line); }
+  @media (min-width: 860px) {
+    #editor { width: min(1040px, calc(100vw - 20px)); }
+    .ed-layout { grid-template-columns: minmax(320px, 400px) minmax(0, 1fr); gap: 0 28px; }
+    .stage { top: 12px; margin: 0; padding: 0; background: none; align-self: start; }
+    #preview-canvas { height: clamp(320px, 56dvh, 470px); }
+    .pv-hint { display: block; }
+  }
+  @media (max-height: 560px) and (max-width: 859px) { #preview-canvas { height: 130px; } .pv-chip { display: none; } }
+  @media (pointer: coarse) { .pv-bar button { min-height: 36px; } .pv-bar .pv-icon { width: 36px; } }
+  @media (prefers-reduced-motion: reduce) { #preview-status.busy::before { animation: none; } .pv-bar button { transition: none; } }
+  .dialog-btns { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
   .dialog-btns .spacer { flex: 1; }
   #status { color: var(--muted); font-size: 14px; }
   code { background: rgba(0,0,0,.06); padding: 1px 5px; border-radius: 5px; }
@@ -134,6 +172,23 @@
 <dialog id="editor" aria-labelledby="editor-title">
   <form id="editor-form" method="dialog">
     <h2 id="editor-title">Product</h2>
+    <div class="ed-layout">
+    <aside class="stage" aria-label="Live 3D preview">
+      <div id="preview-wrap">
+        <canvas id="preview-canvas" tabindex="0" role="img" aria-label="Live 3D preview of the pack. Drag or use the arrow keys to turn it, and plus and minus to zoom."></canvas>
+        <div class="pv-chip" id="pv-dims" aria-hidden="true"></div>
+        <div id="preview-status" role="status"></div>
+        <div class="pv-bar" role="toolbar" aria-label="Preview controls">
+          <span class="pv-seg" role="group" aria-label="View from">
+            <button type="button" data-view="front">Front</button><button type="button" data-view="side">Side</button><button type="button" data-view="back">Back</button><button type="button" data-view="top">Top</button>
+          </span>
+          <button type="button" id="pv-spin" class="pv-icon" aria-pressed="true" aria-label="Spin automatically" title="Spin automatically"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 4v5h-5"/></svg></button>
+          <button type="button" id="pv-reset" class="pv-icon" aria-label="Reset the view" title="Reset the view"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+        </div>
+      </div>
+      <p class="pv-hint">Live preview · drag to turn · scroll or pinch to zoom</p>
+    </aside>
+    <div class="ed-fields">
     <label class="field">Name<input id="f-name" required maxlength="120" autocomplete="off"></label>
     <div class="grid">
       <label class="field">Price (S$)<input id="f-price" type="number" min="0" max="9999" step="0.01" inputmode="decimal" required></label>
@@ -161,11 +216,6 @@
         <label class="field">Depth<input id="f-d" type="number" min="0.03" max="0.5" step="0.01" inputmode="decimal" required></label>
       </div>
       <span class="hint">Sizes are in shop units, about 3× real life so packs read well on the shelf: a real 15&nbsp;cm-wide bag is about 0.45. Picking a shape fills in typical sizes.</span>
-      <div class="field">Live 3D preview
-        <div id="preview-wrap"><canvas id="preview-canvas"></canvas><div id="preview-status" role="status"></div></div>
-        <small>Drag to turn it — it spins on its own when you leave it alone. It updates as you change the shape, sizes, colour, photo or model, so what you see is what the shop will put on the shelf.</small>
-      </div>
-
       <div class="field">Photo of the pack front
         <div class="file-line">
           <div id="photo-preview"></div>
@@ -183,7 +233,7 @@
         <small>If copying is refused, save the picture to your computer and upload it with “Choose file” above.</small>
       </div>
       <label class="check"><input id="f-cover" type="checkbox"> The photo is the flat artwork — wrap it across the whole pack front</label>
-      <div class="field" id="texfit">Texture fit
+      <div class="field" id="texfit"><div class="tf-head"><span>Texture fit</span><button id="texfit-reset" class="small" type="button">Reset</button></div>
         <div class="texfit">
           <label for="f-tex-scale">Scale</label><input id="f-tex-scale" type="range" min="0.5" max="2" step="0.05" value="1" aria-label="Texture scale"><output id="f-tex-scale-out">100%</output>
           <label for="f-tex-ox">Slide right</label><input id="f-tex-ox" type="range" min="-0.5" max="0.5" step="0.05" value="0" aria-label="Texture horizontal offset"><output id="f-tex-ox-out">0%</output>
@@ -203,6 +253,8 @@
 
     <label class="check"><input id="f-active" type="checkbox" checked> On sale (shown in the shop)</label>
     <p id="editor-error" class="error" role="alert"></p>
+    </div>
+    </div>
     <div class="dialog-btns">
       <button id="save" class="primary" type="submit">Save</button>
       <button id="cancel" type="button">Cancel</button>
@@ -529,9 +581,13 @@ function pvPackTexture(p) {
   return tex;
 }
 // --- The preview itself ---
-const pv = { ready: false, renderer: null, scene: null, camera: null, group: null, raf: 0, rotY: 0.5, rotX: 0.15, zoom: 1, base: 1, lastTouch: 0, pointers: new Map(), pinchD: 0, photoImg: null, photoSrc: '', modelGltf: null, modelKey: '', modelFailed: new Set(), fileUrl: '', timer: 0, status: '' };
+const pv = { ready: false, renderer: null, scene: null, camera: null, group: null, raf: 0, rotY: 0.5, rotX: 0.22, zoom: 1, base: 1, lastTouch: 0, pointers: new Map(), pinchD: 0, vy: 0, vx: 0, spin: true, tween: null, baseT: 1, fitted: false, pop: 1, floor: null, ring: null, lastMoveT: 0, photoImg: null, photoSrc: '', modelGltf: null, modelKey: '', modelFailed: new Set(), fileUrl: '', timer: 0, status: '' };
 const pvReduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-function pvStatus(msg) { pv.status = msg; const s = $('preview-status'); if (s) s.textContent = msg; }
+function pvStatus(msg) { pv.status = msg; const s = $('preview-status'); if (s) { s.textContent = msg; s.classList.toggle('busy', /^Loading/.test(msg)); } }
+const pvWrap = a => { a = (a + Math.PI) % (Math.PI * 2); return (a < 0 ? a + Math.PI * 2 : a) - Math.PI; };   // an angle as the shortest turn, -π to π
+const PV_VIEWS = { front: { y: 0, x: 0.12 }, side: { y: Math.PI / 2, x: 0.12 }, back: { y: Math.PI, x: 0.12 }, top: { y: 0, x: 1.45 } };
+function pvGo(t) { pv.tween = { y: t.y === undefined ? pv.rotY : pv.rotY + pvWrap(t.y - pv.rotY), x: pvClamp(t.x === undefined ? pv.rotX : t.x, -1.5, 1.5), z: t.z === undefined ? pv.zoom : pvClamp(t.z, 0.6, 2.2) }; pv.vy = pv.vx = 0; pv.lastTouch = performance.now(); if (!pv.raf && $('editor').open) pv.raf = requestAnimationFrame(pvTick); }
+function pvMarkView(name) { document.querySelectorAll('.pv-seg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view === name))); }
 // The product as the form describes it right now.
 function pvProduct() {
   const shape = $('f-shape').value;
@@ -578,13 +634,22 @@ function pvSize() {
   if (!pv.renderer) return;
   const canvas = $('preview-canvas'), w = canvas.clientWidth || 1, h = canvas.clientHeight || 1;
   pv.renderer.setSize(w, h, false);
-  pv.camera.aspect = w / h; pv.camera.updateProjectionMatrix();
+  pv.camera.aspect = w / h;
+  pv.camera.setViewOffset(w, h, 0, Math.round(Math.min(26, h * 0.1)), w, h);   // lift the pack a little, clear of the control bar
+  pv.camera.updateProjectionMatrix();
 }
 function pvFit() {
   if (!pv.group) return;
-  const size = new T.Box3().setFromObject(pv.group).getSize(new T.Vector3());
+  const ry = pv.group.rotation.y; pv.group.rotation.y = 0; pv.group.scale.setScalar(1);
+  const box = new T.Box3().setFromObject(pv.group), size = box.getSize(new T.Vector3());
+  pv.group.rotation.y = ry;
   const maxDim = Math.max(size.x, size.y, size.z, 0.2);
-  pv.base = (maxDim / 2) / Math.tan((pv.camera.fov * Math.PI / 180) / 2) * 1.55;
+  pv.baseT = (maxDim / 2) / Math.tan((pv.camera.fov * Math.PI / 180) / 2) * 1.75;
+  if (!pv.fitted || pvReduceMotion) { pv.base = pv.baseT; pv.fitted = true; }
+  // A soft shadow and a thin turntable ring on the floor under the pack.
+  const foot = Math.max(Math.hypot(size.x, size.z), 0.2), y = box.min.y - 0.002;
+  if (pv.floor) { pv.floor.scale.set(foot * 2.6, foot * 2.6, 1); pv.floor.position.y = y; }
+  if (pv.ring) { pv.ring.scale.set(foot * 0.78, foot * 0.78, 1); pv.ring.position.y = y + 0.001; }
   pvSize();
 }
 function pvRebuild() {
@@ -619,18 +684,34 @@ function pvRebuild() {
   } else if (!modelKey) { pv.modelKey = ''; pv.modelGltf = null; }
   pvDisposeGroup(pv.group);
   pv.group = pvBuildGroup(p, modelKey);
-  pv.group.rotation.y = pv.rotY; pv.group.rotation.x = pv.rotX;
+  pv.group.rotation.y = pv.rotY;
   pv.scene.add(pv.group);
+  pv.pop = pvReduceMotion ? 1 : 0.94;
   pvFit();
-  window.__previewInfo = { ready: pv.ready, kind: p.kind, width: p.width, height: p.height, depth: p.depth, color: p.color, name: p.name, hasPhoto: !!p.photo, photoFills: p.photoFills, texScale: p.texScale, texOffX: p.texOffX, texOffY: p.texOffY, hasModel: !!modelKey, modelLoaded: !!pv.modelGltf, meshes: pv.group.children.length, status: pv.status };
+  const cm = v => { const c = v * 100 / 3; return c >= 10 ? Math.round(c) : Math.round(c * 10) / 10; };
+  $('pv-dims').textContent = `${cm(p.width)} × ${cm(p.height)} × ${cm(p.depth)} cm`;
+  window.__previewInfo = { ready: pv.ready, rotX: pv.rotX, kind: p.kind, width: p.width, height: p.height, depth: p.depth, color: p.color, name: p.name, hasPhoto: !!p.photo, photoFills: p.photoFills, texScale: p.texScale, texOffX: p.texOffX, texOffY: p.texOffY, hasModel: !!modelKey, modelLoaded: !!pv.modelGltf, meshes: pv.group.children.length, status: pv.status };
 }
 let pvPrevT = 0;
 function pvTick(now) {
   if (!$('editor').open) { pv.raf = 0; return; }
   const dt = pvPrevT ? Math.min(0.05, (now - pvPrevT) / 1000) : 0; pvPrevT = now;
-  if (!pvReduceMotion && !pv.pointers.size && now - pv.lastTouch > 2500) pv.rotY += dt * 0.45;
-  if (pv.group) { pv.group.rotation.y = pv.rotY; pv.group.rotation.x = pv.rotX; }
-  pv.camera.position.set(0, pv.base * 0.25, pv.base * pv.zoom);
+  const dragging = pv.pointers.size > 0, k = pvReduceMotion ? 1 : 1 - Math.exp(-dt * 9);
+  if (pv.tween && !dragging) {
+    const t = pv.tween;
+    pv.rotY += (t.y - pv.rotY) * k; pv.rotX += (t.x - pv.rotX) * k; pv.zoom += (t.z - pv.zoom) * k;
+    if (Math.abs(t.y - pv.rotY) < 0.002 && Math.abs(t.x - pv.rotX) < 0.002 && Math.abs(t.z - pv.zoom) < 0.002) { pv.rotY = t.y; pv.rotX = t.x; pv.zoom = t.z; pv.tween = null; }
+    pv.lastTouch = now;
+  } else if (!dragging) {
+    // Let go of a drag and it coasts to a stop; left alone it turns slowly.
+    pv.rotY += pv.vy * dt; pv.rotX = pvClamp(pv.rotX + pv.vx * dt, -1.5, 1.5);
+    const d = Math.exp(-dt * 3.2); pv.vy *= d; pv.vx *= d;
+    if (pv.spin && !pvReduceMotion && now - pv.lastTouch > 2500 && Math.abs(pv.vy) < 0.05) pv.rotY += dt * 0.45;
+  }
+  pv.base += (pv.baseT - pv.base) * k; pv.pop += (1 - pv.pop) * k;
+  if (pv.group) { pv.group.rotation.y = pv.rotY; pv.group.scale.setScalar(pv.pop); }
+  const dist = pv.base * pv.zoom;
+  pv.camera.position.set(0, Math.sin(pv.rotX) * dist, Math.cos(pv.rotX) * dist);
   pv.camera.lookAt(0, 0, 0);
   pv.renderer.render(pv.scene, pv.camera);
   pv.raf = requestAnimationFrame(pvTick);
@@ -651,18 +732,32 @@ function pvInitScene() {
   const key = new T.DirectionalLight(0xfff2df, 1.6); key.position.set(2, 3, 4); pv.scene.add(key);
   const rim = new T.DirectionalLight(0xbfd9ff, 0.7); rim.position.set(-3, 1.5, -2); pv.scene.add(rim);
   pv.camera = new T.PerspectiveCamera(40, 1, 0.05, 20);
+  // Floor: a soft pool of light with a dark contact shadow, and a thin turntable ring.
+  const sc = document.createElement('canvas'); sc.width = sc.height = 256;
+  const sg = sc.getContext('2d'); let gr = sg.createRadialGradient(128, 128, 0, 128, 128, 128);
+  gr.addColorStop(0, 'rgba(255,255,255,.16)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); sg.fillStyle = gr; sg.fillRect(0, 0, 256, 256);
+  gr = sg.createRadialGradient(128, 128, 0, 128, 128, 72); gr.addColorStop(0, 'rgba(0,0,0,.7)'); gr.addColorStop(0.6, 'rgba(0,0,0,.3)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); sg.fillStyle = gr; sg.fillRect(0, 0, 256, 256);
+  const stex = new T.CanvasTexture(sc); stex.colorSpace = T.SRGBColorSpace;
+  pv.floor = new T.Mesh(new T.PlaneGeometry(1, 1), new T.MeshBasicMaterial({ map: stex, transparent: true, depthWrite: false })); pv.floor.rotation.x = -Math.PI / 2; pv.floor.renderOrder = -2;
+  pv.ring = new T.Mesh(new T.RingGeometry(0.985, 1, 128), new T.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.2, depthWrite: false, side: T.DoubleSide })); pv.ring.rotation.x = -Math.PI / 2; pv.ring.renderOrder = -1;
+  pv.scene.add(pv.floor, pv.ring);
   // Drag to turn, pinch or scroll to zoom — the same gestures as Inspect in the shop.
   canvas.addEventListener('pointerdown', e => {
     canvas.setPointerCapture(e.pointerId);
     pv.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (pv.pointers.size === 2) { const [a, b] = [...pv.pointers.values()]; pv.pinchD = Math.hypot(a.x - b.x, a.y - b.y); }
+    pv.tween = null; pv.vy = pv.vx = 0; pv.lastMoveT = e.timeStamp; pvMarkView(null);
     pv.lastTouch = performance.now(); canvas.classList.add('dragging');
   });
   canvas.addEventListener('pointermove', e => {
     if (!pv.pointers.has(e.pointerId)) return;
     const prev = pv.pointers.get(e.pointerId), dx = e.clientX - prev.x, dy = e.clientY - prev.y;
     pv.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-    if (pv.pointers.size === 1) { pv.rotY += dx * 0.008; pv.rotX = pvClamp(pv.rotX + dy * 0.006, -1.1, 1.1); }
+    if (pv.pointers.size === 1) {
+      pv.rotY += dx * 0.008; pv.rotX = pvClamp(pv.rotX + dy * 0.006, -1.5, 1.5);
+      const dtm = Math.max(0.008, (e.timeStamp - pv.lastMoveT) / 1000); pv.lastMoveT = e.timeStamp;
+      if (!pvReduceMotion) { pv.vy = pvClamp(dx * 0.008 / dtm, -7, 7) * 0.5 + pv.vy * 0.5; pv.vx = pvClamp(dy * 0.006 / dtm, -5, 5) * 0.5 + pv.vx * 0.5; }
+    }
     else if (pv.pointers.size === 2) {
       const [a, b] = [...pv.pointers.values()], d = Math.hypot(a.x - b.x, a.y - b.y);
       if (pv.pinchD > 0) pv.zoom = pvClamp(pv.zoom * pv.pinchD / d, 0.6, 2.2);
@@ -673,9 +768,22 @@ function pvInitScene() {
   const pvPointerUp = e => { pv.pointers.delete(e.pointerId); if (!pv.pointers.size) canvas.classList.remove('dragging'); pv.lastTouch = performance.now(); };
   canvas.addEventListener('pointerup', pvPointerUp);
   canvas.addEventListener('pointercancel', pvPointerUp);
-  canvas.addEventListener('wheel', e => { e.preventDefault(); pv.zoom = pvClamp(pv.zoom * (1 + e.deltaY * 0.001), 0.6, 2.2); pv.lastTouch = performance.now(); }, { passive: false });
+  canvas.addEventListener('wheel', e => { e.preventDefault(); pv.tween = null; pv.zoom = pvClamp(pv.zoom * (1 + e.deltaY * 0.001), 0.6, 2.2); pv.lastTouch = performance.now(); }, { passive: false });
   canvas.addEventListener('contextmenu', e => e.preventDefault());
-  window.addEventListener('resize', () => { if ($('editor').open) pvSize(); });
+  new ResizeObserver(() => { if ($('editor').open) pvSize(); }).observe(canvas);
+  // Keyboard: arrows turn, + and - zoom, Home resets.
+  canvas.addEventListener('keydown', e => {
+    const base = pv.tween || { y: pv.rotY, x: pv.rotX, z: pv.zoom }, step = 0.25;
+    const go = { ArrowLeft: { y: base.y - step }, ArrowRight: { y: base.y + step }, ArrowUp: { x: base.x - step }, ArrowDown: { x: base.x + step }, '+': { z: base.z / 1.15 }, '=': { z: base.z / 1.15 }, '-': { z: base.z * 1.15 }, Home: { y: 0.5, x: 0.22, z: 1 } }[e.key];
+    if (!go) return; e.preventDefault(); pvMarkView(null);
+    pvGo({ y: go.y === undefined ? base.y : go.y, x: go.x === undefined ? base.x : go.x, z: go.z === undefined ? base.z : go.z });
+  });
+  // View buttons, spin toggle, reset.
+  document.querySelectorAll('.pv-seg button').forEach(b => b.addEventListener('click', () => { pvGo(PV_VIEWS[b.dataset.view]); pvMarkView(b.dataset.view); }));
+  $('pv-reset').addEventListener('click', () => { pvGo({ y: 0.5, x: 0.22, z: 1 }); pvMarkView(null); });
+  try { pv.spin = localStorage.getItem('products-preview-spin') !== '0'; } catch (e) {}
+  $('pv-spin').setAttribute('aria-pressed', String(pv.spin));
+  $('pv-spin').addEventListener('click', () => { pv.spin = !pv.spin; $('pv-spin').setAttribute('aria-pressed', String(pv.spin)); pv.lastTouch = performance.now(); try { localStorage.setItem('products-preview-spin', pv.spin ? '1' : '0'); } catch (e) {} });
 }
 async function pvOpen() {
   if (!pv.ready) {
@@ -694,6 +802,7 @@ function pvSchedule() { clearTimeout(pv.timer); pv.timer = setTimeout(pvRebuild,
 ['f-shape', 'f-cover'].forEach(id => $(id).addEventListener('change', pvSchedule));
 ['f-tex-scale', 'f-tex-ox', 'f-tex-oy'].forEach(id => $(id).addEventListener('input', () => { texfitOut(); pvSchedule(); }));
 $('editor').addEventListener('close', pvStop);
+$('texfit-reset').addEventListener('click', () => { [['f-tex-scale', 1], ['f-tex-ox', 0], ['f-tex-oy', 0]].forEach(([id, v]) => { $(id).value = v; }); texfitOut(); pvSchedule(); });
 
 // --- The editor ---
 function fillCategories(selected) {
