@@ -161,12 +161,18 @@
   #inspect-badge { display: inline-block; margin-bottom: 6px; padding: 3px 11px; border-radius: 999px; font-size: 11.5px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: #3b2a00; background: linear-gradient(100deg, #ffd54f, #ffb74d); }
   #inspect-name { font-size: 21px; font-weight: 800; letter-spacing: -.01em; line-height: 1.2; }
   #inspect-meta { color: #cfd8dc; font-size: 14px; margin: 3px 0 0; }
-  #inspect-items { display: flex; gap: 6px; justify-content: safe center; margin: 12px 0 0; padding: 0 0 2px; list-style: none; overflow-x: auto; scrollbar-width: none; }
-  #inspect-items::-webkit-scrollbar { display: none; }
+  #inspect-items { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 12px 0 0; padding: 2px 4px 2px 2px; list-style: none; max-height: min(112px, 20vh); overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.35) transparent; -webkit-mask-image: linear-gradient(#000 calc(100% - 14px), transparent); mask-image: linear-gradient(#000 calc(100% - 14px), transparent); }
+  #inspect-items.end { -webkit-mask-image: none; mask-image: none; }
+  #inspect-items::-webkit-scrollbar { width: 5px; } #inspect-items::-webkit-scrollbar-thumb { background: rgba(255,255,255,.35); border-radius: 3px; }
   #inspect-items .chip { flex: none; display: inline-flex; align-items: center; gap: 7px; min-height: 34px; padding: 3px 12px 3px 4px; border-radius: 999px; font-size: 12.5px; font-weight: 600; color: #fff; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.16); transition: background .15s, transform .15s; }
   #inspect-items .chip:hover { background: rgba(255,255,255,.2); transform: translateY(-1px); }
-  #inspect-items .chip span { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #inspect-items .chip span { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   #inspect-items .chip img { width: 26px; height: 26px; object-fit: contain; border-radius: 50%; background: #fff; padding: 2px; }
+  #inspect-added { margin: 0 0 10px; padding: 7px 12px; border-radius: 12px; font-size: 13.5px; font-weight: 700; color: #0d2b14; background: #8be3a2; }
+  #inspect-added.pop { animation: added-pop .35s cubic-bezier(.2,1.4,.4,1); }
+  @keyframes added-pop { from { transform: scale(.9); opacity: 0; } to { transform: none; opacity: 1; } }
+  #inspect-add.added { background: #2e9e57; border-color: #2e9e57; color: #fff; }
+  #toast { z-index: 40; }
   #inspect-hint { font-size: 12.5px; color: #9fb0b8; margin: 10px 0 12px; }
   #inspect-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px 16px; flex-wrap: wrap; }
   #inspect-price { font-size: 24px; font-weight: 800; color: #ffd54f; font-variant-numeric: tabular-nums; }
@@ -306,6 +312,7 @@
     <div id="inspect-meta"></div>
     <ul id="inspect-items" aria-label="What is in the box" hidden></ul>
     <p id="inspect-hint">Drag to turn it around · Scroll or pinch to zoom</p>
+    <div id="inspect-added" role="status" hidden></div>
     <div id="inspect-foot">
       <div id="inspect-price"></div>
       <div class="acts">
@@ -1236,7 +1243,7 @@ function startWorld(THREE) {
   const SLOT_W = 0.85;                 // width of one product's space on a shelf
   const LEVELS = [0.12, 0.77, 1.42];   // height of each shelf board's top
   const UNIT_H = 2.1, UNIT_D = 0.8;    // shelf unit height and depth (deep, so packs queue up front to back)
-  const AISLE = 4.4, WALL_H = 3.4;     // distance between the middles of two neighbouring gondolas; wall height
+  const AISLE = 5.2, WALL_H = 3.7;     // distance between the middles of two neighbouring gondolas; wall height
   const EYE = 1.6, BODY = 0.42;        // eye height, and how close you can get to things
   const colsFor = len => Math.floor((len - 0.1) / SLOT_W);
   const lenFor = cols => cols * SLOT_W + 0.1;
@@ -1247,9 +1254,9 @@ function startWorld(THREE) {
   // A shop of a given size: G middle gondolas (two faces each) and wall shelves `sideCols` columns long.
   // Shelf faces are listed in shopping order: left wall, middle aisles, right wall, back wall.
   function plan(G, sideCols) {
-    const halfW = Math.max(5.6, (G - 1) / 2 * AISLE + 4.4), sideLen = lenFor(sideCols), gondolaLen = lenFor(Math.max(2, sideCols - 2)), backLen = halfW - 0.6;
-    const halfD = (UNIT_D + 0.3 + sideLen + 4.6) / 2;                        // back shelves + wall shelves + room at the front for the door and counter
-    const sideZ0 = -halfD + UNIT_D + 0.3, gondolaZ0 = -halfD + UNIT_D + 2.2;  // where the wall shelves and the gondolas start (their back ends)
+    const halfW = Math.max(5.6, (G - 1) / 2 * AISLE + 5.0), sideLen = lenFor(sideCols), gondolaLen = lenFor(Math.max(2, sideCols - 2)), backLen = halfW - 0.6;
+    const halfD = (UNIT_D + 0.3 + sideLen + 6.2) / 2;                        // back shelves + wall shelves + room at the front for the door and counter
+    const sideZ0 = -halfD + UNIT_D + 0.3, gondolaZ0 = -halfD + UNIT_D + 2.7;  // where the wall shelves and the gondolas start (their back ends)
     const units = [{ x: -halfW + UNIT_D / 2 + 0.06, z0: sideZ0, rotY: Math.PI / 2, length: sideLen }];
     for (let g = 0; g < G; g++) {
       const gx = (g - (G - 1) / 2) * AISLE;
@@ -2203,7 +2210,7 @@ function startWorld(THREE) {
     if (inspectPulse && now - inspectPulse.t0 > 1100) inspectPulse = null;
   }
   function fillInspectChips(b) {
-    const ul = $('inspect-items'); ul.textContent = '';
+    const ul = $('inspect-items'); ul.textContent = ''; ul.scrollTop = 0; ul.classList.remove('end');
     b.items.forEach((p, j) => {
       const img = new Image(); img.alt = ''; img.src = p.thumbDirect || thumbUrl(p);
       const chip = el('button', { type: 'button', className: 'chip', title: `${p.name} · ${money(p.price)}`, onclick: () => { inspectPulse = { j, t0: performance.now() }; inspectLastTouch = performance.now(); } }, img, el('span', { textContent: p.name }));
@@ -2211,6 +2218,14 @@ function startWorld(THREE) {
       ul.append(el('li', {}, chip));
     });
     ul.hidden = false;
+    const edge = () => ul.classList.toggle('end', ul.scrollHeight - ul.scrollTop - ul.clientHeight < 4); ul.onscroll = edge; requestAnimationFrame(edge);
+  }
+  let addedTimer = 0;
+  function flashInspectAdded(n) {   // the toast sits under the overlay, so confirm on the button itself and in the panel
+    const b = $('inspect-add'), msg = $('inspect-added');
+    b.classList.add('added'); b.textContent = `✓ Added${n > 1 ? ' ' + n : ''}`;
+    msg.textContent = `${inspectP.name} is in your cart · ${cart.get(inspectP)} total`; msg.hidden = false; msg.classList.remove('pop'); void msg.offsetWidth; msg.classList.add('pop');
+    clearTimeout(addedTimer); addedTimer = setTimeout(() => { b.classList.remove('added'); msg.hidden = true; if (inspectP) setInspectAdd(); }, 1800);
   }
   function setInspectAdd() {
     const room = maxQty(inspectP) - (cart.get(inspectP) || 0);
@@ -2239,7 +2254,7 @@ function startWorld(THREE) {
       window.addEventListener('resize', inspectSize);
       $('inspect-close').onclick = closeInspect;
       $('inspect-close2').onclick = closeInspect;
-      $('inspect-add').onclick = () => { if (inspectP) { addToCart(inspectP, cardQty); cardQty = 1; updateCard(); setInspectAdd(); } };
+      $('inspect-add').onclick = () => { if (!inspectP) return; const before = cart.get(inspectP) || 0; addToCart(inspectP, cardQty); const added = (cart.get(inspectP) || 0) - before; cardQty = 1; updateCard(); setInspectAdd(); if (added > 0) flashInspectAdded(added); };
     }
     inspectDisposePack();
     inspectRings = null; inspectRadius = 0; inspectPulse = null; inspectClock = 0;
@@ -2260,6 +2275,7 @@ function startWorld(THREE) {
       $('inspect-hint').textContent = 'Drag to turn it around · Scroll or pinch to zoom';
     }
     inspectScene.add(inspectPack);
+    clearTimeout(addedTimer); $('inspect-add').classList.remove('added'); $('inspect-added').hidden = true;
     $('inspect-name').textContent = p.name;
     $('inspect-price').textContent = money(p.price);
     setInspectAdd();
