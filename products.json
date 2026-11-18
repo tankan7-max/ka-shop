@@ -21,7 +21,7 @@
       },
       "name": "Mamee noodles chicken",
       "pack": "1 pack, 25g",
-      "price_sgd": 0.5,
+      "price_sgd": 0.55,
       "reference": {
         "note": "Shopee Singapore bundle of 8 x 25g packs listed at SGD 2.79–3.46; starting single-pack shop price set at SGD 0.50",
         "source_url": "https://shopee.sg/-Bundle-of-8-Mamee-Monster-Noodle-Snack-25g-BBQ-Spicy-Chicken-Flavour-Halal-Snack-i.17287844.24366412395"
@@ -45,7 +45,7 @@
       },
       "name": "Mamee noodles BBQ",
       "pack": "1 pack, 25g",
-      "price_sgd": 0.5,
+      "price_sgd": 0.55,
       "reference": {
         "note": "Shopee Singapore bundle of 8 x 25g packs listed at SGD 2.79–3.46; starting single-pack shop price set at SGD 0.50",
         "source_url": "https://shopee.sg/-Bundle-of-8-Mamee-Monster-Noodle-Snack-25g-BBQ-Spicy-Chicken-Flavour-Halal-Snack-i.17287844.24366412395"
@@ -69,7 +69,7 @@
       },
       "name": "Hello Panda",
       "pack": "1 pack, 35g",
-      "price_sgd": 1.3,
+      "price_sgd": 1.5,
       "reference": {
         "note": "Shopee Singapore single 35g pack listed at SGD 1.30",
         "source_url": "https://shopee.sg/Meiji-Hello-Panda-Biscuits-35g-pack-Chocolate-Milk-Strawberry-Biscuit-Assorted-Flavours-i.435361035.22368202347"
@@ -117,14 +117,14 @@
       },
       "name": "Twisties BBQ",
       "pack": "1 pack, 60g",
-      "price_sgd": 1.2,
+      "price_sgd": 1.4,
       "reference": {
         "note": "Shopee Singapore single 60g pack listed at SGD 0.96–1.20",
         "source_url": "https://shopee.sg/Twisties-Flavoured-Corn-Snacks-60g-Cherry-Tomato-Cheddar-Cheese-BBQ-Curry-Chicken-Irresistible-Crunchy-Snack-i.268415566.24972295677"
       },
       "texture": {
         "description": "Twisties BBQ corn snack pack photo",
-        "image_url": "./images/twisties-bbq.png",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/twisties-bbq/front-mwkqnraw.png",
         "source_url": "https://mart.grab.com/sg/en/merchant/grabmart-grocer-mini-s-mart-booze-beachroad-sultan-gate-place/4-C4EGC7T3NYAXAJ/twisties-bbq-curry/SGITE20250221022450177288",
         "type": "image"
       },
@@ -141,7 +141,7 @@
       },
       "name": "Lays BBQ",
       "pack": "1 pack, 50g",
-      "price_sgd": 3.2,
+      "price_sgd": 3.6,
       "reference": {
         "note": "Shopee Singapore single 50g BBQ pack listed at SGD 3.16",
         "source_url": "https://shopee.sg/Lay's-Potato-Chips-Extra-BBQ-(50g)-Lay's-Kerepek-Kentang-Perisa-BBQ-50g-i.392474457.22873463256"
@@ -189,7 +189,7 @@
       },
       "name": "Korean seaweed",
       "pack": "1 pack, 40g",
-      "price_sgd": 5.3,
+      "price_sgd": 5.9,
       "reference": {
         "note": "Shopee Singapore 40g Korean seaweed chips pack listed at SGD 5.29",
         "source_url": "https://shopee.sg/HBAF-Korean-Seaweed-Chips-40g-4-Flavors-(Honey-Butter-Wasabi-Salted-Garlic-Bread)-Crispy-Seaweed-Snack-i.1664342463.43126071653"
@@ -272,7 +272,7 @@
       "id": "pringles-sco",
       "name": "Pringles Sour Cream & Onion",
       "category": "Chips & crisps",
-      "price_sgd": 3.5,
+      "price_sgd": 4.0,
       "pack": "1 tube, 134g",
       "model": {
         "type": "cylinder",
@@ -423,7 +423,7 @@
       "id": "julies-peanut-butter",
       "name": "Julie's Peanut Butter Sandwich",
       "category": "Biscuits & cookies",
-      "price_sgd": 5.6,
+      "price_sgd": 6.2,
       "pack": "1 pack, 12 x 30g",
       "model": {
         "type": "box",
@@ -552,7 +552,7 @@
       "id": "kinder-bueno-milk",
       "name": "Kinder Bueno Milk",
       "category": "Chocolate",
-      "price_sgd": 2.75,
+      "price_sgd": 3.0,
       "pack": "1 bar, 43g",
       "model": {
         "type": "box",
@@ -662,7 +662,7 @@
       "id": "kitkat-2f-6pack",
       "name": "Kit Kat 2 Finger (6-pack)",
       "category": "Chocolate",
-      "price_sgd": 4.65,
+      "price_sgd": 5.2,
       "pack": "1 pack, 6 x 17g",
       "model": {
         "type": "box",
@@ -1135,5 +1135,33 @@
     "Instant noodles",
     "Drinks",
     "Nuts & healthier snacks"
+  ],
+  "bundles": [
+    {
+      "id": "bundle-movie-night",
+      "name": "Movie Night Box",
+      "price": 15.9,
+      "blurb": "Five favourites for a movie night at home.",
+      "items": [
+        "twisties-bbq",
+        "lays-bbq",
+        "pringles-sco",
+        "kitkat-2f-6pack",
+        "kinder-bueno-milk"
+      ]
+    },
+    {
+      "id": "bundle-local-favourites",
+      "name": "Local Favourites Box",
+      "price": 13.9,
+      "blurb": "The local classics, in one box.",
+      "items": [
+        "mamee-chicken",
+        "mamee-bbq",
+        "hello-panda",
+        "korean-seaweed",
+        "julies-peanut-butter"
+      ]
+    }
   ]
 }

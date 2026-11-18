@@ -93,7 +93,8 @@ if errors:
 
 data = json.dumps(
     {"currency": db.get("currency", "SGD"), "shop": db.get("shop", {}),
-     "categories": categories, "products": products},
+     "categories": categories, "products": products,
+     "bundles": db.get("bundles", [])},   # bundles ride along so the embedded backup has them too
     ensure_ascii=False, separators=(",", ":"),
 ).replace("</", "<\\/")  # never close the <script> tag early
 
