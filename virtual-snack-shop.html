@@ -478,7 +478,7 @@ async function fetchInventory() {
 try { INVENTORY = await fetchInventory(); }
 catch (e) { console.warn('Could not read the stock, treating everything as in stock:', e); }
 const stockOf = p => {
-  if (p.isBundle) return Math.min(...p.items.map(q => Object.prototype.hasOwnProperty.call(INVENTORY, q.id) ? INVENTORY[q.id] : Infinity));
+  if (p.isBundle) return Math.min(...groupItems(p.items).map(g => (Object.prototype.hasOwnProperty.call(INVENTORY, g.p.id) ? INVENTORY[g.p.id] : Infinity) / g.n).map(Math.floor));   // a snack used twice in a box needs two in stock per box
   return Object.prototype.hasOwnProperty.call(INVENTORY, p.id) ? INVENTORY[p.id] : Infinity;
 };
 const inStock = p => stockOf(p) > 0;
@@ -541,6 +541,9 @@ const PRODUCTS = db.products.map(p => {
   };
 }).filter(p => p.name && typeof p.price === 'number');
 
+// A bundle may use the same snack more than once (2 × Mamee noodles chicken): group the repeats, keeping the order of first appearance.
+function groupItems(items) { const m = new Map(); items.forEach((p, j) => { const g = m.get(p) || { p, n: 0, js: [] }; g.n++; g.js.push(j); m.set(p, g); }); return [...m.values()]; }
+const itemsText = (items, sep) => groupItems(items).map(g => (g.n > 1 ? `${g.n} × ` : '') + g.p.name).join(sep);
 // Bundles: ready-made boxes of snacks, from the "bundles" part of products.json.
 // A bundle is a cart item like a product, but its stock is the scarcest of its
 // snacks, and at checkout it is held as its snacks (so the owner packs them).
@@ -775,7 +778,7 @@ function renderCart() {
   cart.forEach((qty, p) => {
     const remove = el('button', { type: 'button', className: 'quiet', textContent: 'Remove', onclick: () => setQty(p, 0) }); remove.setAttribute('aria-label', `Remove ${p.name}`);
     list.append(el('div', { className: 'item cart-item' }, thumbBox(p),
-      el('div', {}, el('div', { className: 'name', textContent: p.name }), el('div', { className: 'meta', textContent: `${money(p.price)} each` + (qty >= maxQty(p) && maxQty(p) < 99 ? (qty >= stockOf(p) ? ` · all ${qty} in stock` : ' · the rest are in your cart') : '') }), p.isBundle ? el('div', { className: 'contents', textContent: p.items.map(x => x.name).join(' · ') }) : '', el('div', { className: 'acts' }, stepper(p, qty), remove)),
+      el('div', {}, el('div', { className: 'name', textContent: p.name }), el('div', { className: 'meta', textContent: `${money(p.price)} each` + (qty >= maxQty(p) && maxQty(p) < 99 ? (qty >= stockOf(p) ? ` · all ${qty} in stock` : ' · the rest are in your cart') : '') }), p.isBundle ? el('div', { className: 'contents', textContent: itemsText(p.items, ' · ') }) : '', el('div', { className: 'acts' }, stepper(p, qty), remove)),
       el('div', { className: 'line-total', textContent: money(qty * p.price) })));
   });
   const { subtotal, delivery, total, count } = cartTotals();
@@ -818,7 +821,7 @@ function updateCard() {
   if (inCart) $('card-price').append(el('small', { textContent: `${inCart} in your cart` }));
   const stocked = inStock(selected), room = maxQty(selected) - inCart, note = stockNote(selected);
   cardQty = clamp(cardQty, 1, Math.max(1, room));
-  $('card-pack').textContent = selected.isBundle ? selected.items.map(p => p.name).join(' · ') : selected.pack;
+  $('card-pack').textContent = selected.isBundle ? itemsText(selected.items, ' · ') : selected.pack;
   if (selected.isBundle && selected.save > 0) $('card-pack').append(` — save ${money(selected.save)} vs buying separately`);
   if (note) $('card-pack').append($('card-pack').textContent ? ' · ' : '', el('span', { className: stocked ? 'low' : 'oos', textContent: note }));
   $('card-qty').textContent = cardQty;
@@ -970,7 +973,7 @@ const waNumber = String(SHOP.whatsapp || '').replace(/\D/g, '');
 function orderText() {
   const { subtotal, delivery, total, count } = cartTotals(), lines = [`Order from ${SHOP.name}`, `Order ref: ${paynowRef}`, ''];
   cart.forEach((q, p) => {
-    if (p.isBundle) lines.push(`${q} × ${p.name} — ${money(q * p.price)} (${p.items.map(x => x.name).join(', ')})`);
+    if (p.isBundle) lines.push(`${q} × ${p.name} — ${money(q * p.price)} (${itemsText(p.items, ', ')})`);
     else lines.push(`${q} × ${p.name}${p.pack ? ` (${p.pack})` : ''} — ${money(q * p.price)}`);
   });
   lines.push('', `Subtotal: ${money(subtotal)}`, `Delivery: ${delivery === 0 ? 'FREE' : money(delivery)}`, `Total: ${money(total)} (${count} item${count === 1 ? '' : 's'})`);
@@ -1261,7 +1264,7 @@ function startWorld(THREE) {
   // Snacks are shown at their real size, in two staggered rows, so a tray is as wide as its snacks need.
   const B_TIERS = 3, B_TIER_H = 0.92, B_DEPTH = 1.0, B_GAP = 0.25;
   BUNDLES.forEach(b => {
-    const w = b.items.map(p => p.width), xs = [0];
+    const gr = groupItems(b.items), w = gr.map(g => g.p.width + (g.n - 1) * 0.07), xs = [0];   // identical snacks share one slot, stacked
     for (let i = 1; i < w.length; i++) xs.push(xs[i - 1] + 0.62 * (w[i - 1] + w[i]) / 2);
     const lo = Math.min(...xs.map((x, i) => x - w[i] / 2)), hi = Math.max(...xs.map((x, i) => x + w[i] / 2));
     b.lay = { w: Math.max(0.95, hi - lo + 0.24), xs: xs.map(x => x - (lo + hi) / 2) };
@@ -1788,13 +1791,20 @@ function startWorld(THREE) {
       zEnd -= L / 2; shelf.position.set(BUNDLE_TABLE.x, 0, zEnd); shelf.rotation.y = Math.PI / 2; scene.add(shelf); zEnd -= L / 2 + B_GAP;
       [[L, TOP, 0.04, 0, TOP / 2, -B_DEPTH / 2 + 0.02, teal], [0.05, TOP, B_DEPTH, -L / 2 + 0.025, TOP / 2, 0, wood], [0.05, TOP, B_DEPTH, L / 2 - 0.025, TOP / 2, 0, wood],
        [L, BOARD, B_DEPTH, 0, TOP - BOARD / 2, 0, wood], [L, 0.1, B_DEPTH - 0.1, 0, 0.05, -0.02, std(0x4b5a62)]]
-        .concat(Array.from({ length: TIERS }, (_, t) => t).map(t => [L - 0.1, BOARD, B_DEPTH - 0.04, 0, 0.1 + t * B_TIER_H - BOARD / 2, 0.0, wood]))
         .forEach(([w, h, d, x, y, z, mat]) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); m.position.set(x, y, z); shelf.add(m); clickable.push(m); });
+      // Each shelf board is slanted to face a shopper standing back from the unit (about eye height): trays above eye
+      // level lean forward and look down at you, trays below lean back and look up, so every tray can be seen.
+      const tiers = Array.from({ length: TIERS }, (_, t) => {
+        const g = new THREE.Group(), mid = 0.1 + t * B_TIER_H + 0.35;
+        g.position.set(0, 0.1 + t * B_TIER_H, 0); g.rotation.x = Math.max(-0.34, Math.min(0.34, Math.atan2(mid - EYE, 3.4))) * 1.15; shelf.add(g);
+        const board = new THREE.Mesh(new THREE.BoxGeometry(L - 0.1, BOARD, B_DEPTH - 0.04), wood); board.position.y = -BOARD / 2; g.add(board); clickable.push(board);
+        return g;
+      });
       const sign = new THREE.Sprite(new THREE.SpriteMaterial({ map: signTexture('Bundles', '#2a9d8f', 512, 140) }));
       sign.scale.set(Math.min(2.2, L), Math.min(2.2, L) * 0.273, 1); sign.position.set(0, TOP + 0.3, 0.05); shelf.add(sign);
       unit.bundles.forEach((b, bi) => {
         const BOX_W = b.lay.w, box = new THREE.Group();
-        box.position.set(0, 0.1 + TIER_ORDER[unit.bundles.length][bi] * B_TIER_H, 0); shelf.add(box);
+        box.position.set(0, 0, 0); tiers[TIER_ORDER[unit.bundles.length][bi]].add(box);   // the tray rides on its slanted board
         [[BOX_W, BOX_T, BOX_D, 0, BOX_T / 2, 0, kraft], [BOX_W, BOX_H, BOX_T, 0, BOX_H / 2, -BOX_D / 2 + BOX_T / 2, kraftDark],
          [BOX_W, BOX_H, BOX_T, 0, BOX_H / 2, BOX_D / 2 - BOX_T / 2, kraftDark], [BOX_T, BOX_H, BOX_D, -BOX_W / 2 + BOX_T / 2, BOX_H / 2, 0, kraftDark],
          [BOX_T, BOX_H, BOX_D, BOX_W / 2 - BOX_T / 2, BOX_H / 2, 0, kraftDark]]
@@ -1802,14 +1812,16 @@ function startWorld(THREE) {
         // Real size (scale 1), zig-zag in two rows; the back row stands on a riser.
         const rz = BOX_D * 0.19;
         const riser = new THREE.Mesh(new THREE.BoxGeometry(BOX_W - 2 * BOX_T - 0.04, RISER, BOX_D * 0.4), kraftDark); riser.position.set(0, BOX_T + RISER / 2, -rz); riser.userData.bundle = b; box.add(riser); clickable.push(riser);
-        b.items.forEach((p, i) => {
-          const back = i % 2 === 1;
-          const mesh = packMesh(p, p.width, p.depth, 1);
-          const pos = new THREE.Vector3(b.lay.xs[i], BOX_T + (back ? RISER : 0) + p.height / 2, back ? -rz : rz);
-          const quat = new THREE.Quaternion().setFromEuler(new THREE.Euler(back ? -0.06 : 0.03, (hashOf(p.id) % 20 - 10) * Math.PI / 180, 0));
-          mesh.setMatrixAt(0, new THREE.Matrix4().compose(pos, quat, new THREE.Vector3(1, 1, 1)));
-          mesh.instanceMatrix.needsUpdate = true;
-          mesh.userData.bundle = b; box.add(mesh); clickable.push(mesh);
+        groupItems(b.items).forEach((g, i) => {
+          const p = g.p, back = i % 2 === 1, n = g.n, step = n > 1 ? Math.min(0.16, (back ? 0.12 : 0.3) / (n - 1)) : 0;
+          for (let c = 0; c < n; c++) {   // identical snacks stand in a little stack: each one a touch behind and to the side of the last
+            const mesh = packMesh(p, p.width, p.depth, 1);
+            const pos = new THREE.Vector3(b.lay.xs[i] - (n - 1) * 0.035 + c * 0.07, BOX_T + (back ? RISER : 0) + p.height / 2, (back ? -rz : rz) - c * step);
+            const quat = new THREE.Quaternion().setFromEuler(new THREE.Euler(back ? -0.06 : 0.03, (hashOf(p.id) % 20 - 10 + c * 3) * Math.PI / 180, 0));
+            mesh.setMatrixAt(0, new THREE.Matrix4().compose(pos, quat, new THREE.Vector3(1, 1, 1)));
+            mesh.instanceMatrix.needsUpdate = true;
+            mesh.userData.bundle = b; box.add(mesh); clickable.push(mesh);
+          }
         });
         // A name card in front of each tray: what it is, what it costs, what you save, and when it is gone.
         const cv = document.createElement('canvas'); cv.width = 640; cv.height = 190;
@@ -2198,21 +2210,27 @@ function startWorld(THREE) {
     const m = packMesh(p, p.width, p.depth, 1); m.setMatrixAt(0, new THREE.Matrix4()); m.instanceMatrix.needsUpdate = true; return m;
   }
   function buildRings(b) {
-    const sys = new THREE.Group(), count = Math.min(b.items.length, 6), rings = [];
+    const sys = new THREE.Group(), groups = groupItems(b.items), count = Math.min(groups.length, 6), rings = [];   // identical snacks stack together on one orbit
     const additive = { transparent: true, depthWrite: false, blending: THREE.AdditiveBlending };
     for (let i = 0; i < count; i++) {
-      const colour = new THREE.Color(shade(b.items[i].color, 0.3)), r = RING_FIRST + i * RING_STEP, dir = i % 2 ? -1 : 1;
+      const colour = new THREE.Color(shade(groups[i].p.color, 0.3)), r = RING_FIRST + i * RING_STEP, dir = i % 2 ? -1 : 1;
       const holder = new THREE.Group(); holder.rotation.set(0.45 + (i % 3) * 0.32, i * 2.4, 0, 'YXZ'); sys.add(holder);   // each ring is tilted its own way
       const spin = new THREE.Group(); holder.add(spin);
       spin.add(new THREE.Mesh(new THREE.CylinderGeometry(r, r, 0.11, 160, 1, true), new THREE.MeshBasicMaterial({ map: ringTexture(dir < 0), color: colour, side: THREE.DoubleSide, ...additive })));
       [-0.055, 0.055].forEach(y => spin.add(new THREE.Mesh(new THREE.TorusGeometry(r, 0.005, 6, 160).rotateX(Math.PI / 2).translate(0, y, 0), new THREE.MeshBasicMaterial({ color: colour, opacity: 0.55, ...additive }))));
       rings.push({ holder, spin, r, speed: dir * (RING_SPEED + 0.1 * i), phase: i * 2.1, packs: [] });
     }
-    b.items.forEach((p, j) => {
-      const ring = rings[j % count], slot = new THREE.Group(), arm = new THREE.Group(), pack = new THREE.Group(), k = RING_SNACK / Math.max(p.width, p.height, p.depth, 0.05);
+    groups.forEach((g, j) => {
+      const p = g.p, n = g.n, ring = rings[j % count], slot = new THREE.Group(), arm = new THREE.Group(), pack = new THREE.Group();
+      const dim = Math.max(p.width, p.height, p.depth, 0.05), k = RING_SNACK / (dim * (1 + 0.2 * (n - 1)));   // a stack is scaled down a little so it still fits its orbit
       slot.rotation.y = Math.floor(j / count) * Math.PI;    // a seventh snack and beyond ride opposite the first
-      arm.position.set(ring.r, 0, 0); pack.scale.setScalar(k); pack.add(inspectObjectFor(p));
-      arm.add(pack); slot.add(arm); ring.spin.add(slot); ring.packs.push({ slot, pack, r: ring.r, k, j });
+      arm.position.set(ring.r, 0, 0); pack.scale.setScalar(k);
+      for (let c = 0; c < n; c++) {   // each copy sits a little behind, beside and above the one in front, like a fanned stack
+        const o = inspectObjectFor(p), m = c - (n - 1) / 2;
+        o.position.set(m * dim * 0.3, m * dim * 0.06, -m * dim * 0.34); o.rotation.y = -m * 0.12;
+        pack.add(o);
+      }
+      arm.add(pack); slot.add(arm); ring.spin.add(slot); ring.packs.push({ slot, pack, r: ring.r, k, j: g.js[0] });
     });
     // The core: a small bright sun with a soft halo, and a little drifting dust to give the space some depth.
     sys.add(new THREE.Mesh(new THREE.SphereGeometry(0.1, 24, 16), new THREE.MeshBasicMaterial({ color: 0xfff1d0 })));
@@ -2238,17 +2256,17 @@ function startWorld(THREE) {
         _rv.set(pk.r, 0, 0).applyQuaternion(_rq);
         _ry.setFromAxisAngle(_up, Math.atan2(_rv.x, _rv.z));
         pk.pack.quaternion.copy(_rq.invert().multiply(_ry));
-        pk.pack.scale.setScalar(pk.k * (1 + (inspectPulse && inspectPulse.j === pk.j ? pulse : 0)));
+        pk.pack.scale.setScalar(pk.k * (1 + (inspectPulse && inspectPulse.js.includes(pk.j) ? pulse : 0)));
       });
     });
     if (inspectPulse && now - inspectPulse.t0 > 1100) inspectPulse = null;
   }
   function fillInspectChips(b) {
     const ul = $('inspect-items'); ul.textContent = ''; ul.scrollTop = 0; ul.classList.remove('end');
-    b.items.forEach((p, j) => {
-      const img = new Image(); img.alt = ''; img.src = p.thumbDirect || thumbUrl(p);
-      const chip = el('button', { type: 'button', className: 'chip', title: `${p.name} · ${money(p.price)}`, onclick: () => { inspectPulse = { j, t0: performance.now() }; inspectLastTouch = performance.now(); } }, img, el('span', { textContent: p.name }));
-      chip.setAttribute('aria-label', `Show ${p.name} in the rings`);
+    groupItems(b.items).forEach(g => {
+      const p = g.p, img = new Image(); img.alt = ''; img.src = p.thumbDirect || thumbUrl(p);
+      const chip = el('button', { type: 'button', className: 'chip', title: `${g.n > 1 ? g.n + ' × ' : ''}${p.name} · ${money(p.price)}`, onclick: () => { inspectPulse = { js: g.js, t0: performance.now() }; inspectLastTouch = performance.now(); } }, img, el('span', { textContent: (g.n > 1 ? g.n + ' × ' : '') + p.name }));
+      chip.setAttribute('aria-label', `Show ${g.n > 1 ? g.n + ' × ' : ''}${p.name} in the rings`);
       ul.append(el('li', {}, chip));
     });
     ul.hidden = false;
