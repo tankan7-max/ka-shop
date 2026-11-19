@@ -104,16 +104,46 @@
   .pv-bar .pv-icon { width: 30px; padding: 0; display: grid; place-items: center; }
   .pv-bar svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   .pv-hint { display: none; margin: 8px 2px 0; font-size: 12px; color: var(--muted); text-align: center; }
+  .dims { display: grid; gap: 8px; margin-top: 10px; }
+  .dim { display: grid; grid-template-columns: 1fr 104px; gap: 2px 10px; align-items: center; }
+  .dim[hidden] { display: none; }
+  .dim label { font-weight: 600; }
+  .dim input[type="number"] { height: 38px; padding: 0 8px; font-size: 16px; border: 1px solid var(--line); border-radius: 10px; background: #fff; width: 100%; }
+  .dim input[type="range"] { grid-column: 1 / -1; width: 100%; height: 24px; background: transparent; -webkit-appearance: none; appearance: none; cursor: pointer; }
+  #texed { width: min(980px, calc(100vw - 16px)); }
+  #texed form { padding: 16px 18px; }
+  .te-layout { display: grid; gap: 16px; align-items: start; }
+  @media (min-width: 800px) { .te-layout { grid-template-columns: minmax(0, 1fr) 340px; } }
+  .te-stage { position: sticky; top: 0; z-index: 2; background: var(--card); padding-bottom: 6px; }
+  #te-wrap { position: relative; display: grid; place-items: center; min-height: 220px; max-height: 56vh; padding: 10px; border-radius: 14px; background: #e9eeee; overflow: hidden; }
+  #te-canvas { max-width: 100%; max-height: calc(56vh - 20px); border-radius: 6px; cursor: grab; touch-action: none; background: repeating-conic-gradient(#fff 0 25%, #dfe5e5 0 50%) 0 0 / 16px 16px; box-shadow: 0 2px 12px rgba(20,30,35,.25); }
+  #te-canvas.drag { cursor: grabbing; }
+  #te-info { margin: 6px 2px 0; font-size: 13px; color: var(--muted); }
+  .te-ctl { display: grid; gap: 10px; min-width: 0; }
+  .te-ctl fieldset { margin: 0; min-width: 0; }
+  .te-layer { min-width: 0; grid-template-columns: minmax(0, 1fr); }
+  .te-layer .top input[type="text"] { width: 0; }
+  .te-layer .te-row { grid-template-columns: 76px minmax(0, 1fr) 42px; }
+  .te-layer .top .small { flex: none; }
+  .te-row { display: grid; grid-template-columns: 92px 1fr 46px; gap: 4px 8px; align-items: center; margin-top: 6px; font-size: 14px; }
+  .te-row output { text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; font-size: 13px; }
+  .te-row input[type="range"] { width: 100%; height: 24px; background: transparent; -webkit-appearance: none; appearance: none; cursor: pointer; }
+  .te-btns { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .te-layer { border: 1px solid var(--line); border-radius: 10px; padding: 8px; margin-top: 8px; display: grid; gap: 4px; }
+  .te-layer .top { display: flex; gap: 6px; align-items: center; }
+  .te-layer .top input[type="text"] { flex: 1; min-width: 0; height: 36px; padding: 0 8px; font-size: 16px; border: 1px solid var(--line); border-radius: 8px; }
+  .te-layer input[type="color"] { width: 38px; height: 36px; padding: 1px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+  .te-layer label.inl { display: flex; gap: 6px; align-items: center; font-size: 13px; }
   .tf-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
   .texfit { display: grid; grid-template-columns: 104px 1fr 48px; gap: 6px 10px; align-items: center; margin-top: 8px; }
   .texfit label { font-weight: 600; }
   .texfit output { font-weight: 400; text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; }
-  .texfit input[type="range"] { width: 100%; height: 24px; background: transparent; -webkit-appearance: none; appearance: none; cursor: pointer; }
-  .texfit input[type="range"]::-webkit-slider-runnable-track { height: 4px; border-radius: 4px; background: #d8e0df; }
-  .texfit input[type="range"]::-moz-range-track { height: 4px; border-radius: 4px; background: #d8e0df; }
-  .texfit input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; margin-top: -7px; border-radius: 50%; background: var(--brand); border: 3px solid #fff; box-shadow: 0 1px 4px rgba(20,30,35,.4); }
-  .texfit input[type="range"]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--brand); border: 3px solid #fff; box-shadow: 0 1px 4px rgba(20,30,35,.4); }
-  .texfit input[type="range"]:disabled { opacity: .4; cursor: default; }
+  .texfit input[type="range"], .rngs input[type="range"] { width: 100%; height: 24px; background: transparent; -webkit-appearance: none; appearance: none; cursor: pointer; }
+  .texfit input[type="range"]::-webkit-slider-runnable-track, .rngs input[type="range"]::-webkit-slider-runnable-track { height: 4px; border-radius: 4px; background: #d8e0df; }
+  .texfit input[type="range"]::-moz-range-track, .rngs input[type="range"]::-moz-range-track { height: 4px; border-radius: 4px; background: #d8e0df; }
+  .texfit input[type="range"]::-webkit-slider-thumb, .rngs input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; margin-top: -7px; border-radius: 50%; background: var(--brand); border: 3px solid #fff; box-shadow: 0 1px 4px rgba(20,30,35,.4); }
+  .texfit input[type="range"]::-moz-range-thumb, .rngs input[type="range"]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--brand); border: 3px solid #fff; box-shadow: 0 1px 4px rgba(20,30,35,.4); }
+  .texfit input[type="range"]:disabled, .rngs input[type="range"]:disabled { opacity: .4; cursor: default; }
   .dialog-btns { position: sticky; bottom: 0; z-index: 5; margin: 18px -20px -18px; padding: 12px 20px; background: var(--card); border-top: 1px solid var(--line); }
   @media (min-width: 860px) {
     #editor { width: min(1040px, calc(100vw - 20px)); }
@@ -218,6 +248,52 @@
 </dialog>
 
 
+<dialog id="texed" class="texed" aria-labelledby="te-title">
+  <form id="texed-form" method="dialog">
+    <h2 id="te-title">Picture editor</h2>
+    <div class="te-layout">
+      <div class="te-stage">
+        <div id="te-wrap"><canvas id="te-canvas" tabindex="0" role="img" aria-label="The picture as it will be printed on the pack. Drag to slide it, scroll to zoom."></canvas></div>
+        <p id="te-info"></p>
+      </div>
+      <div class="te-ctl rngs">
+        <fieldset><legend>Picture</legend>
+          <div class="te-btns">
+            <button type="button" class="small" id="te-rotl" aria-label="Rotate left">⟲ Rotate</button><button type="button" class="small" id="te-rotr" aria-label="Rotate right">⟳ Rotate</button>
+            <button type="button" class="small" id="te-flip" aria-pressed="false">⇋ Flip</button>
+          </div>
+          <label class="te-row">Frame<select id="te-frame" style="grid-column: 2 / -1"><option value="face">The pack’s printable area</option><option value="free">Keep the picture’s own shape</option></select></label>
+          <div class="te-row"><label for="te-zoom">Zoom</label><input id="te-zoom" type="range" min="0.3" max="4" step="0.01" value="1"><output id="te-zoom-o">100%</output></div>
+          <div class="te-row"><label for="te-px">Slide right</label><input id="te-px" type="range" min="-1" max="1" step="0.01" value="0"><output id="te-px-o">0%</output></div>
+          <div class="te-row"><label for="te-py">Slide down</label><input id="te-py" type="range" min="-1" max="1" step="0.01" value="0"><output id="te-py-o">0%</output></div>
+        </fieldset>
+        <fieldset><legend>Colour</legend>
+          <div class="te-row"><label for="te-bri">Brightness</label><input id="te-bri" type="range" min="-100" max="100" step="1" value="0"><output id="te-bri-o">0</output></div>
+          <div class="te-row"><label for="te-con">Contrast</label><input id="te-con" type="range" min="-100" max="100" step="1" value="0"><output id="te-con-o">0</output></div>
+          <div class="te-row"><label for="te-sat">Colour</label><input id="te-sat" type="range" min="-100" max="100" step="1" value="0"><output id="te-sat-o">0</output></div>
+        </fieldset>
+        <fieldset><legend>Background</legend>
+          <label class="check"><input id="te-cut" type="checkbox"> Make white see-through</label>
+          <div class="te-row"><label for="te-tol">How much</label><input id="te-tol" type="range" min="5" max="80" step="1" value="30"><output id="te-tol-o">30</output></div>
+          <label class="check"><input id="te-clear" type="checkbox"> Leave empty areas see-through</label>
+          <label class="check" style="font-weight:400">Fill empty areas with <input id="te-bg" type="color" value="#ffffff" style="width:38px;height:30px;padding:1px;border:1px solid var(--line);border-radius:6px"></label>
+        </fieldset>
+        <fieldset><legend>Text</legend>
+          <div id="te-layers"></div>
+          <div class="te-btns"><button type="button" class="small" id="te-addtext">+ Add text</button></div>
+        </fieldset>
+      </div>
+    </div>
+    <p id="te-error" class="error" role="alert"></p>
+    <div class="dialog-btns">
+      <button id="te-apply" class="primary" type="button">Use this picture</button>
+      <button id="te-cancel" type="button">Cancel</button>
+      <span class="spacer"></span>
+      <button id="te-reset" type="button">Start over</button>
+    </div>
+  </form>
+</dialog>
+
 <dialog id="editor" aria-labelledby="editor-title">
   <form id="editor-form" method="dialog">
     <h2 id="editor-title">Product</h2>
@@ -260,12 +336,12 @@
         </select></label>
         <label class="field">Pack colour<input id="f-color" type="color" value="#2a9d8f" style="display:block;width:100%;height:42px;margin-top:4px;padding:2px;border:1px solid var(--line);border-radius:10px;background:#fff"></label>
       </div>
-      <div class="grid">
-        <label class="field">Width<input id="f-w" type="number" min="0.05" max="0.8" step="0.01" inputmode="decimal" required></label>
-        <label class="field">Height<input id="f-h" type="number" min="0.05" max="0.6" step="0.01" inputmode="decimal" required></label>
-        <label class="field">Depth<input id="f-d" type="number" min="0.03" max="0.5" step="0.01" inputmode="decimal" required></label>
+      <div class="dims rngs">
+        <div class="dim" id="dim-w"><label for="f-w" id="dim-w-l">Width</label><input id="f-w" type="number" min="0.05" max="0.8" step="0.01" inputmode="decimal" required><input id="f-w-r" type="range" min="0.05" max="0.8" step="0.01" aria-label="Width slider"></div>
+        <div class="dim" id="dim-h"><label for="f-h" id="dim-h-l">Height</label><input id="f-h" type="number" min="0.05" max="0.6" step="0.01" inputmode="decimal" required><input id="f-h-r" type="range" min="0.05" max="0.6" step="0.01" aria-label="Height slider"></div>
+        <div class="dim" id="dim-d"><label for="f-d" id="dim-d-l">Depth</label><input id="f-d" type="number" min="0.03" max="0.5" step="0.01" inputmode="decimal" required><input id="f-d-r" type="range" min="0.03" max="0.5" step="0.01" aria-label="Depth slider"></div>
       </div>
-      <span class="hint">Sizes are in shop units, about 3× real life so packs read well on the shelf: a real 15&nbsp;cm-wide bag is about 0.45. Picking a shape fills in typical sizes.</span>
+      <span class="hint" id="dim-hint">Sizes are in shop units, about 3× real life so packs read well on the shelf: a real 15&nbsp;cm-wide bag is about 0.45. Picking a shape fills in typical sizes.</span>
       <div class="field">Photo of the pack front
         <div class="file-line">
           <div id="photo-preview"></div>
@@ -273,6 +349,7 @@
             <input id="f-photo" type="file" accept="image/jpeg,image/png,image/webp" aria-label="Photo of the pack front">
             <small>JPEG, PNG or WebP. It is made smaller before uploading. Without a photo the shop draws the pack from the name and colour.</small>
             <button id="photo-remove" class="small" type="button" hidden>Remove photo</button>
+            <button id="texed-open" class="small" type="button">Edit picture / design a label…</button>
           </div>
         </div>
       </div>
@@ -283,6 +360,15 @@
         <small>If copying is refused, save the picture to your computer and upload it with “Choose file” above.</small>
       </div>
       <label class="check"><input id="f-cover" type="checkbox"> The photo is the flat artwork — wrap it across the whole pack front</label>
+      <div class="field" id="wrapbox" hidden>Wrap around the pack
+        <select id="f-wrap" aria-label="How the label wraps around the pack">
+          <option value="twice">Same art on the front and the back</option>
+          <option value="once">One continuous label, once all the way round</option>
+          <option value="front">Front only (plain colour behind)</option>
+        </select>
+        <small id="wrap-note"></small>
+        <div class="texfit rngs"><label for="f-tex-spin">Turn label</label><input id="f-tex-spin" type="range" min="-180" max="180" step="5" value="0" aria-label="Turn the label around the pack"><output id="f-tex-spin-out">0°</output></div>
+      </div>
       <div class="field" id="texfit"><div class="tf-head"><span>Texture fit</span><button id="texfit-reset" class="small" type="button">Reset</button></div>
         <div class="texfit">
           <label for="f-tex-scale">Scale</label><input id="f-tex-scale" type="range" min="0.5" max="2" step="0.05" value="1" aria-label="Texture scale"><output id="f-tex-scale-out">100%</output>
@@ -589,7 +675,7 @@ const pvLabelShare = p => (p.kind === 'bottle' ? 0.56 : 1);
 function pvFaceSize(p) {
   if (p.kind === 'roll') return [p.width * 0.9, Math.PI * Math.min(p.height, p.depth) / 2];
   if (p.kind === 'hex') return [p.width / 2, p.height * 0.92];
-  return [p.round ? Math.PI * p.width / 2 : p.width, p.height * pvLabelShare(p)];
+  return [p.round ? Math.PI * p.width / (p.wrap === 'once' ? 1 : 2) : p.width, p.height * pvLabelShare(p)];
 }
 function pvPackGeometry(p, w, d) {
   const h = p.height, r = w / 2, top = h / 2, bot = -h / 2;
@@ -668,10 +754,14 @@ function pvModelParts(gltf, w, h, d) {
 }
 const pvStd = (color, opts = {}) => new T.MeshStandardMaterial({ color, roughness: 0.8, ...opts });
 function pvPackTexture(p) {
-  const [faceW, faceH] = pvFaceSize(p);
-  const W = 320, H = Math.round(pvClamp(W * faceH / faceW, 96, p.kind === 'hex' ? 1280 : 640));
-  const tex = pvCanvasTexture(p.round ? W * 2 : W, H, ctx => { pvDrawPack(ctx, p, 0, 0, W, H); if (p.round) pvDrawPack(ctx, p, W, 0, W, H); });
-  if (p.round) { tex.wrapS = T.RepeatWrapping; tex.offset.x = 0.25; }
+  const [faceW, faceH] = pvFaceSize(p), once = p.round && p.wrap === 'once';
+  const W = once ? 640 : 320, H = Math.round(pvClamp(W * faceH / faceW, 96, p.kind === 'hex' ? 1280 : 640));
+  const tex = pvCanvasTexture(p.round && !once ? W * 2 : W, H, ctx => {
+    if (p.round && p.wrap === 'front') { ctx.fillStyle = hex(p.color); ctx.fillRect(0, 0, W * 2, H); }
+    pvDrawPack(ctx, p, 0, 0, W, H);
+    if (p.round && !once && p.wrap !== 'front') pvDrawPack(ctx, p, W, 0, W, H);
+  });
+  if (p.round) { tex.wrapS = T.RepeatWrapping; tex.offset.x = (once ? 0.5 : 0.25) - (p.texSpin || 0) / 360; }
   if (p.kind === 'hex') { tex.wrapS = T.RepeatWrapping; tex.repeat.x = 6; }   // the same art on all six sides
   return tex;
 }
@@ -694,6 +784,7 @@ function pvProduct() {
     kind: shape, round: ROUND.includes(shape),
     width: num('f-w', 0.05, 0.8, size[0]), height: num('f-h', 0.05, 0.6, size[1]), depth: num('f-d', 0.03, 0.5, size[2]),
     photoFills: $('f-cover').checked, photo: pv.photoImg,
+    wrap: $('f-wrap').value, texSpin: Number($('f-tex-spin').value) || 0,
     texScale: Number($('f-tex-scale').value) || 1, texOffX: Number($('f-tex-ox').value) || 0, texOffY: Number($('f-tex-oy').value) || 0,
     hash: pvHashOf($('f-name').value.trim() || 'new-snack'),
   };
@@ -899,6 +990,35 @@ function pvSchedule() { clearTimeout(pv.timer); pv.timer = setTimeout(pvRebuild,
 $('editor').addEventListener('close', pvStop);
 $('texfit-reset').addEventListener('click', () => { [['f-tex-scale', 1], ['f-tex-ox', 0], ['f-tex-oy', 0]].forEach(([id, v]) => { $(id).value = v; }); texfitOut(); pvSchedule(); });
 
+// --- Size sliders. Round packs are described by diameter and height, a roll by length and diameter. ---
+function dimSpec(shape) {
+  if (ROUND.includes(shape)) return { w: ['Diameter', 0.08, 0.6], h: ['Height', 0.05, 0.6], d: null, mirror: ['f-w', 'f-d'], hint: 'Diameter is across the pack; height is how tall it stands. The shop makes it perfectly round.' };
+  if (shape === 'roll') return { w: ['Length', 0.1, 0.8], h: ['Diameter', 0.05, 0.3], d: null, mirror: ['f-h', 'f-d'], hint: 'Length is along the roll; diameter is across it. The shop makes it perfectly round.' };
+  return { w: ['Width', 0.05, 0.8], h: ['Height', 0.05, 0.6], d: ['Depth', 0.03, 0.5], mirror: null, hint: 'Sizes are in shop units, about 3× real life so packs read well on the shelf: a real 15 cm-wide bag is about 0.45. Picking a shape fills in typical sizes.' };
+}
+function syncDims() {
+  const spec = dimSpec($('f-shape').value);
+  [['w', 'f-w'], ['h', 'f-h'], ['d', 'f-d']].forEach(([k, id]) => {
+    const row = $('dim-' + k), sp = spec[k]; row.hidden = !sp; if (!sp) return;
+    $('dim-' + k + '-l').textContent = sp[0];
+    [$(id), $(id + '-r')].forEach(i => { i.min = sp[1]; i.max = sp[2]; });
+    $(id + '-r').setAttribute('aria-label', sp[0] + ' slider');
+  });
+  if (spec.mirror) $(spec.mirror[1]).value = $(spec.mirror[0]).value;
+  ['f-w', 'f-h', 'f-d'].forEach(id => { $(id + '-r').value = $(id).value; });
+  $('dim-hint').textContent = spec.hint;
+  const round = ROUND.includes($('f-shape').value);
+  $('wrapbox').hidden = !round;
+  $('wrap-note').textContent = $('f-wrap').value === 'once' ? 'The picture is stretched round the whole pack once, so it is as wide as the pack is round. Use “Turn label” to hide the seam at the back.' : $('f-wrap').value === 'front' ? 'The picture is printed on the front half only; the back is the plain pack colour.' : 'The picture is printed twice, so you see it from the front and the back.';
+  $('f-tex-spin-out').textContent = Number($('f-tex-spin').value) + '°';
+}
+['f-w', 'f-h', 'f-d'].forEach(id => {
+  $(id).addEventListener('input', () => { $(id + '-r').value = $(id).value; const m = dimSpec($('f-shape').value).mirror; if (m && m[0] === id) { $(m[1]).value = $(id).value; $(m[1] + '-r').value = $(id).value; } });
+  $(id + '-r').addEventListener('input', () => { $(id).value = $(id + '-r').value; $(id).dispatchEvent(new Event('input')); });
+});
+$('f-wrap').addEventListener('change', () => { syncDims(); pvSchedule(); });
+$('f-tex-spin').addEventListener('input', () => { syncDims(); pvSchedule(); });
+
 // --- The editor ---
 function fillCategories(selected) {
   const sel = $('f-category'); sel.textContent = '';
@@ -908,7 +1028,7 @@ function fillCategories(selected) {
   $('f-newcat-wrap').hidden = sel.value !== '\u0000new';
 }
 $('f-category').onchange = () => { $('f-newcat-wrap').hidden = $('f-category').value !== '\u0000new'; if (!$('f-newcat-wrap').hidden) $('f-newcat').focus(); };
-$('f-shape').onchange = () => { const s = SIZES[$('f-shape').value]; if (s) [$('f-w').value, $('f-h').value, $('f-d').value] = s; };
+$('f-shape').onchange = () => { const s = SIZES[$('f-shape').value]; if (s) [$('f-w').value, $('f-h').value, $('f-d').value] = s; syncDims(); };
 // Texture fit readouts: show the slider values as percentages, and grey the
 // settings out while a 3D model is set (a model brings its own textures).
 function texfitOut() {
@@ -940,6 +1060,8 @@ function openEditor(p) {
   $('f-stock-wrap').hidden = !!p; $('f-stock').value = 10;
   $('f-shape').value = shape; $('f-color').value = hex(m.color === undefined ? 0x2a9d8f : m.color);
   $('f-w').value = m.width || size[0]; $('f-h').value = m.height || size[1]; $('f-d').value = m.depth || size[2];
+  $('f-wrap').value = ['once', 'front'].includes(t.wrap) ? t.wrap : 'twice'; $('f-tex-spin').value = Number.isFinite(t.rotate) ? t.rotate : 0;
+  syncDims();
   $('f-cover').checked = t.fit === 'cover'; $('f-active').checked = p ? !!p.active : true;
   $('f-tex-scale').value = t.scale === undefined ? 1 : t.scale; $('f-tex-ox').value = t.offset_x || 0; $('f-tex-oy').value = t.offset_y || 0;
   $('f-photo').value = ''; $('f-model').value = '';
@@ -995,6 +1117,136 @@ $('f-model').onchange = async () => {
 };
 $('model-remove').onclick = () => { draft.modelFile = null; draft.modelUrl = ''; $('f-model').value = ''; showFiles(); };
 
+// --- Picture editor: crop, rotate, colour, cut out a white background, add text. Makes the picture the pack prints. ---
+const te = { src: null, rot: 0, flip: false, zoom: 1, px: 0, py: 0, bri: 0, con: 0, sat: 0, cut: false, tol: 30, clear: false, bg: '#ffffff', frame: 'face', layers: [], aspect: 1, blank: false, raf: 0, drag: null, pinch: null };
+const teFace = () => { const p = pvProduct(), [w, h] = pvFaceSize(p); return w / h; };
+const teDims = long => { const a = te.aspect; return a >= 1 ? [long, Math.max(8, Math.round(long / a))] : [Math.max(8, Math.round(long * a)), long]; };
+function teAspect() {
+  if (te.frame === 'free' && te.src) { const sw = te.rot % 2 ? te.src.height : te.src.width, sh = te.rot % 2 ? te.src.width : te.src.height; return Math.min(6, Math.max(1 / 6, sw / sh)); }
+  return Math.min(6, Math.max(1 / 6, teFace()));
+}
+function teRender(ctx, W, H) {
+  ctx.clearRect(0, 0, W, H);
+  if (!te.clear) { ctx.fillStyle = te.bg; ctx.fillRect(0, 0, W, H); }
+  const img = te.src, sw = te.rot % 2 ? img.height : img.width, sh = te.rot % 2 ? img.width : img.height;
+  const scale = Math.max(W / sw, H / sh) * te.zoom;
+  ctx.save(); ctx.translate(W / 2 + te.px * W / 2, H / 2 + te.py * H / 2); ctx.scale(te.flip ? -1 : 1, 1); ctx.rotate(te.rot * Math.PI / 2); ctx.scale(scale, scale);
+  ctx.imageSmoothingQuality = 'high'; ctx.drawImage(img, -img.width / 2, -img.height / 2); ctx.restore();
+  if (te.bri || te.con || te.sat || te.cut) {
+    const d = ctx.getImageData(0, 0, W, H), a = d.data, b = te.bri * 2.55, c = te.con >= 0 ? 1 + te.con / 50 : 1 + te.con / 100, sat = 1 + te.sat / 100, thr = 255 - te.tol;
+    for (let i = 0; i < a.length; i += 4) {
+      let r = a[i], g = a[i + 1], bl = a[i + 2];
+      if (te.sat) { const l = 0.299 * r + 0.587 * g + 0.114 * bl; r = l + (r - l) * sat; g = l + (g - l) * sat; bl = l + (bl - l) * sat; }
+      if (te.con) { r = (r - 128) * c + 128; g = (g - 128) * c + 128; bl = (bl - 128) * c + 128; }
+      r += b; g += b; bl += b;
+      a[i] = r < 0 ? 0 : r > 255 ? 255 : r; a[i + 1] = g < 0 ? 0 : g > 255 ? 255 : g; a[i + 2] = bl < 0 ? 0 : bl > 255 ? 255 : bl;
+      if (te.cut) { const m = Math.min(a[i], a[i + 1], a[i + 2]); if (m >= thr) a[i + 3] = 0; else if (m > thr - 28) a[i + 3] = Math.round(a[i + 3] * (thr - m) / 28); }
+    }
+    ctx.putImageData(d, 0, 0);
+  }
+  te.layers.forEach(L => {
+    if (!L.text.trim()) return;
+    const size = Math.max(6, L.size / 100 * H); ctx.font = `800 ${size}px ${PV_FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineJoin = 'round';
+    const w = ctx.measureText(L.text).width, k = w > W * 0.94 ? W * 0.94 / w : 1;
+    ctx.save(); ctx.translate((0.5 + L.x / 2) * W, (0.5 + L.y / 2) * H); ctx.scale(k, k);
+    if (L.outline) { ctx.lineWidth = Math.max(2, size * 0.16); ctx.strokeStyle = pvIsDark(parseInt(L.color.slice(1), 16)) ? 'rgba(255,255,255,.9)' : 'rgba(0,0,0,.75)'; ctx.strokeText(L.text, 0, 0); }
+    ctx.fillStyle = L.color; ctx.fillText(L.text, 0, 0); ctx.restore();
+  });
+}
+function teDraw() {
+  te.raf = 0; if (!$('texed').open || !te.src) return;
+  te.aspect = teAspect();
+  const c = $('te-canvas'), [W, H] = teDims(560);
+  if (c.width !== W || c.height !== H) { c.width = W; c.height = H; }
+  c.style.aspectRatio = `${W} / ${H}`; c.style.width = Math.min(W, 520) + 'px';
+  teRender(c.getContext('2d', { willReadFrequently: true }), W, H);
+  $('te-info').textContent = te.frame === 'face' ? `Frame = the pack’s printable area (${(te.aspect).toFixed(2)} : 1${ROUND.includes($('f-shape').value) ? ', for “' + $('f-wrap').selectedOptions[0].textContent.split(' (')[0] + '”' : ''}). Drag to slide, scroll to zoom. Anything outside the frame is cut off. For a can or bottle, choose how it wraps before editing, since the printable area changes.` : 'Frame = the picture’s own shape. It will be stretched over the pack’s printable area.';
+  $('te-zoom-o').textContent = Math.round(te.zoom * 100) + '%'; $('te-px-o').textContent = Math.round(te.px * 100) + '%'; $('te-py-o').textContent = Math.round(te.py * 100) + '%';
+  $('te-bri-o').textContent = te.bri; $('te-con-o').textContent = te.con; $('te-sat-o').textContent = te.sat; $('te-tol-o').textContent = te.tol;
+  $('te-tol').disabled = !te.cut; $('te-bg').disabled = te.clear;
+}
+const teAsk = () => { if (!te.raf) te.raf = requestAnimationFrame(teDraw); };
+function teLayers() {
+  const box = $('te-layers'); box.textContent = '';
+  te.layers.forEach((L, i) => {
+    const slider = (label, key, min, max, step, fmt) => { const r = el('input', { type: 'range', min, max, step, value: L[key] }); const o = el('output', { textContent: fmt(L[key]) }); r.oninput = () => { L[key] = Number(r.value); o.textContent = fmt(L[key]); teAsk(); }; r.setAttribute('aria-label', `Text ${i + 1} ${label}`); return [el('label', { textContent: label }), r, o]; };
+    const text = el('input', { type: 'text', value: L.text, maxLength: 60, placeholder: 'Text' }); text.oninput = () => { L.text = text.value; teAsk(); }; text.setAttribute('aria-label', `Text ${i + 1}`);
+    const col = el('input', { type: 'color', value: L.color }); col.oninput = () => { L.color = col.value; teAsk(); }; col.setAttribute('aria-label', `Text ${i + 1} colour`);
+    const rm = el('button', { type: 'button', className: 'small', textContent: '✕', onclick: () => { te.layers.splice(i, 1); teLayers(); teAsk(); } }); rm.setAttribute('aria-label', `Remove text ${i + 1}`);
+    const out = el('input', { type: 'checkbox', checked: L.outline }); out.onchange = () => { L.outline = out.checked; teAsk(); };
+    box.append(el('div', { className: 'te-layer' }, el('div', { className: 'top' }, text, col, rm),
+      ...[['Size', 'size', 3, 60, 1, v => v + '%'], ['Left–right', 'x', -1, 1, 0.01, v => Math.round(v * 100) + '%'], ['Up–down', 'y', -1, 1, 0.01, v => Math.round(v * 100) + '%']].map(a => el('div', { className: 'te-row' }, ...slider(...a))),
+      el('label', { className: 'inl' }, out, 'Outline')));
+  });
+  $('te-addtext').disabled = te.layers.length >= 4;
+}
+function teReset() {
+  Object.assign(te, { rot: 0, flip: false, zoom: 1, px: 0, py: 0, bri: 0, con: 0, sat: 0, cut: false, tol: 30, clear: false, bg: '#ffffff', layers: [] });
+  [['te-zoom', 1], ['te-px', 0], ['te-py', 0], ['te-bri', 0], ['te-con', 0], ['te-sat', 0], ['te-tol', 30]].forEach(([id, v]) => { $(id).value = v; });
+  $('te-cut').checked = false; $('te-clear').checked = false; $('te-bg').value = '#ffffff'; $('te-flip').setAttribute('aria-pressed', 'false'); teLayers(); teAsk();
+}
+// A flat picture in the pack's own colour, for designing a label from scratch.
+function teBlank() {
+  const a = Math.min(6, Math.max(1 / 6, teFace())), [W, H] = a >= 1 ? [1024, Math.round(1024 / a)] : [Math.round(1024 * a), 1024];
+  const c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d'); x.fillStyle = $('f-color').value; x.fillRect(0, 0, W, H); return c;
+}
+async function teOpen() {
+  const err = $('editor-error'); err.textContent = '';
+  try {
+    let src = null;
+    if (draft.photoBlob || draft.photoPreview) {
+      const blob = draft.photoBlob || await (async () => { const res = await fetch(draft.photoUrl, { mode: 'cors', referrerPolicy: 'no-referrer' }); if (!res.ok) throw new Error('HTTP ' + res.status); return res.blob(); })();
+      src = await new Promise((ok, bad) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => bad(new Error('x')); i.src = URL.createObjectURL(blob); });
+    }
+    te.blank = !src; te.src = src || teBlank(); teReset();
+    te.frame = 'face'; $('te-frame').value = 'face'; $('te-frame').disabled = te.blank;
+    $('te-title').textContent = te.blank ? 'Design a label' : 'Edit picture';
+    $('te-error').textContent = ''; $('texed').showModal(); teAsk(); $('te-zoom').focus();
+    if (te.blank) { te.layers.push({ text: $('f-name').value.trim() || 'Snack', color: '#ffffff', size: 16, x: 0, y: -0.15, outline: true }); teLayers(); teAsk(); }
+  } catch (e) { err.textContent = draft.photoBlob || !isLink(draft.photoUrl) ? 'That picture could not be opened.' : `${hostOf(draft.photoUrl)} does not let this page edit its picture. Use “Copy it into my shop”, or choose the file from your computer, then edit it.`; }
+}
+$('texed-open').onclick = teOpen;
+$('te-cancel').onclick = () => $('texed').close();
+$('te-reset').onclick = teReset;
+$('te-rotl').onclick = () => { te.rot = (te.rot + 3) % 4; te.px = te.py = 0; teAsk(); };
+$('te-rotr').onclick = () => { te.rot = (te.rot + 1) % 4; te.px = te.py = 0; teAsk(); };
+$('te-flip').onclick = () => { te.flip = !te.flip; $('te-flip').setAttribute('aria-pressed', String(te.flip)); teAsk(); };
+$('te-frame').onchange = () => { te.frame = $('te-frame').value; teAsk(); };
+[['te-zoom', 'zoom'], ['te-px', 'px'], ['te-py', 'py'], ['te-bri', 'bri'], ['te-con', 'con'], ['te-sat', 'sat'], ['te-tol', 'tol']].forEach(([id, k]) => $(id).addEventListener('input', () => { te[k] = Number($(id).value); teAsk(); }));
+$('te-cut').onchange = () => { te.cut = $('te-cut').checked; teAsk(); };
+$('te-clear').onchange = () => { te.clear = $('te-clear').checked; teAsk(); };
+$('te-bg').oninput = () => { te.bg = $('te-bg').value; teAsk(); };
+$('te-addtext').onclick = () => { te.layers.push({ text: 'Text', color: '#ffffff', size: 14, x: 0, y: te.layers.length ? 0.4 : 0, outline: true }); teLayers(); teAsk(); };
+{ // drag to slide, wheel or pinch to zoom
+  const c = $('te-canvas'), pts = new Map();
+  c.addEventListener('pointerdown', e => { c.setPointerCapture(e.pointerId); pts.set(e.pointerId, { x: e.clientX, y: e.clientY }); c.classList.add('drag'); te.pinch = pts.size === 2 ? { d: Math.hypot(...[...pts.values()].reduce((a, p, i) => i ? [a[0] - p.x, a[1] - p.y] : [p.x, p.y], [])), z: te.zoom } : null; });
+  c.addEventListener('pointermove', e => {
+    const q = pts.get(e.pointerId); if (!q) return; const r = c.getBoundingClientRect();
+    if (pts.size === 1) { te.px = Math.max(-1, Math.min(1, te.px + (e.clientX - q.x) / r.width * 2)); te.py = Math.max(-1, Math.min(1, te.py + (e.clientY - q.y) / r.height * 2)); $('te-px').value = te.px; $('te-py').value = te.py; }
+    q.x = e.clientX; q.y = e.clientY;
+    if (pts.size === 2 && te.pinch) { const [a, b] = [...pts.values()], d = Math.hypot(a.x - b.x, a.y - b.y); te.zoom = Math.max(0.3, Math.min(4, te.pinch.z * d / (te.pinch.d || d))); $('te-zoom').value = te.zoom; }
+    teAsk();
+  });
+  const up = e => { pts.delete(e.pointerId); te.pinch = null; if (!pts.size) c.classList.remove('drag'); };
+  c.addEventListener('pointerup', up); c.addEventListener('pointercancel', up);
+  c.addEventListener('wheel', e => { e.preventDefault(); te.zoom = Math.max(0.3, Math.min(4, te.zoom * Math.exp(-e.deltaY * 0.0015))); $('te-zoom').value = te.zoom; teAsk(); }, { passive: false });
+  c.addEventListener('keydown', e => { const k = { ArrowLeft: ['px', -0.03], ArrowRight: ['px', 0.03], ArrowUp: ['py', -0.03], ArrowDown: ['py', 0.03] }[e.key]; if (k) { e.preventDefault(); te[k[0]] = Math.max(-1, Math.min(1, te[k[0]] + k[1])); $('te-' + k[0]).value = te[k[0]]; teAsk(); } else if (e.key === '+' || e.key === '=') { te.zoom = Math.min(4, te.zoom * 1.05); $('te-zoom').value = te.zoom; teAsk(); } else if (e.key === '-') { te.zoom = Math.max(0.3, te.zoom / 1.05); $('te-zoom').value = te.zoom; teAsk(); } });
+}
+$('te-apply').onclick = async () => {
+  const btn = $('te-apply'); btn.disabled = true;
+  try {
+    te.aspect = teAspect(); const [W, H] = teDims(1024), c = document.createElement('canvas'); c.width = W; c.height = H;
+    teRender(c.getContext('2d', { willReadFrequently: true }), W, H);
+    const clear = te.clear || te.cut, blob = await new Promise(ok => c.toBlob(ok, clear ? 'image/png' : 'image/jpeg', 0.92));
+    if (!blob) throw new Error('The picture could not be prepared.');
+    await usePhoto(new File([blob], 'label.' + (clear ? 'png' : 'jpg'), { type: blob.type }));
+    if (te.frame === 'face') $('f-cover').checked = true;   // it is exactly the printable area, so wrap it across the whole face
+    $('texed').close(); showFiles();
+  } catch (e) { $('te-error').textContent = e.message; }
+  btn.disabled = false;
+};
+$('texed').addEventListener('close', () => { try { if (te.src && te.src.src) URL.revokeObjectURL(te.src.src); } catch (e) {} te.src = null; });
+
 const slug = name => name.toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'product';
 $('editor-form').addEventListener('submit', async e => {
   e.preventDefault();
@@ -1017,10 +1269,13 @@ $('editor-form').addEventListener('submit', async e => {
     else if (!draft.modelUrl && editing && (editing.model || {}).glb_url) stale.push(editing.model.glb_url);
     const shape = $('f-shape').value;
     const model = { ...((editing && editing.model) || {}), type: ROUND.includes(shape) ? 'cylinder' : 'box', shape, width: num('f-w', 0.05, 0.8), height: num('f-h', 0.05, 0.6), depth: num('f-d', 0.03, 0.5), color: parseInt($('f-color').value.slice(1), 16) };
+    { const mir = dimSpec(shape).mirror; if (mir) model[mir[1] === 'f-d' ? 'depth' : 'width'] = model[mir[0] === 'f-w' ? 'width' : 'height']; }   // round packs are as deep as they are wide
     if (modelUrl) model.glb_url = modelUrl; else delete model.glb_url;
     const texture = { ...((editing && editing.texture) || {}) };
     if (photoUrl) { texture.type = 'image'; texture.image_url = photoUrl; if ($('f-cover').checked) texture.fit = 'cover'; else delete texture.fit; }
     else { delete texture.image_url; delete texture.fit; texture.type = 'generated'; }
+    if (ROUND.includes(shape) && $('f-wrap').value !== 'twice') texture.wrap = $('f-wrap').value; else delete texture.wrap;
+    { const sp = Math.round(Number($('f-tex-spin').value) || 0); if (ROUND.includes(shape) && sp) texture.rotate = Math.max(-180, Math.min(180, sp)); else delete texture.rotate; }
     const ts = Number($('f-tex-scale').value), tx = Number($('f-tex-ox').value), ty = Number($('f-tex-oy').value);
     if (Number.isFinite(ts) && ts !== 1) texture.scale = Math.round(Math.min(2, Math.max(0.5, ts)) * 100) / 100; else delete texture.scale;
     if (Number.isFinite(tx) && tx !== 0) texture.offset_x = Math.round(Math.min(0.5, Math.max(-0.5, tx)) * 100) / 100; else delete texture.offset_x;
