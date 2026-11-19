@@ -1273,8 +1273,8 @@ function startWorld(THREE) {
   // Shelf faces are listed in shopping order: left wall, middle aisles, right wall, back wall.
   function plan(G, sideCols) {
     const halfW = Math.max(5.6, (G - 1) / 2 * AISLE + 5.8), sideLen = lenFor(sideCols), gondolaLen = lenFor(Math.max(2, sideCols - 2)), backLen = halfW - 0.6;
-    const halfD = (UNIT_D + 0.3 + sideLen + Math.max(7.6, B_RUN + 3.0)) / 2;                        // back shelves + wall shelves + room at the front for the door and counter
-    const sideZ0 = -halfD + UNIT_D + 0.3, gondolaZ0 = -halfD + UNIT_D + 3.1;  // where the wall shelves and the gondolas start (their back ends)
+    const halfD = (UNIT_D + 1.5 + sideLen + Math.max(7.6, B_RUN + 3.0)) / 2;                        // back shelves + wall shelves + room at the front for the door and counter
+    const sideZ0 = -halfD + UNIT_D + 1.5, gondolaZ0 = -halfD + UNIT_D + 3.9;  // where the wall shelves and the gondolas start (their back ends)
     const units = [{ x: -halfW + UNIT_D / 2 + 0.06, z0: sideZ0, rotY: Math.PI / 2, length: sideLen }];
     for (let g = 0; g < G; g++) {
       const gx = (g - (G - 1) / 2) * AISLE;
