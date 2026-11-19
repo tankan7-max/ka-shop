@@ -478,7 +478,7 @@ async function fetchInventory() {
 try { INVENTORY = await fetchInventory(); }
 catch (e) { console.warn('Could not read the stock, treating everything as in stock:', e); }
 const stockOf = p => {
-  if (p.isBundle) return Math.min(...p.items.map(q => Object.prototype.hasOwnProperty.call(INVENTORY, q.id) ? INVENTORY[q.id] : Infinity));
+  if (p.isBundle) return Math.min(...groupItems(p.items).map(g => (Object.prototype.hasOwnProperty.call(INVENTORY, g.p.id) ? INVENTORY[g.p.id] : Infinity) / g.n).map(Math.floor));   // a snack used twice in a box needs two in stock per box
   return Object.prototype.hasOwnProperty.call(INVENTORY, p.id) ? INVENTORY[p.id] : Infinity;
 };
 const inStock = p => stockOf(p) > 0;
@@ -541,6 +541,9 @@ const PRODUCTS = db.products.map(p => {
   };
 }).filter(p => p.name && typeof p.price === 'number');
 
+// A bundle may use the same snack more than once (2 × Mamee noodles chicken): group the repeats, keeping the order of first appearance.
+function groupItems(items) { const m = new Map(); items.forEach((p, j) => { const g = m.get(p) || { p, n: 0, js: [] }; g.n++; g.js.push(j); m.set(p, g); }); return [...m.values()]; }
+const itemsText = (items, sep) => groupItems(items).map(g => (g.n > 1 ? `${g.n} × ` : '') + g.p.name).join(sep);
 // Bundles: ready-made boxes of snacks, from the "bundles" part of products.json.
 // A bundle is a cart item like a product, but its stock is the scarcest of its
 // snacks, and at checkout it is held as its snacks (so the owner packs them).
@@ -775,7 +778,7 @@ function renderCart() {
   cart.forEach((qty, p) => {
     const remove = el('button', { type: 'button', className: 'quiet', textContent: 'Remove', onclick: () => setQty(p, 0) }); remove.setAttribute('aria-label', `Remove ${p.name}`);
     list.append(el('div', { className: 'item cart-item' }, thumbBox(p),
-      el('div', {}, el('div', { className: 'name', textContent: p.name }), el('div', { className: 'meta', textContent: `${money(p.price)} each` + (qty >= maxQty(p) && maxQty(p) < 99 ? (qty >= stockOf(p) ? ` · all ${qty} in stock` : ' · the rest are in your cart') : '') }), p.isBundle ? el('div', { className: 'contents', textContent: p.items.map(x => x.name).join(' · ') }) : '', el('div', { className: 'acts' }, stepper(p, qty), remove)),
+      el('div', {}, el('div', { className: 'name', textContent: p.name }), el('div', { className: 'meta', textContent: `${money(p.price)} each` + (qty >= maxQty(p) && maxQty(p) < 99 ? (qty >= stockOf(p) ? ` · all ${qty} in stock` : ' · the rest are in your cart') : '') }), p.isBundle ? el('div', { className: 'contents', textContent: itemsText(p.items, ' · ') }) : '', el('div', { className: 'acts' }, stepper(p, qty), remove)),
       el('div', { className: 'line-total', textContent: money(qty * p.price) })));
   });
   const { subtotal, delivery, total, count } = cartTotals();
@@ -818,7 +821,7 @@ function updateCard() {
   if (inCart) $('card-price').append(el('small', { textContent: `${inCart} in your cart` }));
   const stocked = inStock(selected), room = maxQty(selected) - inCart, note = stockNote(selected);
   cardQty = clamp(cardQty, 1, Math.max(1, room));
-  $('card-pack').textContent = selected.isBundle ? selected.items.map(p => p.name).join(' · ') : selected.pack;
+  $('card-pack').textContent = selected.isBundle ? itemsText(selected.items, ' · ') : selected.pack;
   if (selected.isBundle && selected.save > 0) $('card-pack').append(` — save ${money(selected.save)} vs buying separately`);
   if (note) $('card-pack').append($('card-pack').textContent ? ' · ' : '', el('span', { className: stocked ? 'low' : 'oos', textContent: note }));
   $('card-qty').textContent = cardQty;
@@ -970,7 +973,7 @@ const waNumber = String(SHOP.whatsapp || '').replace(/\D/g, '');
 function orderText() {
   const { subtotal, delivery, total, count } = cartTotals(), lines = [`Order from ${SHOP.name}`, `Order ref: ${paynowRef}`, ''];
   cart.forEach((q, p) => {
-    if (p.isBundle) lines.push(`${q} × ${p.name} — ${money(q * p.price)} (${p.items.map(x => x.name).join(', ')})`);
+    if (p.isBundle) lines.push(`${q} × ${p.name} — ${money(q * p.price)} (${itemsText(p.items, ', ')})`);
     else lines.push(`${q} × ${p.name}${p.pack ? ` (${p.pack})` : ''} — ${money(q * p.price)}`);
   });
   lines.push('', `Subtotal: ${money(subtotal)}`, `Delivery: ${delivery === 0 ? 'FREE' : money(delivery)}`, `Total: ${money(total)} (${count} item${count === 1 ? '' : 's'})`);
@@ -1788,13 +1791,20 @@ function startWorld(THREE) {
       zEnd -= L / 2; shelf.position.set(BUNDLE_TABLE.x, 0, zEnd); shelf.rotation.y = Math.PI / 2; scene.add(shelf); zEnd -= L / 2 + B_GAP;
       [[L, TOP, 0.04, 0, TOP / 2, -B_DEPTH / 2 + 0.02, teal], [0.05, TOP, B_DEPTH, -L / 2 + 0.025, TOP / 2, 0, wood], [0.05, TOP, B_DEPTH, L / 2 - 0.025, TOP / 2, 0, wood],
        [L, BOARD, B_DEPTH, 0, TOP - BOARD / 2, 0, wood], [L, 0.1, B_DEPTH - 0.1, 0, 0.05, -0.02, std(0x4b5a62)]]
-        .concat(Array.from({ length: TIERS }, (_, t) => t).map(t => [L - 0.1, BOARD, B_DEPTH - 0.04, 0, 0.1 + t * B_TIER_H - BOARD / 2, 0.0, wood]))
         .forEach(([w, h, d, x, y, z, mat]) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); m.position.set(x, y, z); shelf.add(m); clickable.push(m); });
+      // Each shelf board is slanted to face a shopper standing back from the unit (about eye height): trays above eye
+      // level lean forward and look down at you, trays below lean back and look up, so every tray can be seen.
+      const tiers = Array.from({ length: TIERS }, (_, t) => {
+        const g = new THREE.Group(), mid = 0.1 + t * B_TIER_H + 0.35;
+        g.position.set(0, 0.1 + t * B_TIER_H, 0); g.rotation.x = Math.max(-0.34, Math.min(0.34, Math.atan2(mid - EYE, 3.4))) * 1.15; shelf.add(g);
+        const board = new THREE.Mesh(new THREE.BoxGeometry(L - 0.1, BOARD, B_DEPTH - 0.04), wood); board.position.y = -BOARD / 2; g.add(board); clickable.push(board);
+        return g;
+      });
       const sign = new THREE.Sprite(new THREE.SpriteMaterial({ map: signTexture('Bundles', '#2a9d8f', 512, 140) }));
       sign.scale.set(Math.min(2.2, L), Math.min(2.2, L) * 0.273, 1); sign.position.set(0, TOP + 0.3, 0.05); shelf.add(sign);
       unit.bundles.forEach((b, bi) => {
         const BOX_W = b.lay.w, box = new THREE.Group();
-        box.position.set(0, 0.1 + TIER_ORDER[unit.bundles.length][bi] * B_TIER_H, 0); shelf.add(box);
+        box.position.set(0, 0, 0); tiers[TIER_ORDER[unit.bundles.length][bi]].add(box);   // the tray rides on its slanted board
         [[BOX_W, BOX_T, BOX_D, 0, BOX_T / 2, 0, kraft], [BOX_W, BOX_H, BOX_T, 0, BOX_H / 2, -BOX_D / 2 + BOX_T / 2, kraftDark],
          [BOX_W, BOX_H, BOX_T, 0, BOX_H / 2, BOX_D / 2 - BOX_T / 2, kraftDark], [BOX_T, BOX_H, BOX_D, -BOX_W / 2 + BOX_T / 2, BOX_H / 2, 0, kraftDark],
          [BOX_T, BOX_H, BOX_D, BOX_W / 2 - BOX_T / 2, BOX_H / 2, 0, kraftDark]]
@@ -2238,17 +2248,17 @@ function startWorld(THREE) {
         _rv.set(pk.r, 0, 0).applyQuaternion(_rq);
         _ry.setFromAxisAngle(_up, Math.atan2(_rv.x, _rv.z));
         pk.pack.quaternion.copy(_rq.invert().multiply(_ry));
-        pk.pack.scale.setScalar(pk.k * (1 + (inspectPulse && inspectPulse.j === pk.j ? pulse : 0)));
+        pk.pack.scale.setScalar(pk.k * (1 + (inspectPulse && inspectPulse.js.includes(pk.j) ? pulse : 0)));
       });
     });
     if (inspectPulse && now - inspectPulse.t0 > 1100) inspectPulse = null;
   }
   function fillInspectChips(b) {
     const ul = $('inspect-items'); ul.textContent = ''; ul.scrollTop = 0; ul.classList.remove('end');
-    b.items.forEach((p, j) => {
-      const img = new Image(); img.alt = ''; img.src = p.thumbDirect || thumbUrl(p);
-      const chip = el('button', { type: 'button', className: 'chip', title: `${p.name} · ${money(p.price)}`, onclick: () => { inspectPulse = { j, t0: performance.now() }; inspectLastTouch = performance.now(); } }, img, el('span', { textContent: p.name }));
-      chip.setAttribute('aria-label', `Show ${p.name} in the rings`);
+    groupItems(b.items).forEach(g => {
+      const p = g.p, img = new Image(); img.alt = ''; img.src = p.thumbDirect || thumbUrl(p);
+      const chip = el('button', { type: 'button', className: 'chip', title: `${g.n > 1 ? g.n + ' × ' : ''}${p.name} · ${money(p.price)}`, onclick: () => { inspectPulse = { js: g.js, t0: performance.now() }; inspectLastTouch = performance.now(); } }, img, el('span', { textContent: (g.n > 1 ? g.n + ' × ' : '') + p.name }));
+      chip.setAttribute('aria-label', `Show ${g.n > 1 ? g.n + ' × ' : ''}${p.name} in the rings`);
       ul.append(el('li', {}, chip));
     });
     ul.hidden = false;

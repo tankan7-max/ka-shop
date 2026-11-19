@@ -54,6 +54,11 @@
   .row.bundle .meta.items { white-space: normal; }
   #bundle-editor form { display: grid; gap: 12px; }
   #b-picker { max-height: 260px; overflow-y: auto; border: 1px solid var(--line); border-radius: 10px; padding: 4px; display: grid; gap: 2px; }
+  #b-picker .prow { display: flex; align-items: center; gap: 8px; padding: 4px 8px; border-radius: 8px; font-size: 14px; }
+  #b-picker .prow.on { background: rgba(42,157,143,.1); }
+  #b-picker .pn { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #b-picker .stp { display: inline-flex; align-items: center; gap: 4px; }
+  #b-picker .stp output { min-width: 18px; text-align: center; font-variant-numeric: tabular-nums; font-weight: 700; }
   #b-picker label { font-weight: 400; display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 8px; font-size: 14px; cursor: pointer; }
   #b-picker label:hover { background: rgba(0,0,0,.04); }
   #b-picker .pc { margin-left: auto; color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
@@ -232,10 +237,11 @@
       <label class="field">Bundle price (S$)<input id="b-price" type="number" min="0" max="9999" step="0.01" inputmode="decimal" required></label>
       <label class="field">Position<input id="b-sort" type="number" min="0" max="999" step="1" inputmode="numeric" value="0"><small>Lower numbers come first on the shelves</small></label>
     </div>
-    <div class="field">Snacks in the box <small>Tick to add, in the order you tick them. Up to 12.</small>
+    <div class="field">Snacks in the box <small>Use + to add a snack, and + again for more of the same (like 2 × Mamee noodles). Up to 12 in all.</small>
       <input id="b-search" type="search" placeholder="Search snacks…" aria-label="Search snacks" style="margin-bottom:6px">
       <div id="b-picker" role="group" aria-label="Snacks you can add"></div>
     </div>
+    <p id="b-count" class="hint" style="margin:0"></p>
     <ol id="b-picked" aria-label="Snacks in this bundle, in order"></ol>
     <p id="b-sum" role="status"></p>
     <label class="check"><input id="b-active" type="checkbox" checked> On sale (shown on the bundle shelves)</label>
@@ -1459,12 +1465,12 @@ function renderBundles() {
   if (!bundles) return;
   if (!bundles.length) list.append(el('p', { className: 'hint', textContent: 'No bundles yet. Add one, and it appears on the bundle shelves by the shop entrance.' }));
   bundles.forEach(b => {
-    const names = (b.items || []).map(id => (products.find(p => p.id === id) || { name: id + ' (missing)' }).name);
+    const names = (() => { const c = new Map(); (b.items || []).forEach(id => c.set(id, (c.get(id) || 0) + 1)); return [...c].map(([id, n]) => (n > 1 ? n + ' × ' : '') + (products.find(p => p.id === id) || { name: id + ' (missing)' }).name); })();
     const sum = (b.items || []).reduce((t, id) => t + Number((products.find(p => p.id === id) || {}).price_sgd || 0), 0);
     const edit = el('button', { type: 'button', textContent: 'Edit', onclick: () => openBundle(b) }); edit.setAttribute('aria-label', `Edit ${b.name}`);
     list.append(el('div', { className: 'row bundle' + (b.active ? '' : ' off') },
       el('div', {}, el('div', { className: 'name' }, b.name, b.active ? '' : el('span', { className: 'badge off', textContent: 'Hidden' })),
-        el('div', { className: 'meta', textContent: `S$${Number(b.price_sgd).toFixed(2)} · ${names.length} snacks` + (sum > Number(b.price_sgd) ? ` · saves S$${(sum - Number(b.price_sgd)).toFixed(2)}` : '') }),
+        el('div', { className: 'meta', textContent: `S$${Number(b.price_sgd).toFixed(2)} · ${(b.items || []).length} snacks` + (sum > Number(b.price_sgd) ? ` · saves S$${(sum - Number(b.price_sgd)).toFixed(2)}` : '') }),
         el('div', { className: 'meta items', textContent: names.join(' · ') })), edit));
   });
 }
@@ -1478,25 +1484,38 @@ function bundleSum() {
     out.className = d > 0.004 ? 'good' : d < -0.004 ? 'bad' : '';
   } else out.textContent = `Bought separately: S$${sum.toFixed(2)}`;
 }
+// A bundle can hold the same snack more than once (2 × Mamee noodles): bItems repeats the id, repeats kept together.
+const bGroups = () => { const g = []; bItems.forEach(id => { const x = g.find(q => q.id === id); if (x) x.n++; else g.push({ id, n: 1 }); }); return g; };
+const bFlat = groups => groups.flatMap(g => Array(g.n).fill(g.id));
+const bCount = id => bItems.filter(x => x === id).length;
+function bSet(id, n) {
+  const g = bGroups(), x = g.find(q => q.id === id), total = bItems.length - (x ? x.n : 0);
+  n = Math.max(0, Math.min(n, 12 - total));
+  if (x) x.n = n; else if (n) g.push({ id, n });
+  bItems = bFlat(g.filter(q => q.n > 0)); renderPicked(); drawPicker();
+}
 function renderPicked() {
-  const ol = $('b-picked'); ol.textContent = '';
-  bItems.forEach((id, i) => {
-    const p = products.find(q => q.id === id), mv = (d, label, txt) => { const b = el('button', { type: 'button', className: 'small', textContent: txt, disabled: i + d < 0 || i + d >= bItems.length, onclick: () => { [bItems[i], bItems[i + d]] = [bItems[i + d], bItems[i]]; renderPicked(); } }); b.setAttribute('aria-label', `Move ${p ? p.name : id} ${label}`); return b; };
-    const rm = el('button', { type: 'button', className: 'small', textContent: '✕', onclick: () => { bItems.splice(i, 1); renderPicked(); drawPicker(); } }); rm.setAttribute('aria-label', `Remove ${p ? p.name : id}`);
-    ol.append(el('li', {}, el('span', { textContent: `${i + 1}. ${p ? p.name : id + ' (no longer in the shop)'}` }), mv(-1, 'earlier', '↑'), mv(1, 'later', '↓'), rm));
+  const ol = $('b-picked'); ol.textContent = ''; const groups = bGroups();
+  groups.forEach((g, i) => {
+    const p = products.find(q => q.id === g.id), nm = p ? p.name : g.id + ' (no longer in the shop)', mv = (d, label, txt) => { const b = el('button', { type: 'button', className: 'small', textContent: txt, disabled: i + d < 0 || i + d >= groups.length, onclick: () => { [groups[i], groups[i + d]] = [groups[i + d], groups[i]]; bItems = bFlat(groups); renderPicked(); } }); b.setAttribute('aria-label', `Move ${nm} ${label}`); return b; };
+    const rm = el('button', { type: 'button', className: 'small', textContent: '✕', onclick: () => bSet(g.id, 0) }); rm.setAttribute('aria-label', `Remove ${nm}`);
+    ol.append(el('li', {}, el('span', { textContent: `${i + 1}. ${g.n > 1 ? g.n + ' × ' : ''}${nm}` }), mv(-1, 'earlier', '↑'), mv(1, 'later', '↓'), rm));
   });
+  $('b-count').textContent = `${bItems.length} of 12 snacks`;
   bundleSum();
 }
 function drawPicker() {
-  const q = $('b-search').value.trim().toLowerCase(), box = $('b-picker'); box.textContent = '';
+  const q = $('b-search').value.trim().toLowerCase(), box = $('b-picker'), keep = box.scrollTop; box.textContent = '';
   categoryNames().forEach(cat => {
     products.filter(p => p.category === cat && (!q || `${p.name} ${p.category} ${p.pack}`.toLowerCase().includes(q))).forEach(p => {
-      const cb = el('input', { type: 'checkbox', checked: bItems.includes(p.id), disabled: !bItems.includes(p.id) && bItems.length >= 12 });
-      cb.onchange = () => { if (cb.checked) bItems.push(p.id); else bItems = bItems.filter(x => x !== p.id); renderPicked(); drawPicker(); };
-      box.append(el('label', {}, cb, el('span', { textContent: p.name }), el('span', { className: 'pc', textContent: `S$${Number(p.price_sgd).toFixed(2)}` })));
+      const n = bCount(p.id);
+      const minus = el('button', { type: 'button', className: 'small', textContent: '−', disabled: !n, onclick: () => bSet(p.id, n - 1) }); minus.setAttribute('aria-label', `One fewer ${p.name}`);
+      const plus = el('button', { type: 'button', className: 'small', textContent: '+', disabled: bItems.length >= 12, onclick: () => bSet(p.id, n + 1) }); plus.setAttribute('aria-label', `One more ${p.name}`);
+      box.append(el('div', { className: 'prow' + (n ? ' on' : '') }, el('span', { className: 'pn', textContent: p.name }), el('span', { className: 'pc', textContent: `S$${Number(p.price_sgd).toFixed(2)}` }), el('span', { className: 'stp' }, minus, el('output', { textContent: n }), plus)));
     });
   });
   if (!box.children.length) box.textContent = 'No snacks match.';
+  box.scrollTop = keep;
 }
 function openBundle(b) {
   bEditing = b || null; bItems = b ? [...(b.items || [])] : [];
