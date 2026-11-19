@@ -349,7 +349,7 @@
     </dl>
     <ul class="tips">
       <li><b>Browse</b>Search every snack, add it to your cart, or press Find to be walked to its shelf.</li>
-      <li><b>Bundles</b>Ready-made boxes on the tall shelves by the entrance. Inspect one to watch the snacks orbit.</li>
+      <li><b>Bundles</b>Ready-made boxes on the table in the middle (and the shelves by the entrance). Inspect one to watch the snacks orbit.</li>
       <li><b>Delivery</b>Free over S$15, otherwise S$1.00. Add your address at checkout.</li>
       <li><b>Pay</b>Scan the PayNow QR, tick “I’ve paid”, then send your order on WhatsApp.</li>
     </ul>
@@ -874,7 +874,7 @@ function applyListFilter() {
 });
 CATS.forEach(cat => {
   const dot = el('span', { className: 'dot' }); dot.style.background = cat.sign;
-  const go = el('button', { type: 'button', className: 'needs3d', textContent: 'Walk to shelf', onclick: () => { closeDrawersOnSmallScreens(); world.goToCategory(cat); } });
+  const go = el('button', { type: 'button', className: 'needs3d', textContent: 'Walk to bundles', onclick: () => { closeDrawersOnSmallScreens(); world.goToCategory(cat); } });
   const section = el('section', {}, el('div', { className: 'cat-head' }, el('h3', {}, dot, cat.name), go)); section.dataset.cat = cat.name;
   cat.items.forEach(p => {
     const find = el('button', { type: 'button', className: 'needs3d', textContent: 'Find', onclick: () => { closeDrawersOnSmallScreens(); world.findProduct(p); } }); find.setAttribute('aria-label', `Find ${p.name} in the shop`);
@@ -888,10 +888,10 @@ CATS.forEach(cat => {
   });
   $('product-list').appendChild(section);
 });
-// Bundles first: ready-made boxes, with a Find that walks to the bundle shelves.
+// Bundles first: ready-made boxes, with a Find that walks to the bundle table.
 if (BUNDLES.length) {
   const dot = el('span', { className: 'dot' }); dot.style.background = '#2a9d8f';
-  const go = el('button', { type: 'button', className: 'needs3d', textContent: 'Walk to shelf', onclick: () => { closeDrawersOnSmallScreens(); world.goToBundles(); } });
+  const go = el('button', { type: 'button', className: 'needs3d', textContent: 'Walk to bundles', onclick: () => { closeDrawersOnSmallScreens(); world.goToBundles(); } });
   const section = el('section', {}, el('div', { className: 'cat-head' }, el('h3', {}, dot, 'Bundles'), go));
   section.dataset.cat = 'Bundles';
   BUNDLES.forEach(b => {
@@ -1260,25 +1260,34 @@ function startWorld(THREE) {
 
   // Like a real supermarket, every product has ONE space on a shelf, with its packs queued up behind
   // the front one. Each category gets a "bay": enough side-by-side columns for all its products.
-  // Bundle shelves: each bundle stands in a tray, three trays to a tall shelf unit, on the left wall by the entrance.
-  // Snacks are shown at their real size, in two staggered rows, so a tray is as wide as its snacks need.
-  const B_TIERS = 3, B_TIER_H = 0.92, B_DEPTH = 1.0, B_GAP = 0.25;
-  const B_BASE = 0.38;    // height of the lowest board above the floor: plenty, so the slanted front edge never touches it
+  // Bundles: each stands in a tray, with its snacks at their real size in two staggered rows, so a tray is as wide as its
+  // snacks need. Trays go on the table in the middle of the shop first; whatever does not fit goes on the bundle shelves
+  // by the entrance, which are only two trays high with both trays kept near eye level.
+  const B_TIERS = 2, B_TIER_H = 0.85, B_DEPTH = 1.0, B_GAP = 0.25;
+  const B_BASE = 0.7;    // height of the lower tray's board: well off the floor, so the slanted front edge never touches it
   const B_SLANT = 0.2;   // radians (about 11°) that every bundle shelf board tips forward
+  const T_ROW_W = 4.8, T_GAP = 0.2, T_ROWS = 2, TRAY_D = 0.72;   // the table: two rows of trays back to back, up to this wide
   BUNDLES.forEach(b => {
     const gr = groupItems(b.items), w = gr.map(g => g.p.width + (g.n - 1) * 0.07), xs = [0];   // identical snacks share one slot, stacked
     for (let i = 1; i < w.length; i++) xs.push(xs[i - 1] + 0.62 * (w[i - 1] + w[i]) / 2);
     const lo = Math.min(...xs.map((x, i) => x - w[i] / 2)), hi = Math.max(...xs.map((x, i) => x + w[i] / 2));
     b.lay = { w: Math.max(0.95, hi - lo + 0.24), xs: xs.map(x => x - (lo + hi) / 2) };
   });
-  const BUNDLE_UNITS = []; for (let i = 0; i < BUNDLES.length; i += B_TIERS) { const g = BUNDLES.slice(i, i + B_TIERS); BUNDLE_UNITS.push({ bundles: g, len: Math.max(...g.map(b => b.lay.w)) + 0.5 }); }
+  const TABLE_ROWS = Array.from({ length: T_ROWS }, () => ({ items: [], used: 0 })), SHELF_BUNDLES = [];
+  BUNDLES.forEach(b => {   // fill the table in order; once one bundle does not fit, it and all after it go to the shelves
+    const room = TABLE_ROWS.filter(r => r.used + b.lay.w + (r.items.length ? T_GAP : 0) <= T_ROW_W).sort((a, c) => a.used - c.used)[0];
+    if (room && !SHELF_BUNDLES.length) { room.used += b.lay.w + (room.items.length ? T_GAP : 0); room.items.push(b); } else SHELF_BUNDLES.push(b);
+  });
+  const TABLE_USED = TABLE_ROWS.filter(r => r.items.length);
+  const TABLE_W = TABLE_USED.length ? Math.max(3.2, ...TABLE_USED.map(r => r.used)) + 0.6 : 0, TABLE_D = TABLE_USED.length ? TABLE_USED.length * (TRAY_D + 0.25) + 0.35 : 0;
+  const BUNDLE_UNITS = []; for (let i = 0; i < SHELF_BUNDLES.length; i += B_TIERS) { const g = SHELF_BUNDLES.slice(i, i + B_TIERS); BUNDLE_UNITS.push({ bundles: g, len: Math.max(...g.map(b => b.lay.w)) + 0.5 }); }
   const B_RUN = BUNDLE_UNITS.reduce((t, u) => t + u.len + B_GAP, 0) - (BUNDLE_UNITS.length ? B_GAP : 0);   // how much wall the bundle shelves need
   const BAYS = CATS.map(cat => ({ cat, cols: Math.ceil(cat.items.length / LEVELS.length) }));
   // A shop of a given size: G middle gondolas (two faces each) and wall shelves `sideCols` columns long.
   // Shelf faces are listed in shopping order: left wall, middle aisles, right wall, back wall.
   function plan(G, sideCols) {
     const halfW = Math.max(5.6, (G - 1) / 2 * AISLE + 5.8), sideLen = lenFor(sideCols), gondolaLen = lenFor(Math.max(2, sideCols - 2)), backLen = halfW - 0.6;
-    const halfD = (UNIT_D + 1.5 + sideLen + Math.max(7.6, B_RUN + 3.0)) / 2;                        // back shelves + wall shelves + room at the front for the door and counter
+    const halfD = (UNIT_D + 1.5 + sideLen + Math.max(8.6, B_RUN + 3.0)) / 2;                        // back shelves + wall shelves + room at the front for the door and counter
     const sideZ0 = -halfD + UNIT_D + 1.5, gondolaZ0 = -halfD + UNIT_D + 3.9;  // where the wall shelves and the gondolas start (their back ends)
     const units = [{ x: -halfW + UNIT_D / 2 + 0.06, z0: sideZ0, rotY: Math.PI / 2, length: sideLen }];
     for (let g = 0; g < G; g++) {
@@ -1780,22 +1789,89 @@ function startWorld(THREE) {
   const counterSign = new THREE.Sprite(new THREE.SpriteMaterial({ map: signTexture('Checkout', '#2a9d8f', 512, 140) }));
   counterSign.scale.set(1.6, 0.44, 1); counterSign.position.set(0, 2.35, 0); counter.add(counterSign);
   counter.updateMatrixWorld(true); addObstacle(counter); floorShadow(counter.position.x, counter.position.z, 3.6, 1.9);
-  // Bundle shelves on the left wall by the entrance, opposite the checkout counter: tall units, three trays high,
-  // each tray holding one bundle with its snacks standing in it.
-  const BUNDLE_TABLE = { x: -HALF_W + 0.05 + B_DEPTH / 2, z: HALF_D - 1.0 - B_RUN / 2, w: B_DEPTH, d: B_RUN };   // the whole run of shelves (centre, depth, length): used for walking there and for the map
+  // Bundles: a table in the middle of the front of the shop, and (only if the table is full) two-tray shelves on the
+  // left wall by the entrance. Both hold the same trays: one bundle each, with its snacks standing in it.
+  const BUNDLE_TABLE = { x: 0, z: HALF_D - 5.2, w: TABLE_W, d: TABLE_D };                                                   // the table (centre and size)
+  const BUNDLE_SHELVES = { x: -HALF_W + 0.05 + B_DEPTH / 2, z: HALF_D - 1.0 - B_RUN / 2, w: B_DEPTH, d: B_RUN };           // the whole run of wall shelves
   if (BUNDLES.length) {
-    const BOX_D = 0.72, BOX_H = 0.14, BOX_T = 0.04, RISER = 0.08, BOARD = 0.05;
+    const BOX_D = TRAY_D, BOX_H = 0.14, BOX_T = 0.04, RISER = 0.08, BOARD = 0.05;
     const wood = std(0xcaa776, { roughness: 0.5 }), teal = std(0x2f6f68), kraft = std(0xcaa776, { roughness: 0.7 }), kraftDark = std(0xa87f4e, { roughness: 0.7 });
-    const TIER_ORDER = { 1: [1], 2: [1, 0], 3: [1, 2, 0] };   // the first bundle sits at eye level, the next below (or above) it
-    let zEnd = BUNDLE_TABLE.z + B_RUN / 2;      // units are laid from the front of the shop towards the back
+    // One tray with its snacks and its name card, ready to stand on a board or the table. Its front is +z.
+    function makeTray(b) {
+      const BOX_W = b.lay.w, box = new THREE.Group();
+      [[BOX_W, BOX_T, BOX_D, 0, BOX_T / 2, 0, kraft], [BOX_W, BOX_H, BOX_T, 0, BOX_H / 2, -BOX_D / 2 + BOX_T / 2, kraftDark],
+       [BOX_W, BOX_H, BOX_T, 0, BOX_H / 2, BOX_D / 2 - BOX_T / 2, kraftDark], [BOX_T, BOX_H, BOX_D, -BOX_W / 2 + BOX_T / 2, BOX_H / 2, 0, kraftDark],
+       [BOX_T, BOX_H, BOX_D, BOX_W / 2 - BOX_T / 2, BOX_H / 2, 0, kraftDark]]
+        .forEach(([w, h, d, x, y, z, mat]) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); m.position.set(x, y, z); m.userData.bundle = b; box.add(m); clickable.push(m); });
+      // Real size (scale 1), zig-zag in two rows; the back row stands on a riser.
+      const rz = BOX_D * 0.19;
+      const riser = new THREE.Mesh(new THREE.BoxGeometry(BOX_W - 2 * BOX_T - 0.04, RISER, BOX_D * 0.4), kraftDark); riser.position.set(0, BOX_T + RISER / 2, -rz); riser.userData.bundle = b; box.add(riser); clickable.push(riser);
+      groupItems(b.items).forEach((g, i) => {
+        const p = g.p, back = i % 2 === 1, n = g.n, step = n > 1 ? Math.min(0.16, (back ? 0.12 : 0.3) / (n - 1)) : 0;
+        for (let c = 0; c < n; c++) {   // identical snacks stand in a little stack: each one a touch behind and to the side of the last
+          const mesh = packMesh(p, p.width, p.depth, 1);
+          const pos = new THREE.Vector3(b.lay.xs[i] - (n - 1) * 0.035 + c * 0.07, BOX_T + (back ? RISER : 0) + p.height / 2, (back ? -rz : rz) - c * step);
+          const quat = new THREE.Quaternion().setFromEuler(new THREE.Euler(back ? -0.06 : 0.03, (hashOf(p.id) % 20 - 10 + c * 3) * Math.PI / 180, 0));
+          mesh.setMatrixAt(0, new THREE.Matrix4().compose(pos, quat, new THREE.Vector3(1, 1, 1)));
+          mesh.instanceMatrix.needsUpdate = true;
+          mesh.userData.bundle = b; box.add(mesh); clickable.push(mesh);
+        }
+      });
+      // A name card in front of each tray: what it is, what it costs, what you save, and when it is gone.
+      const cv = document.createElement('canvas'); cv.width = 640; cv.height = 190;
+      const plateTex = new THREE.CanvasTexture(cv); plateTex.colorSpace = THREE.SRGBColorSpace; plateTex.anisotropy = maxAniso;
+      const paint = () => {
+        const g = cv.getContext('2d'), w = cv.width, h = cv.height, out = !inStock(b), left = stockOf(b);
+        g.clearRect(0, 0, w, h); g.fillStyle = '#fffdf6'; roundRect(g, 0, 0, w, h, 24); g.fill();
+        g.fillStyle = out ? '#9aa4a9' : '#2a9d8f'; g.save(); roundRect(g, 0, 0, w, h, 24); g.clip(); g.fillRect(0, 0, 16, h); g.restore();
+        g.textBaseline = 'middle'; g.textAlign = 'left'; g.fillStyle = out ? '#7a8389' : '#1d2327';
+        fitOneLine(g, b.name, w - 64, 56, '800'); g.fillText(b.name, 40, 50);
+        g.font = `600 27px ${FONT}`; g.fillStyle = out ? '#7a8389' : '#5f6b70';
+        g.fillText(out ? 'Out of stock' : `${b.items.length} snacks${b.save > 0 ? ` · save ${money(b.save)}` : ''}`, 40, 112);
+        if (!out && left <= LOW_STOCK) { g.fillStyle = '#c62828'; g.font = `700 25px ${FONT}`; g.fillText(`Only ${left} left`, 40, 152); }
+        const price = money(b.price); g.font = `800 50px ${FONT}`; const pw = g.measureText(price).width + 36;
+        g.fillStyle = out ? '#e3e6e8' : '#ffd54f'; roundRect(g, w - pw - 24, h - 92, pw, 70, 16); g.fill();
+        g.fillStyle = out ? '#7a8389' : '#b71c1c'; g.textAlign = 'center'; g.fillText(price, w - pw / 2 - 24, h - 55);
+        plateTex.needsUpdate = true;
+      };
+      const plate = new THREE.Mesh(new THREE.PlaneGeometry(0.72, 0.213), new THREE.MeshBasicMaterial({ map: plateTex, transparent: true }));
+      plate.position.set(0, 0.1, BOX_D / 2 + 0.1); plate.rotation.x = -0.6; plate.userData.bundle = b; box.add(plate); clickable.push(plate);
+      b.plate = { paint }; paint();
+      return box;
+    }
+
+    // --- The table in the middle: two rows of trays back to back, so it can be walked all the way round.
+    if (TABLE_USED.length) {
+      const table = new THREE.Group(); table.position.set(BUNDLE_TABLE.x, 0, BUNDLE_TABLE.z); scene.add(table);
+      [[new THREE.BoxGeometry(TABLE_W - 0.3, 0.9, TABLE_D - 0.3), teal, 0, 0.45], [new THREE.BoxGeometry(TABLE_W, 0.06, TABLE_D), wood, 0, 0.93]]
+        .forEach(([geo, material, x, y]) => { const m = new THREE.Mesh(geo, material); m.position.set(x, y, 0); table.add(m); clickable.push(m); });
+      const sign = new THREE.Sprite(new THREE.SpriteMaterial({ map: signTexture('Bundles', '#2a9d8f', 512, 140) }));
+      sign.scale.set(2.2, 0.6, 1); sign.position.set(0, 2.6, 0); table.add(sign);
+      TABLE_USED.forEach((row, ri) => {
+        const front = ri === 0, rowZ = (TABLE_USED.length === 1 ? 0 : (front ? 1 : -1) * (TRAY_D / 2 + 0.06));
+        let x = -row.used / 2;
+        row.items.forEach(b => {
+          const box = makeTray(b); box.position.set(x + b.lay.w / 2, 0.96, rowZ); if (!front) box.rotation.y = Math.PI; table.add(box); x += b.lay.w + T_GAP;
+          const wx = BUNDLE_TABLE.x + box.position.x;   // where to stand to look at this tray: on its own side of the table
+          b.view = { x: wx, z: BUNDLE_TABLE.z + (front ? 1 : -1) * (TABLE_D / 2 + 1.7), lookX: wx, lookZ: BUNDLE_TABLE.z + rowZ };
+        });
+      });
+      table.updateMatrixWorld(true); addObstacle(table);
+      shelfGlow(BUNDLE_TABLE.x, 2.6, BUNDLE_TABLE.z, 14, 10);
+      floorShadow(BUNDLE_TABLE.x, BUNDLE_TABLE.z, TABLE_W + 0.7, TABLE_D + 0.7);
+    }
+
+    // --- Overflow shelves on the left wall: two trays high, both near eye level.
+    const TIER_ORDER = { 1: [1], 2: [1, 0] };   // the first bundle goes on the upper tray, the next below it
+    let zEnd = BUNDLE_SHELVES.z + B_RUN / 2;      // units are laid from the front of the shop towards the back
     BUNDLE_UNITS.forEach(unit => {
-      const L = unit.len, shelf = new THREE.Group(), TIERS = Math.max(2, unit.bundles.length), TOP = B_BASE + (TIERS - 1) * B_TIER_H + 1.0;   // a unit is as tall as it has trays
-      zEnd -= L / 2; shelf.position.set(BUNDLE_TABLE.x, 0, zEnd); shelf.rotation.y = Math.PI / 2; scene.add(shelf); zEnd -= L / 2 + B_GAP;
+      const L = unit.len, shelf = new THREE.Group(), TIERS = B_TIERS, TOP = B_BASE + (TIERS - 1) * B_TIER_H + 0.95;
+      zEnd -= L / 2; shelf.position.set(BUNDLE_SHELVES.x, 0, zEnd); shelf.rotation.y = Math.PI / 2; scene.add(shelf);
+      const unitZ = zEnd; zEnd -= L / 2 + B_GAP;
       [[L, TOP, 0.04, 0, TOP / 2, -B_DEPTH / 2 + 0.02, teal], [0.05, TOP, B_DEPTH, -L / 2 + 0.025, TOP / 2, 0, wood], [0.05, TOP, B_DEPTH, L / 2 - 0.025, TOP / 2, 0, wood],
        [L, BOARD, B_DEPTH, 0, TOP - BOARD / 2, 0, wood], [L, B_BASE - 0.1, B_DEPTH - 0.1, 0, (B_BASE - 0.1) / 2, -0.02, std(0x4b5a62)]]
         .forEach(([w, h, d, x, y, z, mat]) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); m.position.set(x, y, z); shelf.add(m); clickable.push(m); });
-      // Every shelf board has the same slant (front edge lower, parallel to the others), so the snacks lean towards the
-      // shopper and the top tray can be seen from below.
+      // Every shelf board has the same slant (front edge lower, parallel to the others), so the snacks lean towards the shopper.
       const tiers = Array.from({ length: TIERS }, (_, t) => {
         const g = new THREE.Group();
         g.position.set(0, B_BASE + t * B_TIER_H, 0); g.rotation.x = B_SLANT; shelf.add(g);
@@ -1805,51 +1881,15 @@ function startWorld(THREE) {
       const sign = new THREE.Sprite(new THREE.SpriteMaterial({ map: signTexture('Bundles', '#2a9d8f', 512, 140) }));
       sign.scale.set(Math.min(2.2, L), Math.min(2.2, L) * 0.273, 1); sign.position.set(0, TOP + 0.3, 0.05); shelf.add(sign);
       unit.bundles.forEach((b, bi) => {
-        const BOX_W = b.lay.w, box = new THREE.Group();
-        box.position.set(0, 0, 0); tiers[TIER_ORDER[unit.bundles.length][bi]].add(box);   // the tray rides on its slanted board
-        [[BOX_W, BOX_T, BOX_D, 0, BOX_T / 2, 0, kraft], [BOX_W, BOX_H, BOX_T, 0, BOX_H / 2, -BOX_D / 2 + BOX_T / 2, kraftDark],
-         [BOX_W, BOX_H, BOX_T, 0, BOX_H / 2, BOX_D / 2 - BOX_T / 2, kraftDark], [BOX_T, BOX_H, BOX_D, -BOX_W / 2 + BOX_T / 2, BOX_H / 2, 0, kraftDark],
-         [BOX_T, BOX_H, BOX_D, BOX_W / 2 - BOX_T / 2, BOX_H / 2, 0, kraftDark]]
-          .forEach(([w, h, d, x, y, z, mat]) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); m.position.set(x, y, z); m.userData.bundle = b; box.add(m); clickable.push(m); });
-        // Real size (scale 1), zig-zag in two rows; the back row stands on a riser.
-        const rz = BOX_D * 0.19;
-        const riser = new THREE.Mesh(new THREE.BoxGeometry(BOX_W - 2 * BOX_T - 0.04, RISER, BOX_D * 0.4), kraftDark); riser.position.set(0, BOX_T + RISER / 2, -rz); riser.userData.bundle = b; box.add(riser); clickable.push(riser);
-        groupItems(b.items).forEach((g, i) => {
-          const p = g.p, back = i % 2 === 1, n = g.n, step = n > 1 ? Math.min(0.16, (back ? 0.12 : 0.3) / (n - 1)) : 0;
-          for (let c = 0; c < n; c++) {   // identical snacks stand in a little stack: each one a touch behind and to the side of the last
-            const mesh = packMesh(p, p.width, p.depth, 1);
-            const pos = new THREE.Vector3(b.lay.xs[i] - (n - 1) * 0.035 + c * 0.07, BOX_T + (back ? RISER : 0) + p.height / 2, (back ? -rz : rz) - c * step);
-            const quat = new THREE.Quaternion().setFromEuler(new THREE.Euler(back ? -0.06 : 0.03, (hashOf(p.id) % 20 - 10 + c * 3) * Math.PI / 180, 0));
-            mesh.setMatrixAt(0, new THREE.Matrix4().compose(pos, quat, new THREE.Vector3(1, 1, 1)));
-            mesh.instanceMatrix.needsUpdate = true;
-            mesh.userData.bundle = b; box.add(mesh); clickable.push(mesh);
-          }
-        });
-        // A name card in front of each tray: what it is, what it costs, what you save, and when it is gone.
-        const cv = document.createElement('canvas'); cv.width = 640; cv.height = 190;
-        const plateTex = new THREE.CanvasTexture(cv); plateTex.colorSpace = THREE.SRGBColorSpace; plateTex.anisotropy = maxAniso;
-        const paint = () => {
-          const g = cv.getContext('2d'), w = cv.width, h = cv.height, out = !inStock(b), left = stockOf(b);
-          g.clearRect(0, 0, w, h); g.fillStyle = '#fffdf6'; roundRect(g, 0, 0, w, h, 24); g.fill();
-          g.fillStyle = out ? '#9aa4a9' : '#2a9d8f'; g.save(); roundRect(g, 0, 0, w, h, 24); g.clip(); g.fillRect(0, 0, 16, h); g.restore();
-          g.textBaseline = 'middle'; g.textAlign = 'left'; g.fillStyle = out ? '#7a8389' : '#1d2327';
-          fitOneLine(g, b.name, w - 64, 56, '800'); g.fillText(b.name, 40, 50);
-          g.font = `600 27px ${FONT}`; g.fillStyle = out ? '#7a8389' : '#5f6b70';
-          g.fillText(out ? 'Out of stock' : `${b.items.length} snacks${b.save > 0 ? ` · save ${money(b.save)}` : ''}`, 40, 112);
-          if (!out && left <= LOW_STOCK) { g.fillStyle = '#c62828'; g.font = `700 25px ${FONT}`; g.fillText(`Only ${left} left`, 40, 152); }
-          const price = money(b.price); g.font = `800 50px ${FONT}`; const pw = g.measureText(price).width + 36;
-          g.fillStyle = out ? '#e3e6e8' : '#ffd54f'; roundRect(g, w - pw - 24, h - 92, pw, 70, 16); g.fill();
-          g.fillStyle = out ? '#7a8389' : '#b71c1c'; g.textAlign = 'center'; g.fillText(price, w - pw / 2 - 24, h - 55);
-          plateTex.needsUpdate = true;
-        };
-        const plate = new THREE.Mesh(new THREE.PlaneGeometry(0.72, 0.213), new THREE.MeshBasicMaterial({ map: plateTex, transparent: true }));
-        plate.position.set(0, 0.1, BOX_D / 2 + 0.1); plate.rotation.x = -0.6; plate.userData.bundle = b; box.add(plate); clickable.push(plate);
-        b.plate = { paint }; paint();
+        tiers[TIER_ORDER[unit.bundles.length][bi]].add(makeTray(b));   // the tray rides on its slanted board
+        b.view = { x: BUNDLE_SHELVES.x + B_DEPTH / 2 + 3.4, z: unitZ, lookX: BUNDLE_SHELVES.x, lookZ: unitZ };
       });
       shelf.updateMatrixWorld(true); addObstacle(shelf);
     });
-    shelfGlow(BUNDLE_TABLE.x + 0.8, 2.6, BUNDLE_TABLE.z, 8, 14);
-    floorShadow(BUNDLE_TABLE.x + 0.1, BUNDLE_TABLE.z, B_DEPTH + 0.8, B_RUN + 0.8);
+    if (BUNDLE_UNITS.length) {
+      shelfGlow(BUNDLE_SHELVES.x + 0.8, 2.6, BUNDLE_SHELVES.z, 8, 14);
+      floorShadow(BUNDLE_SHELVES.x + 0.1, BUNDLE_SHELVES.z, B_DEPTH + 0.8, B_RUN + 0.8);
+    }
   }
   // Potted plants by the entrance.
   [-1, 1].forEach(s => {
@@ -1953,18 +1993,17 @@ function startWorld(THREE) {
     const spot = nearestFree(bay.x + Math.sin(bay.unit.rotY) * 2.2, bay.z + Math.cos(bay.unit.rotY) * 2.2);
     walkTo(spot, lookAtFrom(spot, { x: bay.x, y: 1.25, z: bay.z }));
   }
-  // Walk to the bundle shelves and open the box's card.
+  // Walk to a bundle's tray (on the table or the shelves) and open its card; with no bundle given, to the first one.
+  function walkToBundle(b) {
+    const v = b && b.view; if (!v) return;
+    const spot = nearestFree(v.x, v.z);
+    walkTo(spot, lookAtFrom(spot, { x: v.lookX, y: 1.3, z: v.lookZ }));
+  }
   function findBundle(b) {
     if (!inStock(b)) { selectProduct(b); return; }
-    const spot = nearestFree(BUNDLE_TABLE.x + BUNDLE_TABLE.w / 2 + 3.4, BUNDLE_TABLE.z);
-    selectProduct(b);
-    walkTo(spot, lookAtFrom(spot, { x: BUNDLE_TABLE.x, y: 1.5, z: BUNDLE_TABLE.z }));
+    selectProduct(b); walkToBundle(b);
   }
-  function goToBundles() {
-    if (!BUNDLES.length) return;
-    const spot = nearestFree(BUNDLE_TABLE.x + BUNDLE_TABLE.w / 2 + 3.4, BUNDLE_TABLE.z);
-    walkTo(spot, lookAtFrom(spot, { x: BUNDLE_TABLE.x, y: 1.5, z: BUNDLE_TABLE.z }));
-  }
+  function goToBundles() { if (BUNDLES.length) walkToBundle(BUNDLES[0]); }
   function showSelection(p, it) { placeOutline(selectBox, p, it); selectProduct(p); }
   // Walk to a snack: to the very pack that was clicked when there is one, otherwise to its first pack.
   function findProduct(p, pack = null) {
@@ -2082,7 +2121,11 @@ function startWorld(THREE) {
       });
     });
     mctx.fillStyle = '#2f6f68'; mctx.fillRect(mx(counter.position.x - 1.3), mz(counter.position.z - 0.4), 2.6 * MS, 0.8 * MS);
-    if (BUNDLES.length) { mctx.fillStyle = '#caa776'; mctx.fillRect(mx(BUNDLE_TABLE.x - BUNDLE_TABLE.w / 2), mz(BUNDLE_TABLE.z - BUNDLE_TABLE.d / 2), BUNDLE_TABLE.w * MS, BUNDLE_TABLE.d * MS); }
+    if (BUNDLES.length) {
+      mctx.fillStyle = '#caa776';
+      if (TABLE_USED.length) mctx.fillRect(mx(BUNDLE_TABLE.x - BUNDLE_TABLE.w / 2), mz(BUNDLE_TABLE.z - BUNDLE_TABLE.d / 2), BUNDLE_TABLE.w * MS, BUNDLE_TABLE.d * MS);
+      if (BUNDLE_UNITS.length) mctx.fillRect(mx(BUNDLE_SHELVES.x - BUNDLE_SHELVES.w / 2), mz(BUNDLE_SHELVES.z - BUNDLE_SHELVES.d / 2), BUNDLE_SHELVES.w * MS, BUNDLE_SHELVES.d * MS);
+    }
     mctx.fillStyle = '#2a9d8f'; mctx.fillRect(mx(-DOOR), MAP_H - 3, DOOR * 2 * MS, 3);
     if (nav && marker.visible) {
       mctx.strokeStyle = '#2a9d8f'; mctx.lineWidth = 1.5; mctx.setLineDash([3, 3]); mctx.beginPath(); mctx.moveTo(mx(pos.x), mz(pos.z));
