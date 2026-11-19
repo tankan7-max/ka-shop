@@ -350,7 +350,7 @@
     <ul class="tips">
       <li><b>Browse</b>Search every snack, add it to your cart, or press Find to be walked to its shelf.</li>
       <li><b>Bundles</b>Ready-made boxes on the table in the middle (and the shelves by the entrance). Inspect one to watch the snacks orbit.</li>
-      <li><b>Pharmacy</b>Panadol and Strepsils on the little stand below the checkout counter.</li>
+      <li><b>Pharmacy</b>Panadol and Strepsils on the front of the checkout counter.</li>
       <li><b>Delivery</b>Free over S$15, otherwise S$1.00. Add your address at checkout.</li>
       <li><b>Pay</b>Scan the PayNow QR, tick “I’ve paid”, then send your order on WhatsApp.</li>
     </ul>
@@ -879,7 +879,7 @@ function applyListFilter() {
 });
 CATS.forEach(cat => {
   const dot = el('span', { className: 'dot' }); dot.style.background = cat.sign;
-  const go = el('button', { type: 'button', className: 'needs3d', textContent: 'Walk to bundles', onclick: () => { closeDrawersOnSmallScreens(); world.goToCategory(cat); } });
+  const go = el('button', { type: 'button', className: 'needs3d', textContent: 'Walk to shelf', onclick: () => { closeDrawersOnSmallScreens(); world.goToCategory(cat); } });
   const section = el('section', {}, el('div', { className: 'cat-head' }, el('h3', {}, dot, cat.name), go)); section.dataset.cat = cat.name;
   cat.items.forEach(p => {
     const find = el('button', { type: 'button', className: 'needs3d', textContent: 'Find', onclick: () => { closeDrawersOnSmallScreens(); world.findProduct(p); } }); find.setAttribute('aria-label', `Find ${p.name} in the shop`);
@@ -1758,50 +1758,45 @@ function startWorld(THREE) {
     const s = plane(1.05, 0.82, flat(tex)); s.position.set(gx, 1.55, endZ + 0.045); scene.add(s);
   }
 
-  // Pharmacy at the checkout: a low stand below the counter, facing the shop.
-  // Its packs are built the same way as shelf packs, so Find, stock and the
-  // card all work; the stand is an obstacle and the packs face north.
-  const COUNTER_STAND = { x: HALF_W - 2.6, z: HALF_D - 3.4, w: 1.7, d: 0.5, h: 0.55 };
+  // Pharmacy at the checkout: the packs are mounted flat on the front face of the counter (the side facing the
+  // shop), on a slim backing board, so nothing stands in the walkway. They are built the same way as shelf
+  // packs, so Find, stock and the card all work.
+  const COUNTER_STAND = { x: HALF_W - 2.6 - 0.1, z: HALF_D - 2.6 - 0.4, w: 1.9, d: 0.2, h: 0.95 };   // the display area on the counter face (centre, width, how far packs stick out, height)
   if (COUNTER_PRODUCTS.length) {
-    const stand = new THREE.Group(); stand.position.set(COUNTER_STAND.x, 0, COUNTER_STAND.z); stand.rotation.y = Math.PI; scene.add(stand);
-    const standBase = new THREE.Mesh(new THREE.BoxGeometry(COUNTER_STAND.w, COUNTER_STAND.h - 0.05, COUNTER_STAND.d), std(0x2f6f68));
-    standBase.position.set(0, (COUNTER_STAND.h - 0.05) / 2, 0); stand.add(standBase);
-    const standTop = new THREE.Mesh(new THREE.BoxGeometry(COUNTER_STAND.w + 0.1, 0.05, COUNTER_STAND.d + 0.1), std(0xcaa776, { roughness: 0.5 }));
-    standTop.position.set(0, COUNTER_STAND.h - 0.025, 0); stand.add(standTop);
-    stand.updateMatrixWorld(true);
-    const STAND_SLOT_W = 0.85, STAND_TOP = COUNTER_STAND.h;
+    const face = new THREE.Group(); face.position.set(COUNTER_STAND.x, 0, COUNTER_STAND.z); face.rotation.y = Math.PI; scene.add(face);   // local +z points out into the shop
+    const SLOT_W = 0.85, BACK = 0.03, PACK_Y = 0.5, MAX_H = 0.3;
+    const board = new THREE.Mesh(new THREE.BoxGeometry(SLOT_W * COUNTER_PRODUCTS.length + 0.2, MAX_H + 0.2, BACK), std(0xf1e7d0, { roughness: 0.8 }));
+    board.position.set(0, PACK_Y + MAX_H / 2 + 0.02, BACK / 2); face.add(board);
+    face.updateMatrixWorld(true);
     COUNTER_PRODUCTS.forEach((p, pi) => {
-      const w = Math.min(p.width, STAND_SLOT_W - 0.08), d = Math.min(p.depth, COUNTER_STAND.d - 0.08);
-      const across = Math.max(1, Math.min(2, Math.floor((STAND_SLOT_W - 0.06) / (w + 0.03))));
-      const rows = Math.max(1, Math.min(2, Math.floor((COUNTER_STAND.d - 0.08) / (d + 0.03))));
-      const h = Math.min(p.height, 0.3);
+      const w = Math.min(p.width, SLOT_W - 0.08), d = Math.min(p.depth, 0.16);
+      const across = Math.max(1, Math.min(2, Math.floor((SLOT_W - 0.06) / (w + 0.03))));
+      const h = Math.min(p.height, MAX_H);
       const list = [];
-      const x0 = (pi - (COUNTER_PRODUCTS.length - 1) / 2) * STAND_SLOT_W;   // this product's column, in stand-local x
-      for (let a = 0; a < across; a++) for (let r = 0; r < rows; r++) {
+      const x0 = (pi - (COUNTER_PRODUCTS.length - 1) / 2) * SLOT_W;   // this product's column, in face-local x (left to right as you see it)
+      for (let a = 0; a < across; a++) {
         const local = new THREE.Matrix4().compose(
-          new THREE.Vector3(x0 + (a - (across - 1) / 2) * (w + 0.03), STAND_TOP + h / 2, (r - (rows - 1) / 2) * (d + 0.03) + 0.05),
+          new THREE.Vector3(x0 + (a - (across - 1) / 2) * (w + 0.03), PACK_Y + h / 2, BACK + d / 2),
           new THREE.Quaternion(), new THREE.Vector3(1, h / p.height, 1));
-        const it = { m: new THREE.Matrix4().multiplyMatrices(stand.matrixWorld, local), w, d, unit: { rotY: Math.PI }, front: rows - 1 - r, slotIndex: a };
-        // The pack Find walks to: front row, middle of the row.
-        if (r === rows - 1 && a === Math.floor((across - 1) / 2)) { p.hero = it; it.front = -1; }
+        const it = { m: new THREE.Matrix4().multiplyMatrices(face.matrixWorld, local), w, d, unit: { rotY: Math.PI }, front: 0, slotIndex: a };
+        if (a === Math.floor((across - 1) / 2)) { p.hero = it; it.front = -1; }   // the pack Find walks to
         list.push(it);
       }
-      // Front rows first, so that when stock is low the packs left are at the front.
       list.sort((a, b) => a.front - b.front || a.slotIndex - b.slotIndex);
-      // Grey "Out of stock" tag and price tag on the stand's front face, under the top board.
+      // Grey "Out of stock" tag and price tag on the counter face, under the packs.
       const soldTag = plane(0.6, 0.12, flat(tagTexture(p, '#9aa3a7', true)));
-      soldTag.position.set(x0, STAND_TOP - 0.08, COUNTER_STAND.d / 2 + 0.012); soldTag.userData.product = p;
-      stand.add(soldTag); soldTag.updateMatrixWorld(); clickable.push(soldTag);
+      soldTag.position.set(x0, PACK_Y - 0.1, 0.012); soldTag.userData.product = p;
+      face.add(soldTag); soldTag.updateMatrixWorld(); clickable.push(soldTag);
       const tag = plane(0.6, 0.12, flat(tagTexture(p, '#2a9d8f')));
-      tag.position.set(x0, STAND_TOP - 0.08, COUNTER_STAND.d / 2 + 0.012); tag.userData.product = p;
-      stand.add(tag); tag.updateMatrixWorld(); clickable.push(tag);
+      tag.position.set(x0, PACK_Y - 0.1, 0.012); tag.userData.product = p;
+      face.add(tag); tag.updateMatrixWorld(); clickable.push(tag);
       p.shelf = { soldTag, tags: [tag], meshes: [], list: null };
       productInstances.set(p, list);
     });
-    // Pharmacy sign on the front face, below the price tags.
-    const standSign = plane(1.2, 0.2, flat(signTexture('Pharmacy', '#2a9d8f', 512, 140)));
-    standSign.position.set(0, 0.16, COUNTER_STAND.d / 2 + 0.012); stand.add(standSign);
-    stand.updateMatrixWorld(true); addObstacle(stand); floorShadow(COUNTER_STAND.x, COUNTER_STAND.z, COUNTER_STAND.w + 0.7, COUNTER_STAND.d + 0.7);
+    // Pharmacy sign below the price tags.
+    const faceSign = plane(1.2, 0.2, flat(signTexture('Pharmacy', '#2a9d8f', 512, 140)));
+    faceSign.position.set(0, 0.2, 0.012); face.add(faceSign);
+    face.updateMatrixWorld(true);
   }
 
   // One instanced mesh per product: all its packs drawn in a single batch (fast on phones).
@@ -2077,8 +2072,8 @@ function startWorld(THREE) {
   function goToBundles() { if (BUNDLES.length) walkToBundle(BUNDLES[0]); }
   function goToCounter() {
     if (!COUNTER_PRODUCTS.length) return;
-    const spot = nearestFree(COUNTER_STAND.x, COUNTER_STAND.z - 2.2);
-    walkTo(spot, lookAtFrom(spot, { x: COUNTER_STAND.x, y: 0.8, z: COUNTER_STAND.z }));
+    const spot = nearestFree(COUNTER_STAND.x, COUNTER_STAND.z - 1.8);
+    walkTo(spot, lookAtFrom(spot, { x: COUNTER_STAND.x, y: 0.7, z: COUNTER_STAND.z }));
   }
   function showSelection(p, it) { placeOutline(selectBox, p, it); selectProduct(p); }
   // Walk to a snack: to the very pack that was clicked when there is one, otherwise to its first pack.
@@ -2197,7 +2192,6 @@ function startWorld(THREE) {
       });
     });
     mctx.fillStyle = '#2f6f68'; mctx.fillRect(mx(counter.position.x - 1.3), mz(counter.position.z - 0.4), 2.6 * MS, 0.8 * MS);
-    if (COUNTER_PRODUCTS.length) { mctx.fillStyle = '#2a9d8f'; mctx.fillRect(mx(COUNTER_STAND.x - COUNTER_STAND.w / 2), mz(COUNTER_STAND.z - COUNTER_STAND.d / 2), COUNTER_STAND.w * MS, COUNTER_STAND.d * MS); }
     if (BUNDLES.length) {
       mctx.fillStyle = '#caa776';
       if (TABLE_USED.length) mctx.fillRect(mx(BUNDLE_TABLE.x - BUNDLE_TABLE.w / 2), mz(BUNDLE_TABLE.z - BUNDLE_TABLE.d / 2), BUNDLE_TABLE.w * MS, BUNDLE_TABLE.d * MS);
