@@ -530,6 +530,8 @@ const PRODUCTS = db.products.map(p => {
     kind, round: ROUND_KINDS.includes(kind),
     width: m.width || p.width || 0.5, height: m.height || p.height || 0.5, depth: m.depth || p.depth || 0.2,
     photoUrl: tex.image_url || p.texture_url || null, photo: null,
+    wrap: tex.wrap === 'once' || tex.wrap === 'front' ? tex.wrap : 'twice',   // round packs: print the art twice around (default), once all the way round, or on the front only
+    texSpin: Number.isFinite(tex.rotate) ? Math.min(180, Math.max(-180, tex.rotate)) : 0,   // turn the label around the pack, in degrees
     photoFills: tex.fit === 'cover',                    // the photo is the whole pack front (flat artwork), not a picture of the pack
     texScale: Number.isFinite(tex.scale) ? Math.min(4, Math.max(0.25, tex.scale)) : 1,   // texture fit, set in the product editor (1 = as drawn)
     texOffX: Number.isFinite(tex.offset_x) ? Math.min(1, Math.max(-1, tex.offset_x)) : 0,
@@ -1454,17 +1456,23 @@ function startWorld(THREE) {
   function faceSize(p) {
     if (p.kind === 'roll') return [p.width * 0.9, Math.PI * Math.min(p.height, p.depth) / 2];
     if (p.kind === 'hex') return [p.width / 2, p.height * 0.92];
-    return [p.round ? Math.PI * p.width / 2 : p.width, p.height * labelShare(p)];
+    return [p.round ? Math.PI * p.width / (p.wrap === 'once' ? 1 : 2) : p.width, p.height * labelShare(p)];
   }
   function packTexture(p) {
-    // Cans, tubes and cups have the art twice around; everything else has it on the front and back.
-    const [faceW, faceH] = faceSize(p);
-    const W = 320, H = Math.round(clamp(W * faceH / faceW, 96, p.kind === 'hex' ? 1280 : 640));
-    const tex = canvasTexture(p.round ? W * 2 : W, H, ctx => { drawPack(ctx, p, 0, 0, W, H); if (p.round) drawPack(ctx, p, W, 0, W, H); });
-    if (p.round) { tex.wrapS = THREE.RepeatWrapping; tex.offset.x = 0.25; }
+    // Cans, tubes, cups and bottles: the art is printed twice around (front and back), once all the way round
+    // (one continuous label, set in the product editor), or on the front only. Everything else has it on the front and back.
+    const [faceW, faceH] = faceSize(p), once = p.round && p.wrap === 'once';
+    const W = once ? 640 : 320, H = Math.round(clamp(W * faceH / faceW, 96, p.kind === 'hex' ? 1280 : 640));
+    const paint = ctx => {
+      if (p.round && p.wrap === 'front') { ctx.fillStyle = hex(p.color); ctx.fillRect(0, 0, W * 2, H); }
+      drawPack(ctx, p, 0, 0, W, H);
+      if (p.round && !once && p.wrap !== 'front') drawPack(ctx, p, W, 0, W, H);
+    };
+    const tex = canvasTexture(p.round && !once ? W * 2 : W, H, paint);
+    if (p.round) { tex.wrapS = THREE.RepeatWrapping; tex.offset.x = (once ? 0.5 : 0.25) - (p.texSpin || 0) / 360; }
     if (p.kind === 'hex') { tex.wrapS = THREE.RepeatWrapping; tex.repeat.x = 6; }   // the same art on all six sides
     // When the product's photo arrives, every pack picture still in use is drawn again.
-    const repaint = () => { const ctx = tex.image.getContext('2d'); drawPack(ctx, p, 0, 0, W, H); if (p.round) drawPack(ctx, p, W, 0, W, H); tex.needsUpdate = true; redraw(); };
+    const repaint = () => { const ctx = tex.image.getContext('2d'); ctx.clearRect(0, 0, tex.image.width, tex.image.height); paint(ctx); tex.needsUpdate = true; redraw(); };
     p.repaints = p.repaints || new Set(); p.repaints.add(repaint);
     p.onPhoto = () => p.repaints.forEach(fn => fn());
     tex.userData.retire = () => p.repaints.delete(repaint);
