@@ -1263,6 +1263,7 @@ function startWorld(THREE) {
   // Bundle shelves: each bundle stands in a tray, three trays to a tall shelf unit, on the left wall by the entrance.
   // Snacks are shown at their real size, in two staggered rows, so a tray is as wide as its snacks need.
   const B_TIERS = 3, B_TIER_H = 0.92, B_DEPTH = 1.0, B_GAP = 0.25;
+  const B_SLANT = 0.2;   // radians (about 11°) that every bundle shelf board tips forward
   BUNDLES.forEach(b => {
     const gr = groupItems(b.items), w = gr.map(g => g.p.width + (g.n - 1) * 0.07), xs = [0];   // identical snacks share one slot, stacked
     for (let i = 1; i < w.length; i++) xs.push(xs[i - 1] + 0.62 * (w[i - 1] + w[i]) / 2);
@@ -1792,11 +1793,11 @@ function startWorld(THREE) {
       [[L, TOP, 0.04, 0, TOP / 2, -B_DEPTH / 2 + 0.02, teal], [0.05, TOP, B_DEPTH, -L / 2 + 0.025, TOP / 2, 0, wood], [0.05, TOP, B_DEPTH, L / 2 - 0.025, TOP / 2, 0, wood],
        [L, BOARD, B_DEPTH, 0, TOP - BOARD / 2, 0, wood], [L, 0.1, B_DEPTH - 0.1, 0, 0.05, -0.02, std(0x4b5a62)]]
         .forEach(([w, h, d, x, y, z, mat]) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); m.position.set(x, y, z); shelf.add(m); clickable.push(m); });
-      // Each shelf board is slanted to face a shopper standing back from the unit (about eye height): trays above eye
-      // level lean forward and look down at you, trays below lean back and look up, so every tray can be seen.
+      // Every shelf board has the same slant (front edge lower, parallel to the others), so the snacks lean towards the
+      // shopper and the top tray can be seen from below.
       const tiers = Array.from({ length: TIERS }, (_, t) => {
-        const g = new THREE.Group(), mid = 0.1 + t * B_TIER_H + 0.35;
-        g.position.set(0, 0.1 + t * B_TIER_H, 0); g.rotation.x = Math.max(-0.34, Math.min(0.34, Math.atan2(mid - EYE, 3.4))) * 1.15; shelf.add(g);
+        const g = new THREE.Group();
+        g.position.set(0, 0.1 + t * B_TIER_H, 0); g.rotation.x = B_SLANT; shelf.add(g);
         const board = new THREE.Mesh(new THREE.BoxGeometry(L - 0.1, BOARD, B_DEPTH - 0.04), wood); board.position.y = -BOARD / 2; g.add(board); clickable.push(board);
         return g;
       });
