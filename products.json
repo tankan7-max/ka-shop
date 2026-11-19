@@ -28,7 +28,7 @@
       },
       "texture": {
         "description": "Mamee Monster noodle snack, chicken flavour pack photo",
-        "image_url": "https://foodpanda.dhmedia.io/image/darkstores/nv-global-catalog/sg/99a87083-630c-401b-91db-f08c19014fde.jpg?height=480&dpi=3",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/mamee-chicken/front-mwn3mq2b.jpg",
         "source_url": "https://www.foodpanda.sg/groceries/product/0KA9B1/mamee-monster-noodle-snack--chicken-10s-x-25g",
         "type": "image"
       },
@@ -52,7 +52,7 @@
       },
       "texture": {
         "description": "Mamee Monster noodle snack, BBQ flavour pack photo",
-        "image_url": "https://assets.mydeal.com.au/47695/mamee-monster-noodle-snack-200g-bbq-flavour-8-packs-14127623_00.jpg?v=WJlPetuDBRdnZ0S&im=Resize,width=600,height=600,aspect=fit,type=downsize;Crop,rect=(0,0,600,600),gravity=Center,allowExpansion",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/mamee-bbq/front-mwn3qe7m.jpg",
         "source_url": "https://shopee.sg/Mamee-Monster-Noodle-Snack-Family-Pack-(8-x-25g)-i.15167456.25523013678",
         "type": "image"
       },
@@ -76,7 +76,7 @@
       },
       "texture": {
         "description": "Meiji Hello Panda biscuits pack photo",
-        "image_url": "https://cdn.shopify.com/s/files/1/0508/4702/3253/files/ezgif.com-webp-to-jpg-converter_2.jpg?v=1759131248",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/hello-panda/front-mwn3qryc.jpg",
         "source_url": "https://shopee.sg/Meiji-Hello-Panda-Biscuits-35g-pack-Chocolate-Milk-Strawberry-Biscuit-Assorted-Flavours-i.435361035.22368202347",
         "type": "image"
       },
@@ -148,7 +148,7 @@
       },
       "texture": {
         "description": "Lay's BBQ potato chips bag photo",
-        "image_url": "https://i5.peapod.com/c/L7/L7BDW.png",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/lays-bbq/front-mwn3r4le.jpg",
         "source_url": "https://www.foodlion.com/groceries/snacks/chips/potato-chips/barbecue-potato-chips/lays-barbecue-potato-chips-1-oz-bag.html",
         "type": "image"
       },
@@ -196,7 +196,7 @@
       },
       "texture": {
         "description": "Korean seaweed snack pack photo",
-        "image_url": "https://gdimg.gmarket.co.kr/4538534968/still/600?ver=1781081009",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/korean-seaweed/front-mwn3sw62.jpg",
         "source_url": "https://shopee.sg/HBAF-Korean-Seaweed-Chips-40g-4-Flavors-(Honey-Butter-Wasabi-Salted-Garlic-Bread)-Crispy-Seaweed-Snack-i.1664342463.43126071653",
         "type": "image"
       },
@@ -282,8 +282,9 @@
         "color": 3055172
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/pringles-sco/front-mwn3rg3d.jpg"
       },
       "reference": {
         "note": "FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling.",
@@ -433,8 +434,9 @@
         "color": 16088064
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/julies-peanut-butter/front-mwn3sknt.jpg"
       },
       "reference": {
         "note": "FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling. An older 2-for-S$9.95 promotion has ended.",
@@ -562,8 +564,9 @@
         "color": 15094016
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/kinder-bueno-milk/front-mwn3ru1w.jpg"
       },
       "reference": {
         "note": "FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling.",
@@ -672,8 +675,9 @@
         "color": 13959168
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/kitkat-2f-6pack/front-mwn3s7dz.jpg"
       },
       "reference": {
         "note": "FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling.",
