@@ -1152,6 +1152,55 @@
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
       }
+    },
+    {
+      "id": "panadol",
+      "name": "Panadol",
+      "category": "Pharmacy",
+      "price_sgd": 5.3,
+      "pack": "1 box, 16 tablets",
+      "model": {
+        "type": "box",
+        "width": 0.3,
+        "height": 0.22,
+        "depth": 0.12,
+        "color": 2792847
+      },
+      "texture": {
+        "description": "Panadol Original tablets pack photo",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/panadol/front-mwnl9rnl.jpg",
+        "type": "image",
+        "fit": "cover",
+        "scale": 1.3
+      },
+      "reference": {
+        "note": "FairPrice Panadol Original 16 tablets listed at SGD 4.80 (search snapshot, 19 Nov 2026); shop price set at SGD 5.30"
+      }
+    },
+    {
+      "id": "strepsils-honey-lemon",
+      "name": "Strepsils Honey & Lemon",
+      "category": "Pharmacy",
+      "price_sgd": 8.0,
+      "pack": "1 box, 24 lozenges",
+      "model": {
+        "type": "box",
+        "width": 0.35,
+        "height": 0.22,
+        "depth": 0.12,
+        "color": 2792847
+      },
+      "texture": {
+        "description": "Strepsils Honey & Lemon lozenges pack photo",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/strepsils-honey-lemon/front-mwnlbs7e.png",
+        "type": "image",
+        "fit": "cover",
+        "scale": 1.3
+      },
+      "reference": {
+        "note": "FairPrice Strepsils Lozenges Box - Soothing (Honey & Lemon) 24 per pack listed at SGD 7.30 (search snapshot, 19 Nov 2026); shop price set at SGD 8.00",
+        "source_url": "https://www.fairprice.com.sg/brand/strepsils"
+      }
     }
   ],
   "version": 1,
@@ -1163,7 +1212,8 @@
     "Sweets & mints",
     "Instant noodles",
     "Drinks",
-    "Nuts & healthier snacks"
+    "Nuts & healthier snacks",
+    "Pharmacy"
   ],
   "bundles": [
     {
