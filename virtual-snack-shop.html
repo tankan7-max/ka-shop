@@ -460,6 +460,11 @@ if (LIVE) {
       usingFallback = false;
     }
   } catch (e) { console.warn('Could not read products from the database, using products.json instead:', e); }
+  // Bundles are managed in products.html too. If the table exists, it is the truth (even when empty); if not, products.json is used.
+  try {
+    const res = await fetch(`${DB_URL}/rest/v1/bundles?active=eq.true&select=id,name,blurb,price_sgd,items&order=sort,name`, { headers: { apikey: DB_KEY }, signal: timeout(7000) });
+    if (res.ok) { const rows = await res.json(); if (Array.isArray(rows)) db = { ...db, bundles: rows.map(r => ({ id: r.id, name: r.name, blurb: r.blurb || '', price: Number(r.price_sgd), items: Array.isArray(r.items) ? r.items : [] })) }; }
+  } catch (e) { console.warn('Could not read bundles from the database, using products.json instead:', e); }
 }
 async function fetchInventory() {
   if (LIVE) {
@@ -1753,28 +1758,37 @@ function startWorld(THREE) {
   counter.updateMatrixWorld(true); addObstacle(counter); floorShadow(counter.position.x, counter.position.z, 3.6, 1.9);
   // Bundles table by the entrance, opposite the checkout counter: a low table
   // with an open-top box for each bundle, the snacks standing inside it.
-  const BUNDLE_TABLE = { x: -HALF_W + 2.6, z: HALF_D - 2.6 };
+  const BUNDLE_TABLE = { x: -HALF_W + 2.6, z: HALF_D - 2.6, w: 3.0, d: 1.2 };   // w and d (the table's size) are set once the boxes are laid out
   if (BUNDLES.length) {
     const bundleTable = new THREE.Group(); bundleTable.position.set(BUNDLE_TABLE.x, 0, BUNDLE_TABLE.z); scene.add(bundleTable);
-    [[new THREE.BoxGeometry(3.6, 0.9, 1.2), std(0x2f6f68), 0, 0.45], [new THREE.BoxGeometry(3.8, 0.06, 1.35), std(0xcaa776, { roughness: 0.5 }), 0, 0.93]]
+    // Small, neat boxes: a box is only as wide as its snacks need, and the table grows (in rows) as bundles are added.
+    const BOX_D = 0.72, BOX_H = 0.14, BOX_T = 0.04, GAP = 0.16, ROW_W = 4.4, ROW_D = BOX_D + 0.3;
+    const boxW = b => Math.min(1.6, Math.max(0.95, 0.44 + 0.13 * b.items.length));
+    const rows = [[]]; let rowUsed = 0;
+    BUNDLES.forEach(b => { const w = boxW(b); if (rows[rows.length - 1].length && rowUsed + w + GAP > ROW_W) { rows.push([]); rowUsed = 0; } rows[rows.length - 1].push(b); rowUsed += w + GAP; });
+    const rowWidth = r => r.reduce((t, b) => t + boxW(b), 0) + GAP * (r.length - 1);
+    const tableW = Math.max(3.0, ...rows.map(rowWidth)) + 0.5, tableD = 0.55 + rows.length * ROW_D;
+    BUNDLE_TABLE.w = tableW; BUNDLE_TABLE.d = tableD;
+    [[new THREE.BoxGeometry(tableW - 0.2, 0.9, tableD - 0.15), std(0x2f6f68), 0, 0.45], [new THREE.BoxGeometry(tableW, 0.06, tableD), std(0xcaa776, { roughness: 0.5 }), 0, 0.93]]
       .forEach(([geo, material, x, y]) => { const m = new THREE.Mesh(geo, material); m.position.set(x, y, 0); bundleTable.add(m); clickable.push(m); });
     const bundleSign = new THREE.Sprite(new THREE.SpriteMaterial({ map: signTexture('Bundles', '#2a9d8f', 512, 140) }));
     bundleSign.scale.set(2.2, 0.6, 1); bundleSign.position.set(0, 2.55, 0); bundleTable.add(bundleSign);
     shelfGlow(BUNDLE_TABLE.x, 2.6, BUNDLE_TABLE.z, 14, 8);
-    const BOX_W = 1.7, BOX_D = 0.95, BOX_H = 0.15, BOX_T = 0.05;
-    BUNDLES.forEach((b, bi) => {
-      const box = new THREE.Group();
-      box.position.set((bi - (BUNDLES.length - 1) / 2) * (BOX_W + 0.15), 0.96, 0); bundleTable.add(box);
+    rows.forEach((row, ri) => { let x = -rowWidth(row) / 2; row.forEach(b => { b.slot = { x: x + boxW(b) / 2, z: (ri - (rows.length - 1) / 2) * ROW_D }; x += boxW(b) + GAP; }); });
+    BUNDLES.forEach(b => {
+      const BOX_W = boxW(b), box = new THREE.Group();
+      box.position.set(b.slot.x, 0.96, b.slot.z); bundleTable.add(box);
       const kraft = std(0xcaa776, { roughness: 0.7 }), kraftDark = std(0xa87f4e, { roughness: 0.7 });
       [[BOX_W, BOX_T, BOX_D, 0, BOX_T / 2, 0, kraft], [BOX_W, BOX_H, BOX_T, 0, BOX_H / 2, -BOX_D / 2 + BOX_T / 2, kraftDark],
        [BOX_W, BOX_H, BOX_T, 0, BOX_H / 2, BOX_D / 2 - BOX_T / 2, kraftDark], [BOX_T, BOX_H, BOX_D, -BOX_W / 2 + BOX_T / 2, BOX_H / 2, 0, kraftDark],
        [BOX_T, BOX_H, BOX_D, BOX_W / 2 - BOX_T / 2, BOX_H / 2, 0, kraftDark]]
         .forEach(([w, h, d, x, y, z, mat]) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); m.position.set(x, y, z); m.userData.bundle = b; box.add(m); clickable.push(m); });
+      // Snacks stand in two staggered rows (zig-zag front and back), the back row a touch higher, so each one shows.
       b.items.forEach((p, i) => {
-        const s = 0.7, slot = (BOX_W - 0.2) / b.items.length;
+        const s = 0.55, n = b.items.length, back = i % 2 === 1, span = BOX_W - 0.3;
         const mesh = packMesh(p, p.width, p.depth, 1);
-        const pos = new THREE.Vector3(-BOX_W / 2 + 0.1 + slot * (i + 0.5), BOX_T + p.height * s / 2, (hashOf(p.id + 'z') % 30 - 15) / 100);
-        const quat = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, (hashOf(p.id) % 40 - 20) * Math.PI / 180, (hashOf(p.id + 't') % 10 - 5) * Math.PI / 180));
+        const pos = new THREE.Vector3(-span / 2 + (n > 1 ? span * i / (n - 1) : span / 2), BOX_T + p.height * s / 2 + (back ? 0.05 : 0), back ? -BOX_D * 0.2 : BOX_D * 0.17);
+        const quat = new THREE.Quaternion().setFromEuler(new THREE.Euler(back ? -0.1 : 0.04, (hashOf(p.id) % 24 - 12) * Math.PI / 180, 0));
         mesh.setMatrixAt(0, new THREE.Matrix4().compose(pos, quat, new THREE.Vector3(s, s, s)));
         mesh.instanceMatrix.needsUpdate = true;
         mesh.userData.bundle = b; box.add(mesh); clickable.push(mesh);
@@ -1796,12 +1810,12 @@ function startWorld(THREE) {
         g.fillStyle = out ? '#7a8389' : '#b71c1c'; g.textAlign = 'center'; g.fillText(price, w - pw / 2 - 24, h - 55);
         plateTex.needsUpdate = true;
       };
-      const plate = new THREE.Mesh(new THREE.PlaneGeometry(0.84, 0.249), new THREE.MeshBasicMaterial({ map: plateTex, transparent: true }));
-      plate.position.set(0, 0.1, BOX_D / 2 + 0.15); plate.rotation.x = -0.85; plate.userData.bundle = b; box.add(plate); clickable.push(plate);
+      const plate = new THREE.Mesh(new THREE.PlaneGeometry(0.72, 0.213), new THREE.MeshBasicMaterial({ map: plateTex, transparent: true }));
+      plate.position.set(0, 0.09, BOX_D / 2 + 0.13); plate.rotation.x = -0.85; plate.userData.bundle = b; box.add(plate); clickable.push(plate);
       b.plate = { paint }; paint();
       box.updateMatrixWorld(true);
     });
-    bundleTable.updateMatrixWorld(true); addObstacle(bundleTable); floorShadow(BUNDLE_TABLE.x, BUNDLE_TABLE.z, 4.4, 2.0);
+    bundleTable.updateMatrixWorld(true); addObstacle(bundleTable); floorShadow(BUNDLE_TABLE.x, BUNDLE_TABLE.z, tableW + 0.6, tableD + 0.8);
   }
   // Potted plants by the entrance.
   [-1, 1].forEach(s => {
@@ -1908,13 +1922,13 @@ function startWorld(THREE) {
   // Walk to the Bundles table and open the box's card.
   function findBundle(b) {
     if (!inStock(b)) { selectProduct(b); return; }
-    const spot = nearestFree(BUNDLE_TABLE.x, BUNDLE_TABLE.z + 2.1);
+    const spot = nearestFree(BUNDLE_TABLE.x, BUNDLE_TABLE.z + BUNDLE_TABLE.d / 2 + 1.5);
     selectProduct(b);
     walkTo(spot, lookAtFrom(spot, { x: BUNDLE_TABLE.x, y: 1.2, z: BUNDLE_TABLE.z }));
   }
   function goToBundles() {
     if (!BUNDLES.length) return;
-    const spot = nearestFree(BUNDLE_TABLE.x, BUNDLE_TABLE.z + 2.1);
+    const spot = nearestFree(BUNDLE_TABLE.x, BUNDLE_TABLE.z + BUNDLE_TABLE.d / 2 + 1.5);
     walkTo(spot, lookAtFrom(spot, { x: BUNDLE_TABLE.x, y: 1.2, z: BUNDLE_TABLE.z }));
   }
   function showSelection(p, it) { placeOutline(selectBox, p, it); selectProduct(p); }
@@ -2034,7 +2048,7 @@ function startWorld(THREE) {
       });
     });
     mctx.fillStyle = '#2f6f68'; mctx.fillRect(mx(counter.position.x - 1.3), mz(counter.position.z - 0.4), 2.6 * MS, 0.8 * MS);
-    if (BUNDLES.length) { mctx.fillStyle = '#caa776'; mctx.fillRect(mx(BUNDLE_TABLE.x - 1.8), mz(BUNDLE_TABLE.z - 0.6), 3.6 * MS, 1.2 * MS); }
+    if (BUNDLES.length) { mctx.fillStyle = '#caa776'; mctx.fillRect(mx(BUNDLE_TABLE.x - BUNDLE_TABLE.w / 2), mz(BUNDLE_TABLE.z - BUNDLE_TABLE.d / 2), BUNDLE_TABLE.w * MS, BUNDLE_TABLE.d * MS); }
     mctx.fillStyle = '#2a9d8f'; mctx.fillRect(mx(-DOOR), MAP_H - 3, DOOR * 2 * MS, 3);
     if (nav && marker.visible) {
       mctx.strokeStyle = '#2a9d8f'; mctx.lineWidth = 1.5; mctx.setLineDash([3, 3]); mctx.beginPath(); mctx.moveTo(mx(pos.x), mz(pos.z));

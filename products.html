@@ -48,6 +48,19 @@
   .row .meta { font-size: 13px; color: var(--muted); }
   .badge { display: inline-block; font-size: 12px; font-weight: 700; padding: 0 7px; border-radius: 999px; background: #e3f4f1; color: var(--brand-dark); margin-left: 6px; }
   .badge.off { background: #eceff1; color: var(--muted); }
+  .bundles-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: 26px 0 8px; }
+  .bundles-head h2 { margin: 0; font-size: 18px; }
+  .row.bundle { grid-template-columns: 1fr auto; }
+  .row.bundle .meta.items { white-space: normal; }
+  #bundle-editor form { display: grid; gap: 12px; }
+  #b-picker { max-height: 260px; overflow-y: auto; border: 1px solid var(--line); border-radius: 10px; padding: 4px; display: grid; gap: 2px; }
+  #b-picker label { font-weight: 400; display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 8px; font-size: 14px; cursor: pointer; }
+  #b-picker label:hover { background: rgba(0,0,0,.04); }
+  #b-picker .pc { margin-left: auto; color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+  #b-picked { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+  #b-picked li { display: flex; align-items: center; gap: 6px; padding: 4px 6px 4px 10px; border: 1px solid var(--line); border-radius: 10px; font-size: 14px; }
+  #b-picked li span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #b-sum { font-size: 14px; } #b-sum.good { color: #1b7a3d; } #b-sum.bad { color: var(--danger); }
   dialog { border: 0; border-radius: 16px; padding: 0; width: min(620px, calc(100vw - 20px)); max-height: calc(100dvh - 20px); box-shadow: 0 8px 28px rgba(20,30,35,.25); color: var(--ink); }
   dialog::backdrop { background: rgba(20,30,35,.45); }
   dialog form { padding: 18px 20px; }
@@ -160,6 +173,14 @@
     the database cannot be reached, so upload a fresh copy to the repository now and then.
   </details>
 
+  <div class="bundles-head"><h2>Bundles</h2><button id="add-bundle" class="primary" type="button">Add a bundle</button></div>
+  <div id="bundle-setup" class="panel" hidden>
+    <b>Bundles need one small set-up step.</b> In Supabase, open <b>SQL Editor → New query</b>, paste the contents of
+    <code>supabase-bundles.sql</code> (in the repository) and press <b>Run</b>. Then reload this page. Until then the shop keeps using the bundles in <code>products.json</code>.
+  </div>
+  <div id="bundle-list"></div>
+
+  <div class="bundles-head"><h2>Products</h2></div>
   <div class="toolbar">
     <input id="search" type="search" placeholder="Search products…" aria-label="Search products">
     <button id="add" class="primary" type="button">Add a product</button>
@@ -167,7 +188,35 @@
   </div>
   <p id="status" role="status"></p>
   <div id="list"></div>
+
 </main>
+
+<dialog id="bundle-editor" aria-labelledby="b-title">
+  <form id="bundle-form" method="dialog">
+    <h2 id="b-title">Bundle</h2>
+    <label class="field">Name<input id="b-name" required maxlength="120" autocomplete="off"></label>
+    <label class="field">Short description <small>Shown when the bundle is inspected</small><input id="b-blurb" maxlength="300" autocomplete="off"></label>
+    <div class="grid">
+      <label class="field">Bundle price (S$)<input id="b-price" type="number" min="0" max="9999" step="0.01" inputmode="decimal" required></label>
+      <label class="field">Position<input id="b-sort" type="number" min="0" max="999" step="1" inputmode="numeric" value="0"><small>Lower numbers come first on the table</small></label>
+    </div>
+    <div class="field">Snacks in the box <small>Tick to add, in the order you tick them. Up to 12.</small>
+      <input id="b-search" type="search" placeholder="Search snacks…" aria-label="Search snacks" style="margin-bottom:6px">
+      <div id="b-picker" role="group" aria-label="Snacks you can add"></div>
+    </div>
+    <ol id="b-picked" aria-label="Snacks in this bundle, in order"></ol>
+    <p id="b-sum" role="status"></p>
+    <label class="check"><input id="b-active" type="checkbox" checked> On sale (shown on the bundles table)</label>
+    <p id="b-error" class="error" role="alert"></p>
+    <div class="dialog-btns">
+      <button class="primary" type="submit" id="b-save">Save</button>
+      <button type="button" id="b-cancel">Cancel</button>
+      <span class="spacer"></span>
+      <button type="button" id="b-delete" class="danger" hidden>Delete</button>
+    </div>
+  </form>
+</dialog>
+
 
 <dialog id="editor" aria-labelledby="editor-title">
   <form id="editor-form" method="dialog">
@@ -343,6 +392,7 @@ async function reload() {
   [products, categories] = await Promise.all([api('products?select=*&order=sort,name'), api('categories?select=*&order=sort,name')]);
   $('import-box').hidden = products.length > 0;
   render();
+  await loadBundles();
 }
 const categoryNames = () => { const names = categories.map(c => c.name); products.forEach(p => { if (!names.includes(p.category)) names.push(p.category); }); return names; };
 const hex = n => '#' + ((Number(n) || 0) & 0xffffff).toString(16).padStart(6, '0');
@@ -1013,9 +1063,94 @@ $('import').onclick = async () => {
   btn.disabled = false;
 };
 
+// --- Bundles ---
+let bundles = [], bEditing = null, bItems = [];
+async function loadBundles() {
+  try { bundles = await api('bundles?select=*&order=sort,name'); $('bundle-setup').hidden = true; $('add-bundle').disabled = false; }
+  catch (e) { bundles = null; $('bundle-setup').hidden = false; $('add-bundle').disabled = true; }
+  renderBundles();
+}
+function renderBundles() {
+  const list = $('bundle-list'); list.textContent = '';
+  if (!bundles) return;
+  if (!bundles.length) list.append(el('p', { className: 'hint', textContent: 'No bundles yet. Add one, and it appears on the table by the shop entrance.' }));
+  bundles.forEach(b => {
+    const names = (b.items || []).map(id => (products.find(p => p.id === id) || { name: id + ' (missing)' }).name);
+    const sum = (b.items || []).reduce((t, id) => t + Number((products.find(p => p.id === id) || {}).price_sgd || 0), 0);
+    const edit = el('button', { type: 'button', textContent: 'Edit', onclick: () => openBundle(b) }); edit.setAttribute('aria-label', `Edit ${b.name}`);
+    list.append(el('div', { className: 'row bundle' + (b.active ? '' : ' off') },
+      el('div', {}, el('div', { className: 'name' }, b.name, b.active ? '' : el('span', { className: 'badge off', textContent: 'Hidden' })),
+        el('div', { className: 'meta', textContent: `S$${Number(b.price_sgd).toFixed(2)} · ${names.length} snacks` + (sum > Number(b.price_sgd) ? ` · saves S$${(sum - Number(b.price_sgd)).toFixed(2)}` : '') }),
+        el('div', { className: 'meta items', textContent: names.join(' · ') })), edit));
+  });
+}
+function bundleSum() {
+  const sum = bItems.reduce((t, id) => t + Number((products.find(p => p.id === id) || {}).price_sgd || 0), 0), price = Number($('b-price').value), out = $('b-sum');
+  out.className = '';
+  if (!bItems.length) { out.textContent = 'Pick at least one snack.'; return; }
+  if (!($('b-price').value === '')) {
+    const d = sum - price;
+    out.textContent = `Bought separately: S$${sum.toFixed(2)} · ` + (d > 0.004 ? `customers save S$${d.toFixed(2)}` : d < -0.004 ? `this costs MORE than buying them one by one (+S$${(-d).toFixed(2)})` : 'same as buying them separately');
+    out.className = d > 0.004 ? 'good' : d < -0.004 ? 'bad' : '';
+  } else out.textContent = `Bought separately: S$${sum.toFixed(2)}`;
+}
+function renderPicked() {
+  const ol = $('b-picked'); ol.textContent = '';
+  bItems.forEach((id, i) => {
+    const p = products.find(q => q.id === id), mv = (d, label, txt) => { const b = el('button', { type: 'button', className: 'small', textContent: txt, disabled: i + d < 0 || i + d >= bItems.length, onclick: () => { [bItems[i], bItems[i + d]] = [bItems[i + d], bItems[i]]; renderPicked(); } }); b.setAttribute('aria-label', `Move ${p ? p.name : id} ${label}`); return b; };
+    const rm = el('button', { type: 'button', className: 'small', textContent: '✕', onclick: () => { bItems.splice(i, 1); renderPicked(); drawPicker(); } }); rm.setAttribute('aria-label', `Remove ${p ? p.name : id}`);
+    ol.append(el('li', {}, el('span', { textContent: `${i + 1}. ${p ? p.name : id + ' (no longer in the shop)'}` }), mv(-1, 'earlier', '↑'), mv(1, 'later', '↓'), rm));
+  });
+  bundleSum();
+}
+function drawPicker() {
+  const q = $('b-search').value.trim().toLowerCase(), box = $('b-picker'); box.textContent = '';
+  categoryNames().forEach(cat => {
+    products.filter(p => p.category === cat && (!q || `${p.name} ${p.category} ${p.pack}`.toLowerCase().includes(q))).forEach(p => {
+      const cb = el('input', { type: 'checkbox', checked: bItems.includes(p.id), disabled: !bItems.includes(p.id) && bItems.length >= 12 });
+      cb.onchange = () => { if (cb.checked) bItems.push(p.id); else bItems = bItems.filter(x => x !== p.id); renderPicked(); drawPicker(); };
+      box.append(el('label', {}, cb, el('span', { textContent: p.name }), el('span', { className: 'pc', textContent: `S$${Number(p.price_sgd).toFixed(2)}` })));
+    });
+  });
+  if (!box.children.length) box.textContent = 'No snacks match.';
+}
+function openBundle(b) {
+  bEditing = b || null; bItems = b ? [...(b.items || [])] : [];
+  $('b-title').textContent = b ? 'Edit bundle' : 'New bundle';
+  $('b-name').value = b ? b.name : ''; $('b-blurb').value = b ? b.blurb || '' : ''; $('b-price').value = b ? Number(b.price_sgd).toFixed(2) : '';
+  $('b-sort').value = b ? b.sort : bundles.length; $('b-active').checked = b ? b.active : true; $('b-search').value = ''; $('b-error').textContent = '';
+  $('b-delete').hidden = !b; drawPicker(); renderPicked(); $('bundle-editor').showModal(); $('b-name').focus();
+}
+$('add-bundle').onclick = () => openBundle(null);
+$('b-cancel').onclick = () => $('bundle-editor').close();
+$('b-search').oninput = drawPicker; $('b-price').oninput = bundleSum;
+$('bundle-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const name = $('b-name').value.trim(), price = Number($('b-price').value);
+  if (!name) { $('b-error').textContent = 'Give the bundle a name.'; return; }
+  if (!bItems.length) { $('b-error').textContent = 'Pick at least one snack.'; return; }
+  if (!Number.isFinite(price) || price < 0) { $('b-error').textContent = 'Enter the bundle price.'; return; }
+  const row = { name, blurb: $('b-blurb').value.trim(), price_sgd: Math.round(price * 100) / 100, items: bItems, active: $('b-active').checked, sort: Math.max(0, Math.floor(Number($('b-sort').value) || 0)) };
+  $('b-save').disabled = true;
+  try {
+    if (bEditing) await api(`bundles?id=eq.${encodeURIComponent(bEditing.id)}`, { method: 'PATCH', prefer: 'return=minimal', body: row });
+    else {
+      let id = 'bundle-' + slug(name), n = 2; while (bundles.some(b => b.id === id)) id = `bundle-${slug(name)}-${n++}`;
+      await api('bundles', { method: 'POST', prefer: 'return=minimal', body: { id, ...row } });
+    }
+    $('bundle-editor').close(); await loadBundles(); say(`Saved “${name}”. It shows on the bundles table the next time a customer opens the shop.`);
+  } catch (err) { $('b-error').textContent = 'Could not save: ' + err.message; }
+  $('b-save').disabled = false;
+});
+$('b-delete').onclick = async () => {
+  if (!bEditing || !confirm(`Delete “${bEditing.name}” for good? (To just take it off the table, untick “On sale” instead.)`)) return;
+  try { await api(`bundles?id=eq.${encodeURIComponent(bEditing.id)}`, { method: 'DELETE', prefer: 'return=minimal' }); $('bundle-editor').close(); await loadBundles(); say('Bundle deleted.'); }
+  catch (err) { $('b-error').textContent = 'Could not delete: ' + err.message; }
+};
+
 // --- Backup: everything as a products.json file, for the repository. ---
 $('backup').onclick = () => {
-  const out = { ...fileDb, categories: categoryNames(), products: products.filter(p => p.active).map(p => ({ id: p.id, name: p.name, category: p.category, price_sgd: Number(p.price_sgd), pack: p.pack, model: p.model, texture: p.texture, reference: p.reference })) };
+  const out = { ...fileDb, categories: categoryNames(), bundles: (bundles || fileDb.bundles || []).filter(b => b.active !== false).map(b => b.price_sgd === undefined ? b : { id: b.id, name: b.name, price: Number(b.price_sgd), blurb: b.blurb || '', items: b.items }), products: products.filter(p => p.active).map(p => ({ id: p.id, name: p.name, category: p.category, price_sgd: Number(p.price_sgd), pack: p.pack, model: p.model, texture: p.texture, reference: p.reference })) };
   const a = el('a', { href: URL.createObjectURL(new Blob([JSON.stringify(out, null, 2) + '\n'], { type: 'application/json' })), download: 'products.json' });
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 5000);
   say('Backup downloaded — upload it to the repository (and run sync-products.py) so the shop has a fallback.');
