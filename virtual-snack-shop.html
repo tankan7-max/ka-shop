@@ -12,7 +12,7 @@
 </script>
 <style>
   :root {
-    --brand: #2a9d8f; --brand-dark: #1f7a6f; --brand-soft: #e3f4f1;
+    --brand: #228174; --brand-dark: #1a6a60; --brand-soft: #e3f4f1;
     --ink: #1c2428; --muted: #5d6970; --line: #e2e6e8; --bg: #f6f4ef;
     --panel: rgba(255,255,255,.97); --price: #c62828;
     --radius: 14px; --shadow: 0 8px 28px rgba(20,30,35,.18);
@@ -245,7 +245,7 @@
     <div class="logo"><svg class="i" viewBox="0 0 24 24"><path d="M5 9h14l-1.4 11H6.4zM9 9a3 3 0 0 1 6 0"/></svg></div>
     <span id="brand-name">Virtual Snack Shop</span>
   </div>
-  <button id="browse-btn" type="button" aria-expanded="false" aria-controls="catalogue"><svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span class="label">Browse</span></button>
+  <button id="browse-btn" type="button" aria-label="Browse all snacks" aria-expanded="false" aria-controls="catalogue"><svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span class="label">Browse</span></button>
   <button id="people-btn" type="button" aria-expanded="false" aria-controls="people" aria-label="Other shoppers" hidden><svg class="i" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5M16 5.2a3.2 3.2 0 0 1 0 5.6M17.5 14.8c2.1.6 3.5 2.4 3.5 5.2"/></svg><span id="people-count">1</span></button>
   <button id="help-btn" type="button" aria-label="How to use the shop"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.3a2.6 2.6 0 1 1 3.6 2.4c-.7.4-1.1.9-1.1 1.8M12 17h.01"/></svg><span class="label">Help</span></button>
   <button id="cart-btn" type="button" class="primary" aria-expanded="false" aria-controls="cart"><svg class="i" viewBox="0 0 24 24"><path d="M5 9h14l-1.4 11H6.4zM9 9a3 3 0 0 1 6 0"/></svg><span class="label">Cart</span><span id="cart-count">0</span><span id="cart-sum" class="label"></span></button>
@@ -1312,7 +1312,7 @@ function startWorld(THREE) {
   // Shelf faces are listed in shopping order: left wall, middle aisles, right wall, back wall.
   function plan(G, sideCols) {
     const halfW = Math.max(5.6, (G - 1) / 2 * AISLE + 5.8), sideLen = lenFor(sideCols), gondolaLen = lenFor(Math.max(2, sideCols - 2)), backLen = halfW - 0.6;
-    const halfD = (UNIT_D + 1.5 + sideLen + Math.max(8.6, B_RUN + 3.0)) / 2;                        // back shelves + wall shelves + room at the front for the door and counter
+    const halfD = (UNIT_D + 1.5 + sideLen + Math.max(10.0, B_RUN + 3.0)) / 2;                        // back shelves + wall shelves + room at the front for the door and counter
     const sideZ0 = -halfD + UNIT_D + 1.5, gondolaZ0 = -halfD + UNIT_D + 3.9;  // where the wall shelves and the gondolas start (their back ends)
     const units = [{ x: -halfW + UNIT_D / 2 + 0.06, z0: sideZ0, rotY: Math.PI / 2, length: sideLen }];
     for (let g = 0; g < G; g++) {
@@ -1764,9 +1764,9 @@ function startWorld(THREE) {
   const COUNTER_STAND = { x: HALF_W - 2.6 - 0.1, z: HALF_D - 2.6 - 0.4, w: 1.9, d: 0.2, h: 0.95 };   // the display area on the counter face (centre, width, how far packs stick out, height)
   if (COUNTER_PRODUCTS.length) {
     const face = new THREE.Group(); face.position.set(COUNTER_STAND.x, 0, COUNTER_STAND.z); face.rotation.y = Math.PI; scene.add(face);   // local +z points out into the shop
-    const SLOT_W = 0.85, BACK = 0.03, PACK_Y = 0.5, MAX_H = 0.3;
-    const board = new THREE.Mesh(new THREE.BoxGeometry(SLOT_W * COUNTER_PRODUCTS.length + 0.2, MAX_H + 0.2, BACK), std(0xf1e7d0, { roughness: 0.8 }));
-    board.position.set(0, PACK_Y + MAX_H / 2 + 0.02, BACK / 2); face.add(board);
+    const SLOT_W = 0.85, BACK = 0.03, PACK_Y = 0.6, MAX_H = 0.28;   // packs sit high on the face, which leaves a clear band below them for the labels
+    const board = new THREE.Mesh(new THREE.BoxGeometry(SLOT_W * COUNTER_PRODUCTS.length + 0.2, MAX_H + 0.1, BACK), std(0xf1e7d0, { roughness: 0.8 }));
+    board.position.set(0, PACK_Y + MAX_H / 2, BACK / 2); face.add(board);
     face.updateMatrixWorld(true);
     COUNTER_PRODUCTS.forEach((p, pi) => {
       const w = Math.min(p.width, SLOT_W - 0.08), d = Math.min(p.depth, 0.16);
@@ -1784,11 +1784,11 @@ function startWorld(THREE) {
       }
       list.sort((a, b) => a.front - b.front || a.slotIndex - b.slotIndex);
       // Grey "Out of stock" tag and price tag on the counter face, under the packs.
-      const soldTag = plane(0.6, 0.12, flat(tagTexture(p, '#9aa3a7', true)));
-      soldTag.position.set(x0, PACK_Y - 0.1, 0.012); soldTag.userData.product = p;
+      const soldTag = plane(0.76, 0.152, flat(tagTexture(p, '#9aa3a7', true)));
+      soldTag.position.set(x0, PACK_Y - 0.15, 0.012); soldTag.userData.product = p;
       face.add(soldTag); soldTag.updateMatrixWorld(); clickable.push(soldTag);
-      const tag = plane(0.6, 0.12, flat(tagTexture(p, '#2a9d8f')));
-      tag.position.set(x0, PACK_Y - 0.1, 0.012); tag.userData.product = p;
+      const tag = plane(0.76, 0.152, flat(tagTexture(p, '#2a9d8f')));
+      tag.position.set(x0, PACK_Y - 0.15, 0.012); tag.userData.product = p;
       face.add(tag); tag.updateMatrixWorld(); clickable.push(tag);
       p.shelf = { soldTag, tags: [tag], meshes: [], list: null };
       productInstances.set(p, list);
@@ -1857,7 +1857,7 @@ function startWorld(THREE) {
   counter.updateMatrixWorld(true); addObstacle(counter); floorShadow(counter.position.x, counter.position.z, 3.6, 1.9);
   // Bundles: a table in the middle of the front of the shop, and (only if the table is full) two-tray shelves on the
   // left wall by the entrance. Both hold the same trays: one bundle each, with its snacks standing in it.
-  const BUNDLE_TABLE = { x: 0, z: HALF_D - 5.2, w: TABLE_W, d: TABLE_D };                                                   // the table (centre and size)
+  const BUNDLE_TABLE = { x: 0, z: HALF_D - 7.0, w: TABLE_W, d: TABLE_D };   // far enough from the entrance that there is a clear walking lane between it and the checkout counter                                                   // the table (centre and size)
   const BUNDLE_SHELVES = { x: -HALF_W + 0.05 + B_DEPTH / 2, z: HALF_D - 1.0 - B_RUN / 2, w: B_DEPTH, d: B_RUN };           // the whole run of wall shelves
   if (BUNDLES.length) {
     const BOX_D = TRAY_D, BOX_H = 0.14, BOX_T = 0.04, RISER = 0.08, BOARD = 0.05;
@@ -1912,7 +1912,7 @@ function startWorld(THREE) {
       [[new THREE.BoxGeometry(TABLE_W - 0.3, 0.9, TABLE_D - 0.3), teal, 0, 0.45], [new THREE.BoxGeometry(TABLE_W, 0.06, TABLE_D), wood, 0, 0.93]]
         .forEach(([geo, material, x, y]) => { const m = new THREE.Mesh(geo, material); m.position.set(x, y, 0); table.add(m); clickable.push(m); });
       const sign = new THREE.Sprite(new THREE.SpriteMaterial({ map: signTexture('Bundles', '#2a9d8f', 512, 140) }));
-      sign.scale.set(2.2, 0.6, 1); sign.position.set(0, 2.6, 0); table.add(sign);
+      sign.scale.set(2.2, 0.6, 1); sign.position.set(0, 2.3, 0); table.add(sign);   // low enough not to overlap the shop sign on the back wall
       TABLE_USED.forEach((row, ri) => {
         const front = ri === 0, rowZ = (TABLE_USED.length === 1 ? 0 : (front ? 1 : -1) * (TRAY_D / 2 + 0.06));
         let x = -row.used / 2;
