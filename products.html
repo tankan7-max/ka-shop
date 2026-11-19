@@ -116,7 +116,7 @@
   @media (min-width: 800px) { .te-layout { grid-template-columns: minmax(0, 1fr) 340px; } }
   .te-stage { position: sticky; top: 0; z-index: 2; background: var(--card); padding-bottom: 6px; }
   #te-wrap { position: relative; display: grid; place-items: center; min-height: 220px; max-height: 56vh; padding: 10px; border-radius: 14px; background: #e9eeee; overflow: hidden; }
-  #te-canvas { max-width: 100%; max-height: calc(56vh - 20px); border-radius: 6px; cursor: grab; touch-action: none; background: repeating-conic-gradient(#fff 0 25%, #dfe5e5 0 50%) 0 0 / 16px 16px; box-shadow: 0 2px 12px rgba(20,30,35,.25); }
+  #te-canvas { max-width: 100%; max-height: calc(56vh - 20px); cursor: grab; touch-action: none; background: repeating-conic-gradient(#fff 0 25%, #dfe5e5 0 50%) 0 0 / 16px 16px; box-shadow: 0 2px 12px rgba(20,30,35,.25); }
   #te-canvas.drag { cursor: grabbing; }
   #te-info { margin: 6px 2px 0; font-size: 13px; color: var(--muted); }
   .te-ctl { display: grid; gap: 10px; min-width: 0; }
@@ -128,6 +128,8 @@
   .te-row { display: grid; grid-template-columns: 92px 1fr 46px; gap: 4px 8px; align-items: center; margin-top: 6px; font-size: 14px; }
   .te-row output { text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; font-size: 13px; }
   .te-row input[type="range"] { width: 100%; height: 24px; background: transparent; -webkit-appearance: none; appearance: none; cursor: pointer; }
+  .te-cropbox { margin-top: 8px; padding: 8px; border: 1px dashed var(--brand); border-radius: 10px; }
+  #te-canvas.cropping { cursor: crosshair; }
   .te-btns { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
   .te-layer { border: 1px solid var(--line); border-radius: 10px; padding: 8px; margin-top: 8px; display: grid; gap: 4px; }
   .te-layer .top { display: flex; gap: 6px; align-items: center; }
@@ -261,6 +263,13 @@
           <div class="te-btns">
             <button type="button" class="small" id="te-rotl" aria-label="Rotate left">⟲ Rotate</button><button type="button" class="small" id="te-rotr" aria-label="Rotate right">⟳ Rotate</button>
             <button type="button" class="small" id="te-flip" aria-pressed="false">⇋ Flip</button>
+            <button type="button" class="small" id="te-crop" aria-pressed="false">✂ Crop</button>
+            <button type="button" class="small" id="te-undo" disabled>↶ Undo crop</button>
+          </div>
+          <div id="te-cropbox" class="te-cropbox" hidden>
+            <label class="te-row">Shape<select id="te-aspect" style="grid-column: 2 / -1"><option value="free">Free</option><option value="face">The pack’s printable area</option><option value="1">Square (1 : 1)</option><option value="1.3333">4 : 3</option><option value="0.75">3 : 4</option><option value="1.7778">16 : 9</option></select></label>
+            <p class="hint" style="margin:6px 0 0">Drag the corners or edges of the frame, or drag inside it to move it. Arrow keys move it; Shift + arrows resize it.</p>
+            <div class="te-btns"><button type="button" class="small primary" id="te-crop-ok">Apply crop</button><button type="button" class="small" id="te-crop-no">Cancel</button><button type="button" class="small" id="te-crop-all">Select all</button></div>
           </div>
           <label class="te-row">Frame<select id="te-frame" style="grid-column: 2 / -1"><option value="face">The pack’s printable area</option><option value="free">Keep the picture’s own shape</option></select></label>
           <div class="te-row"><label for="te-zoom">Zoom</label><input id="te-zoom" type="range" min="0.3" max="4" step="0.01" value="1"><output id="te-zoom-o">100%</output></div>
@@ -1118,7 +1127,7 @@ $('f-model').onchange = async () => {
 $('model-remove').onclick = () => { draft.modelFile = null; draft.modelUrl = ''; $('f-model').value = ''; showFiles(); };
 
 // --- Picture editor: crop, rotate, colour, cut out a white background, add text. Makes the picture the pack prints. ---
-const te = { src: null, rot: 0, flip: false, zoom: 1, px: 0, py: 0, bri: 0, con: 0, sat: 0, cut: false, tol: 30, clear: false, bg: '#ffffff', frame: 'face', layers: [], aspect: 1, blank: false, raf: 0, drag: null, pinch: null };
+const te = { src: null, rot: 0, flip: false, zoom: 1, px: 0, py: 0, bri: 0, con: 0, sat: 0, cut: false, tol: 30, clear: false, bg: '#ffffff', frame: 'face', layers: [], aspect: 1, blank: false, raf: 0, drag: null, pinch: null, mode: 'edit', crop: null, cropAspect: 'free', history: [], url: '' };
 const teFace = () => { const p = pvProduct(), [w, h] = pvFaceSize(p); return w / h; };
 const teDims = long => { const a = te.aspect; return a >= 1 ? [long, Math.max(8, Math.round(long / a))] : [Math.max(8, Math.round(long * a)), long]; };
 function teAspect() {
@@ -1153,12 +1162,101 @@ function teRender(ctx, W, H) {
     ctx.fillStyle = L.color; ctx.fillText(L.text, 0, 0); ctx.restore();
   });
 }
+// --- Cropping: a frame over the whole (rotated / flipped) picture; "Apply crop" keeps only what is inside it. ---
+const teRotDims = () => [te.rot % 2 ? te.src.height : te.src.width, te.rot % 2 ? te.src.width : te.src.height];
+const teCropRatio = () => te.cropAspect === 'free' ? 0 : te.cropAspect === 'face' ? teFace() : Number(te.cropAspect);   // frame width / height, 0 = any
+function teCropFit(first) {   // the largest frame of the chosen shape (centred), or the whole picture when free
+  const [rw, rh] = teRotDims(), r = teCropRatio();
+  let w = 1, h = 1;
+  if (r) { const pr = rw / rh; if (r > pr) h = pr / r; else w = r / pr; }
+  te.crop = { x: (1 - w) / 2, y: (1 - h) / 2, w, h };
+}
+function teCropClamp(c) {
+  const [rw, rh] = teRotDims(), mw = Math.min(1, 24 / rw), mh = Math.min(1, 24 / rh);
+  c.w = Math.min(1, Math.max(mw, c.w)); c.h = Math.min(1, Math.max(mh, c.h));
+  c.x = Math.min(1 - c.w, Math.max(0, c.x)); c.y = Math.min(1 - c.h, Math.max(0, c.y)); return c;
+}
+function teCropMode(on) {
+  te.mode = on ? 'crop' : 'edit';
+  $('te-cropbox').hidden = !on; $('te-crop').setAttribute('aria-pressed', String(on)); $('te-canvas').classList.toggle('cropping', on);
+  ['te-rotl', 'te-rotr', 'te-flip', 'te-frame', 'te-zoom', 'te-px', 'te-py', 'te-addtext'].forEach(id => { $(id).disabled = on || (id === 'te-frame' && te.blank); });
+  $('te-crop').disabled = on;
+  if (on) { te.cropAspect = $('te-aspect').value; teCropFit(); $('te-canvas').focus(); }
+  teAsk();
+}
+function teCropApply() {
+  const img = te.src, [rw, rh] = teRotDims(), c = te.crop;
+  const full = document.createElement('canvas'); full.width = rw; full.height = rh;
+  const x = full.getContext('2d'); x.translate(rw / 2, rh / 2); x.scale(te.flip ? -1 : 1, 1); x.rotate(te.rot * Math.PI / 2); x.drawImage(img, -img.width / 2, -img.height / 2);
+  const sx = Math.round(c.x * rw), sy = Math.round(c.y * rh), sw = Math.max(1, Math.round(c.w * rw)), sh = Math.max(1, Math.round(c.h * rh));
+  const out = document.createElement('canvas'); out.width = sw; out.height = sh; out.getContext('2d').drawImage(full, sx, sy, sw, sh, 0, 0, sw, sh);
+  te.history.push({ src: te.src, rot: te.rot, flip: te.flip, zoom: te.zoom, px: te.px, py: te.py, frame: te.frame });
+  te.src = out; te.rot = 0; te.flip = false; te.zoom = 1; te.px = te.py = 0;
+  [['te-zoom', 1], ['te-px', 0], ['te-py', 0]].forEach(([id, v]) => { $(id).value = v; }); $('te-flip').setAttribute('aria-pressed', 'false');
+  if (te.cropAspect !== 'free' && !te.blank) { te.frame = 'face'; $('te-frame').value = 'face'; }
+  $('te-undo').disabled = false; teCropMode(false);
+}
+function teCropUndo() {
+  const h = te.history.pop(); if (!h) return;
+  Object.assign(te, { src: h.src, rot: h.rot, flip: h.flip, zoom: h.zoom, px: h.px, py: h.py, frame: h.frame });
+  $('te-zoom').value = te.zoom; $('te-px').value = te.px; $('te-py').value = te.py; $('te-frame').value = te.frame; $('te-flip').setAttribute('aria-pressed', String(te.flip));
+  $('te-undo').disabled = !te.history.length; teAsk();
+}
+function teCropOverlay(ctx, W, H) {
+  const c = te.crop, x = c.x * W, y = c.y * H, w = c.w * W, h = c.h * H;
+  ctx.save(); ctx.fillStyle = 'rgba(10,20,25,.62)';
+  ctx.fillRect(0, 0, W, y); ctx.fillRect(0, y + h, W, H - y - h); ctx.fillRect(0, y, x, h); ctx.fillRect(x + w, y, W - x - w, h);
+  ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,255,255,.45)'; ctx.beginPath();
+  for (let i = 1; i < 3; i++) { ctx.moveTo(x + w * i / 3, y); ctx.lineTo(x + w * i / 3, y + h); ctx.moveTo(x, y + h * i / 3); ctx.lineTo(x + w, y + h * i / 3); }
+  ctx.stroke(); ctx.lineWidth = 2; ctx.strokeStyle = '#fff'; ctx.strokeRect(x, y, w, h);
+  const k = Math.max(7, W / 70); ctx.fillStyle = '#fff'; ctx.strokeStyle = '#2a9d8f'; ctx.lineWidth = 2;
+  teHandles(c).forEach(([, hx, hy]) => { ctx.beginPath(); ctx.rect(hx * W - k / 2, hy * H - k / 2, k, k); ctx.fill(); ctx.stroke(); });
+  ctx.restore();
+  const [rw, rh] = teRotDims(); $('te-info').textContent = `Crop: ${Math.round(c.w * rw)} × ${Math.round(c.h * rh)} px of ${rw} × ${rh}. Drag the frame or its handles, then press Apply crop.`;
+}
+const teHandles = c => [['nw', c.x, c.y], ['n', c.x + c.w / 2, c.y], ['ne', c.x + c.w, c.y], ['e', c.x + c.w, c.y + c.h / 2], ['se', c.x + c.w, c.y + c.h], ['s', c.x + c.w / 2, c.y + c.h], ['sw', c.x, c.y + c.h], ['w', c.x, c.y + c.h / 2]];
+function teCropHit(nx, ny, W, H) {   // which handle, or the inside of the frame, is under the pointer (normalised 0–1)
+  const c = te.crop, rad = Math.max(14, W * 0.032);
+  let best = null, bd = 1e9;
+  teHandles(c).forEach(([k, hx, hy]) => { const d = Math.hypot((nx - hx) * W, (ny - hy) * H); if (d < rad && d < bd) { bd = d; best = k; } });
+  if (best) return best;
+  return nx >= c.x && nx <= c.x + c.w && ny >= c.y && ny <= c.y + c.h ? 'move' : null;
+}
+// Work out the frame after dragging a handle by (dx, dy) (normalised), keeping the chosen shape and staying inside the picture.
+function teCropDrag(handle, o, dx, dy) {
+  const [rw, rh] = teRotDims(), r = teCropRatio(), min = 24, cl = (v, a, b) => Math.min(b, Math.max(a, v));
+  let L = o.x * rw, T = o.y * rh, R = (o.x + o.w) * rw, B = (o.y + o.h) * rh; const ddx = dx * rw, ddy = dy * rh;
+  const norm = (a, b, c, d) => teCropClamp({ x: a / rw, y: b / rh, w: (c - a) / rw, h: (d - b) / rh });
+  if (handle === 'move') { const w = R - L, h = B - T; L = cl(L + ddx, 0, rw - w); T = cl(T + ddy, 0, rh - h); return norm(L, T, L + w, T + h); }
+  const hasW = handle.includes('w'), hasE = handle.includes('e'), hasN = handle.includes('n'), hasS = handle.includes('s');
+  if (!r) {
+    if (hasW) L = cl(L + ddx, 0, R - min); if (hasE) R = cl(R + ddx, L + min, rw);
+    if (hasN) T = cl(T + ddy, 0, B - min); if (hasS) B = cl(B + ddy, T + min, rh);
+    return norm(L, T, R, B);
+  }
+  const corner = handle.length === 2, ax = hasW ? R : hasE ? L : (L + R) / 2, ay = hasN ? B : hasS ? T : (T + B) / 2;
+  const px = (hasW ? L : R) + ddx, py = (hasN ? T : B) + ddy;
+  let w, h, maxW, maxH;
+  if (corner) { w = Math.abs(px - ax); h = Math.abs(py - ay); if (w / r >= h) h = w / r; else w = h * r; maxW = hasW ? ax : rw - ax; maxH = hasN ? ay : rh - ay; }
+  else if (hasE || hasW) { w = Math.abs(px - ax); h = w / r; maxW = hasW ? ax : rw - ax; maxH = 2 * Math.min(ay, rh - ay); }
+  else { h = Math.abs(py - ay); w = h * r; maxH = hasN ? ay : rh - ay; maxW = 2 * Math.min(ax, rw - ax); }
+  if (w < min) { w = min; h = w / r; } if (h < min) { h = min; w = h * r; }
+  const k = Math.min(1, maxW / w, maxH / h); w *= k; h *= k;
+  const nL = hasW ? ax - w : hasE ? ax : ax - w / 2, nR = nL + w, nT = hasN ? ay - h : hasS ? ay : ay - h / 2;
+  return norm(nL, nT, nR, nT + h);
+}
 function teDraw() {
   te.raf = 0; if (!$('texed').open || !te.src) return;
-  te.aspect = teAspect();
+  const cropping = te.mode === 'crop';
+  if (cropping) { const [rw, rh] = teRotDims(); te.aspect = Math.min(6, Math.max(1 / 6, rw / rh)); if (!te.crop) teCropFit(); } else te.aspect = teAspect();
   const c = $('te-canvas'), [W, H] = teDims(560);
   if (c.width !== W || c.height !== H) { c.width = W; c.height = H; }
   c.style.aspectRatio = `${W} / ${H}`; c.style.width = Math.min(W, 520) + 'px';
+  if (cropping) {
+    const keep = [te.zoom, te.px, te.py, te.layers]; te.zoom = 1; te.px = te.py = 0; te.layers = [];
+    teRender(c.getContext('2d', { willReadFrequently: true }), W, H); [te.zoom, te.px, te.py, te.layers] = keep;
+    teCropOverlay(c.getContext('2d'), W, H); return;
+  }
   teRender(c.getContext('2d', { willReadFrequently: true }), W, H);
   $('te-info').textContent = te.frame === 'face' ? `Frame = the pack’s printable area (${(te.aspect).toFixed(2)} : 1${ROUND.includes($('f-shape').value) ? ', for “' + $('f-wrap').selectedOptions[0].textContent.split(' (')[0] + '”' : ''}). Drag to slide, scroll to zoom. Anything outside the frame is cut off. For a can or bottle, choose how it wraps before editing, since the printable area changes.` : 'Frame = the picture’s own shape. It will be stretched over the pack’s printable area.';
   $('te-zoom-o').textContent = Math.round(te.zoom * 100) + '%'; $('te-px-o').textContent = Math.round(te.px * 100) + '%'; $('te-py-o').textContent = Math.round(te.py * 100) + '%';
@@ -1181,6 +1279,8 @@ function teLayers() {
   $('te-addtext').disabled = te.layers.length >= 4;
 }
 function teReset() {
+  if (te.mode === 'crop') teCropMode(false);
+  if (te.history.length) { te.src = te.history[0].src; te.history = []; } $('te-undo').disabled = true;
   Object.assign(te, { rot: 0, flip: false, zoom: 1, px: 0, py: 0, bri: 0, con: 0, sat: 0, cut: false, tol: 30, clear: false, bg: '#ffffff', layers: [] });
   [['te-zoom', 1], ['te-px', 0], ['te-py', 0], ['te-bri', 0], ['te-con', 0], ['te-sat', 0], ['te-tol', 30]].forEach(([id, v]) => { $(id).value = v; });
   $('te-cut').checked = false; $('te-clear').checked = false; $('te-bg').value = '#ffffff'; $('te-flip').setAttribute('aria-pressed', 'false'); teLayers(); teAsk();
@@ -1198,7 +1298,7 @@ async function teOpen() {
       const blob = draft.photoBlob || await (async () => { const res = await fetch(draft.photoUrl, { mode: 'cors', referrerPolicy: 'no-referrer' }); if (!res.ok) throw new Error('HTTP ' + res.status); return res.blob(); })();
       src = await new Promise((ok, bad) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => bad(new Error('x')); i.src = URL.createObjectURL(blob); });
     }
-    te.blank = !src; te.src = src || teBlank(); teReset();
+    te.blank = !src; te.src = src || teBlank(); te.history = []; te.mode = 'edit'; te.crop = null; teReset();
     te.frame = 'face'; $('te-frame').value = 'face'; $('te-frame').disabled = te.blank;
     $('te-title').textContent = te.blank ? 'Design a label' : 'Edit picture';
     $('te-error').textContent = ''; $('texed').showModal(); teAsk(); $('te-zoom').focus();
@@ -1207,6 +1307,12 @@ async function teOpen() {
 }
 $('texed-open').onclick = teOpen;
 $('te-cancel').onclick = () => $('texed').close();
+$('te-crop').onclick = () => teCropMode(true);
+$('te-crop-ok').onclick = teCropApply;
+$('te-crop-no').onclick = () => teCropMode(false);
+$('te-crop-all').onclick = () => { teCropFit(); teAsk(); };
+$('te-aspect').onchange = () => { te.cropAspect = $('te-aspect').value; teCropFit(); teAsk(); };
+$('te-undo').onclick = teCropUndo;
 $('te-reset').onclick = teReset;
 $('te-rotl').onclick = () => { te.rot = (te.rot + 3) % 4; te.px = te.py = 0; teAsk(); };
 $('te-rotr').onclick = () => { te.rot = (te.rot + 1) % 4; te.px = te.py = 0; teAsk(); };
@@ -1219,8 +1325,26 @@ $('te-bg').oninput = () => { te.bg = $('te-bg').value; teAsk(); };
 $('te-addtext').onclick = () => { te.layers.push({ text: 'Text', color: '#ffffff', size: 14, x: 0, y: te.layers.length ? 0.4 : 0, outline: true }); teLayers(); teAsk(); };
 { // drag to slide, wheel or pinch to zoom
   const c = $('te-canvas'), pts = new Map();
-  c.addEventListener('pointerdown', e => { c.setPointerCapture(e.pointerId); pts.set(e.pointerId, { x: e.clientX, y: e.clientY }); c.classList.add('drag'); te.pinch = pts.size === 2 ? { d: Math.hypot(...[...pts.values()].reduce((a, p, i) => i ? [a[0] - p.x, a[1] - p.y] : [p.x, p.y], [])), z: te.zoom } : null; });
+  const norm = e => { const r = c.getBoundingClientRect(); return [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height, c.width]; };
+  let cdrag = null;
+  c.addEventListener('pointerdown', e => {
+    if (te.mode !== 'crop') return;
+    const [nx, ny, W] = norm(e), hit = teCropHit(nx, ny, W, c.height);
+    if (!hit) return;
+    e.preventDefault(); c.setPointerCapture(e.pointerId); cdrag = { hit, nx, ny, o: { ...te.crop }, id: e.pointerId };
+  });
   c.addEventListener('pointermove', e => {
+    if (te.mode !== 'crop') return;
+    const [nx, ny, W] = norm(e);
+    if (cdrag && cdrag.id === e.pointerId) { te.crop = teCropDrag(cdrag.hit, cdrag.o, nx - cdrag.nx, ny - cdrag.ny); teAsk(); }
+    else { const h = teCropHit(nx, ny, W, c.height); c.style.cursor = !h ? 'crosshair' : h === 'move' ? 'move' : ({ n: 'ns-resize', s: 'ns-resize', e: 'ew-resize', w: 'ew-resize', nw: 'nwse-resize', se: 'nwse-resize', ne: 'nesw-resize', sw: 'nesw-resize' })[h]; }
+  });
+  const cup = e => { if (cdrag && cdrag.id === e.pointerId) cdrag = null; };
+  c.addEventListener('pointerup', cup); c.addEventListener('pointercancel', cup);
+  c.addEventListener('pointerdown', e => { if (te.mode === 'crop') return;
+    c.setPointerCapture(e.pointerId); pts.set(e.pointerId, { x: e.clientX, y: e.clientY }); c.classList.add('drag'); te.pinch = pts.size === 2 ? { d: Math.hypot(...[...pts.values()].reduce((a, p, i) => i ? [a[0] - p.x, a[1] - p.y] : [p.x, p.y], [])), z: te.zoom } : null; });
+  c.addEventListener('pointermove', e => {
+    if (te.mode === 'crop') return;
     const q = pts.get(e.pointerId); if (!q) return; const r = c.getBoundingClientRect();
     if (pts.size === 1) { te.px = Math.max(-1, Math.min(1, te.px + (e.clientX - q.x) / r.width * 2)); te.py = Math.max(-1, Math.min(1, te.py + (e.clientY - q.y) / r.height * 2)); $('te-px').value = te.px; $('te-py').value = te.py; }
     q.x = e.clientX; q.y = e.clientY;
@@ -1229,8 +1353,13 @@ $('te-addtext').onclick = () => { te.layers.push({ text: 'Text', color: '#ffffff
   });
   const up = e => { pts.delete(e.pointerId); te.pinch = null; if (!pts.size) c.classList.remove('drag'); };
   c.addEventListener('pointerup', up); c.addEventListener('pointercancel', up);
-  c.addEventListener('wheel', e => { e.preventDefault(); te.zoom = Math.max(0.3, Math.min(4, te.zoom * Math.exp(-e.deltaY * 0.0015))); $('te-zoom').value = te.zoom; teAsk(); }, { passive: false });
-  c.addEventListener('keydown', e => { const k = { ArrowLeft: ['px', -0.03], ArrowRight: ['px', 0.03], ArrowUp: ['py', -0.03], ArrowDown: ['py', 0.03] }[e.key]; if (k) { e.preventDefault(); te[k[0]] = Math.max(-1, Math.min(1, te[k[0]] + k[1])); $('te-' + k[0]).value = te[k[0]]; teAsk(); } else if (e.key === '+' || e.key === '=') { te.zoom = Math.min(4, te.zoom * 1.05); $('te-zoom').value = te.zoom; teAsk(); } else if (e.key === '-') { te.zoom = Math.max(0.3, te.zoom / 1.05); $('te-zoom').value = te.zoom; teAsk(); } });
+  c.addEventListener('wheel', e => { if (te.mode === 'crop') return; e.preventDefault(); te.zoom = Math.max(0.3, Math.min(4, te.zoom * Math.exp(-e.deltaY * 0.0015))); $('te-zoom').value = te.zoom; teAsk(); }, { passive: false });
+  c.addEventListener('keydown', e => {
+    if (te.mode === 'crop') {
+      const a = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key]; if (!a) return; e.preventDefault();
+      const st = 0.01, o = te.crop; te.crop = e.shiftKey ? teCropDrag(a[0] ? (a[0] > 0 ? 'e' : 'w') : (a[1] > 0 ? 's' : 'n'), o, a[0] * st, a[1] * st) : teCropDrag('move', o, a[0] * st, a[1] * st); teAsk(); return;
+    }
+    const k = { ArrowLeft: ['px', -0.03], ArrowRight: ['px', 0.03], ArrowUp: ['py', -0.03], ArrowDown: ['py', 0.03] }[e.key]; if (k) { e.preventDefault(); te[k[0]] = Math.max(-1, Math.min(1, te[k[0]] + k[1])); $('te-' + k[0]).value = te[k[0]]; teAsk(); } else if (e.key === '+' || e.key === '=') { te.zoom = Math.min(4, te.zoom * 1.05); $('te-zoom').value = te.zoom; teAsk(); } else if (e.key === '-') { te.zoom = Math.max(0.3, te.zoom / 1.05); $('te-zoom').value = te.zoom; teAsk(); } });
 }
 $('te-apply').onclick = async () => {
   const btn = $('te-apply'); btn.disabled = true;
@@ -1245,7 +1374,7 @@ $('te-apply').onclick = async () => {
   } catch (e) { $('te-error').textContent = e.message; }
   btn.disabled = false;
 };
-$('texed').addEventListener('close', () => { try { if (te.src && te.src.src) URL.revokeObjectURL(te.src.src); } catch (e) {} te.src = null; });
+$('texed').addEventListener('close', () => { try { [te.src, ...te.history.map(h => h.src)].forEach(i => { if (i && i.src && i.src.startsWith('blob:')) URL.revokeObjectURL(i.src); }); } catch (e) {} te.src = null; te.history = []; te.mode = 'edit'; te.crop = null; });
 
 const slug = name => name.toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'product';
 $('editor-form').addEventListener('submit', async e => {
