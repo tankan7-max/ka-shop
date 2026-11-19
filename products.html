@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex">
 <title>Products — Virtual Snack Shop</title>
 <script type="importmap">
-{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.min.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }
+{ "imports": { "three": "./vendor/three.module.min.js", "three/addons/": "./vendor/addons/" } }
 </script>
 <style>
   :root { --ink: #1d2327; --muted: #5f6b70; --line: #dfe5e4; --brand: #228174; --brand-dark: #1a6a60; --danger: #b3261e; --bg: #f4f7f6; --card: #fff; }
@@ -337,6 +337,7 @@
     <div class="grid">
       <label class="field">Shelf (category)<select id="f-category"></select></label>
       <label class="field" id="f-newcat-wrap" hidden>New shelf name<input id="f-newcat" maxlength="80" autocomplete="off"></label>
+      <label class="field">Badge<select id="f-badge"><option value="">None</option><option value="new">New</option><option value="popular">Popular</option></select><small>A small tag next to the name in the shop</small></label>
       <label class="field" id="f-stock-wrap">Starting stock<input id="f-stock" type="number" min="0" max="9999" step="1" inputmode="numeric" value="10"></label>
     </div>
 
@@ -539,8 +540,9 @@ let pvModelsPossible = false;       // uploaded models need the loader, which on
 async function pvLoadThree() {
   if (T) return T;
   const file = 'three@0.160.0/build/three.module.min.js';
+  try { T = await import('./vendor/three.module.min.js'); pvModelsPossible = true; return T; } catch (e) { console.warn('Could not load the hosted 3D library, trying a CDN.', e); }   // the copy in vendor/ first
   for (const cdn of ['https://unpkg.com/', 'https://cdn.jsdelivr.net/npm/']) {
-    try { T = await import(cdn + file); pvModelsPossible = cdn.includes('unpkg'); return T; } catch (e) { console.warn('Could not load the 3D library from ' + cdn, e); }
+    try { T = await import(cdn + file); pvModelsPossible = false; return T; } catch (e) { console.warn('Could not load the 3D library from ' + cdn, e); }
   }
   throw new Error('The 3D library could not be downloaded.');
 }
@@ -1075,6 +1077,7 @@ function openEditor(p) {
   $('f-stock-wrap').hidden = !!p; $('f-stock').value = 10;
   $('f-shape').value = shape; $('f-color').value = hex(m.color === undefined ? 0x2a9d8f : m.color);
   $('f-w').value = m.width || size[0]; $('f-h').value = m.height || size[1]; $('f-d').value = m.depth || size[2];
+  $('f-badge').value = ['new', 'popular'].includes(m.badge) ? m.badge : '';
   $('f-wrap').value = ['once', 'front'].includes(t.wrap) ? t.wrap : 'twice'; $('f-tex-spin').value = Number.isFinite(t.rotate) ? t.rotate : 0;
   syncDims();
   $('f-cover').checked = t.fit === 'cover'; $('f-active').checked = p ? !!p.active : true;
@@ -1406,6 +1409,7 @@ $('editor-form').addEventListener('submit', async e => {
     const model = { ...((editing && editing.model) || {}), type: ROUND.includes(shape) ? 'cylinder' : 'box', shape, width: num('f-w', 0.05, 0.8), height: num('f-h', 0.05, 0.6), depth: num('f-d', 0.03, 0.5), color: parseInt($('f-color').value.slice(1), 16) };
     { const mir = dimSpec(shape).mirror; if (mir) model[mir[1] === 'f-d' ? 'depth' : 'width'] = model[mir[0] === 'f-w' ? 'width' : 'height']; }   // round packs are as deep as they are wide
     if (modelUrl) model.glb_url = modelUrl; else delete model.glb_url;
+    if ($('f-badge').value) model.badge = $('f-badge').value; else delete model.badge;
     const texture = { ...((editing && editing.texture) || {}) };
     if (photoUrl) { texture.type = 'image'; texture.image_url = photoUrl; if ($('f-cover').checked) texture.fit = 'cover'; else delete texture.fit; }
     else { delete texture.image_url; delete texture.fit; texture.type = 'generated'; }
