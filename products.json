@@ -83,6 +83,31 @@
       "category": "Biscuits & cookies"
     },
     {
+      "id": "hello-panda-milk",
+      "name": "Hello Panda Milk",
+      "category": "Biscuits & cookies",
+      "price_sgd": 1.5,
+      "pack": "1 pack, 35g",
+      "model": {
+        "type": "box",
+        "width": 0.35,
+        "height": 0.5,
+        "depth": 0.2,
+        "color": 2792847
+      },
+      "texture": {
+        "description": "Meiji Hello Panda biscuits, milk flavour pack photo",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/hello-panda-milk/front-mwnj0zaj.png",
+        "type": "image",
+        "fit": "cover",
+        "scale": 1.3
+      },
+      "reference": {
+        "note": "Shopee Singapore single 35g pack listed at SGD 1.30",
+        "source_url": "https://shopee.sg/Meiji-Hello-Panda-Biscuits-35g-pack-Chocolate-Milk-Strawberry-Biscuit-Assorted-Flavours-i.435361035.22368202347"
+      }
+    },
+    {
       "id": "cocque-de-asses",
       "model": {
         "type": "box",
