@@ -17,12 +17,36 @@ It is one web page (`virtual-snack-shop.html`) plus one product list
 | `inventory.json` | Stock on hand per product id. `0` means out of stock. |
 | `inventory.html` | Stock manager page: change quantities, record orders, download the updated `inventory.json`. |
 | `products.html` | Product manager page (needs the Supabase database): add, edit, hide or delete products, upload pack photos and 3D models. |
+| `vendor/` | A copy of the 3D library (three.js 0.160, MIT licence, see `vendor/LICENSE-three.txt`) and its 3D-model loader, so the shop loads nothing from public CDNs and works offline. The page falls back to unpkg / jsDelivr only if this folder is missing. |
+| `tools/check-shop.mjs` | A walkability and speed check for the 3D shop (see *Checking the shop* below). |
 | `qrcode.js` | The QR code library used for the PayNow code at checkout (MIT licence, by Kazuhiko Arase). |
 | `ka.html` | Tan Kwan Ann's professional page: dark, with a spinning 3D ring, an interactive 3D protein structure and a print-to-PDF résumé (two pages from the browser's print dialog). |
 | `ka2.html` | The joke edition, 鲍鱼王 the Abalone King of the Multiverse: an abalone clicker game, royal decrees, a translated résumé and a universe roller. Links back to `ka.html`. |
 | `images/`, `Tan_Kwan_Ann_Resume.pdf` | Photos and the résumé download used by `ka.html` and `ka2.html`. `ka-og.jpg` and `ka2-og.jpg` are the pictures shown when each page's link is shared. |
 | `data/ka-8z5g.bin` | The backbone of PDB 8Z5G (11,024 amino acids, 52 chains) drawn in 3D by `ka.html`. Data from the Protein Data Bank (free to reuse, CC0). Rebuild it with `tools/make-structure.py`. |
 | `fonts/` | The page's fonts, hosted here so it loads nothing from other websites (open licence, see `fonts/LICENSES.txt`). |
+
+## Checking the shop
+
+After changing the layout (moving a table, shelf or the counter), run the built-in check. It opens the shop in a
+headless browser with no internet, then tests that every snack, every bundle tray and the starting spot can be walked
+to without a big detour, that the floor is one connected space, and that the opening view stays inside a drawing budget
+(draw calls) so phones stay smooth. It exits with an error and says what is wrong if something fails.
+
+```bash
+npm install playwright          # once
+npx playwright install chromium # once
+node tools/check-shop.mjs       # add --verbose for every route
+```
+
+The shop page also takes `?debug` in its address, which exposes its internals on `window.__dbg` (that is what the check uses).
+
+## Speed
+
+The shop is built to stay smooth on phones: all price tags are drawn from one shared picture and in one go, plain shelf
+and wall boxes are merged, each pack is drawn in as few steps as its materials allow (a typical opening view is about
+220 draw calls, down from about 550), the page lowers its drawing resolution by itself if frames run slow and raises it
+again when there is room, and the 3D library is hosted in `vendor/`.
 
 ## Try it on your computer
 
@@ -41,6 +65,8 @@ reading `products.json`.)
   mini map, to walk to that spot.
 - **Pick**: click a snack to see its price and add it to the cart.
 - **Inspect**: from a snack's card, open it on its own and drag to turn the pack around; scroll or pinch to zoom.
+- **Remembered details and cues**: the name and delivery address are remembered on the shopper's own device (untick the box at checkout to forget them), and adding to the cart gives a soft sound and a short buzz on phones (switch it off in Help).
+- **Badges**: set *Badge* (New or Popular) on a product in `products.html` (or `"badge": "new"` / `"popular"` inside the product's `"model"` in `products.json`) and a small tag shows next to its name in the list and on its card.
 - **Bundles**: ready-made boxes on a table in the middle of the front of the shop (two rows of trays, walk all the way round). If the table is full, the rest go on two-tray, eye-level shelves on the left wall by the entrance. Add, edit, reorder or hide them on `products.html` (Bundles section; pick snacks, set a price, and it shows the saving). One-time set-up: run `supabase-bundles.sql` in the Supabase SQL Editor. Until that table exists the shop uses the `bundles` list in `products.json`. A bundle may use the same snack more than once (e.g. 2 × Mamee noodles); it then needs that many in stock per box. The shelf boards are slanted to face a shopper, so the top tray is easy to see. Inspect a bundle and its snacks ride glowing rings spinning round a bright core; tap a snack's name to spotlight it. A bundle takes one of each of its snacks from the stock, shared with the same snacks bought on their own.
 - **Pay**: at checkout, scan the PayNow QR for the exact total, tick “I’ve paid”, then send the order on WhatsApp — the shop matches the payment by the order reference. You can also download the QR code to pay later.
 - **After-hours mood**: dark aisles with warm light over each shelf, so the snacks stand out.

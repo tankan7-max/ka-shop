@@ -8,11 +8,11 @@
 <meta name="theme-color" content="#2a9d8f">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232a9d8f'/%3E%3Cpath d='M8 12h16l-1.6 12H9.6zM12 12a4 4 0 0 1 8 0' fill='none' stroke='%23fff' stroke-width='2.4' stroke-linejoin='round'/%3E%3C/svg%3E">
 <script type="importmap">
-{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.min.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }
+{ "imports": { "three": "./vendor/three.module.min.js", "three/addons/": "./vendor/addons/" } }
 </script>
 <style>
   :root {
-    --brand: #2a9d8f; --brand-dark: #1f7a6f; --brand-soft: #e3f4f1;
+    --brand: #228174; --brand-dark: #1a6a60; --brand-soft: #e3f4f1;
     --ink: #1c2428; --muted: #5d6970; --line: #e2e6e8; --bg: #f6f4ef;
     --panel: rgba(255,255,255,.97); --price: #c62828;
     --radius: 14px; --shadow: 0 8px 28px rgba(20,30,35,.18);
@@ -136,6 +136,15 @@
   /* Mini map and walk controls */
   #minimap-wrap { transition: left .25s ease; position: fixed; left: 12px; bottom: calc(14px + var(--safe-b)); z-index: 6; background: var(--panel); border-radius: var(--radius); box-shadow: var(--shadow); padding: 8px; display: grid; gap: 6px; }
   #minimap { display: block; border-radius: 8px; cursor: pointer; touch-action: none; }
+  #map-legend { display: flex; flex-wrap: wrap; gap: 2px 10px; list-style: none; margin: 6px 2px 4px; padding: 0; width: 0; min-width: calc(100% - 4px); font-size: 11.5px; color: var(--muted); }
+  #map-legend li { display: inline-flex; align-items: center; gap: 4px; }
+  #map-legend i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+  #map-legend i.you { background: #1c2428; clip-path: polygon(50% 0, 100% 100%, 50% 75%, 0 100%); border-radius: 0; }
+  .tag-badge { display: inline-block; margin-left: 7px; padding: 1px 7px; border-radius: 999px; font-size: 10.5px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; vertical-align: 2px; }
+  .tag-badge.new { background: #d9f2ee; color: #14594f; }
+  .tag-badge.popular { background: #ffe9b3; color: #6b4300; }
+  label.remember { display: flex; align-items: center; gap: 8px; font-weight: 400; font-size: 13.5px; color: var(--muted); }
+  label.remember input { width: 18px; height: 18px; accent-color: var(--brand); flex: none; }
   #minimap-wrap button { font-size: 13px; padding: 4px 8px; min-height: 30px; }
   #joystick { position: fixed; left: 18px; bottom: calc(22px + var(--safe-b)); width: 124px; height: 124px; border-radius: 50%; z-index: 7; background: rgba(255,255,255,.45); border: 2px solid rgba(255,255,255,.9); box-shadow: 0 2px 12px rgba(0,0,0,.2); touch-action: none; display: none; }
   #joystick i { position: absolute; left: 50%; top: 50%; width: 54px; height: 54px; margin: -27px; border-radius: 50%; background: var(--brand); box-shadow: 0 2px 8px rgba(0,0,0,.3); }
@@ -219,6 +228,7 @@
     #brand { font-size: 15px; }
     #minimap-wrap { left: 10px; right: auto; bottom: auto; top: calc(var(--bar-h) + 10px); padding: 5px; }
     #minimap-wrap button { display: none; }
+    #map-legend { display: none; }
     #card { bottom: calc(10px + var(--safe-b)); }
     body.has-card #joystick { display: none; }
   }
@@ -245,7 +255,7 @@
     <div class="logo"><svg class="i" viewBox="0 0 24 24"><path d="M5 9h14l-1.4 11H6.4zM9 9a3 3 0 0 1 6 0"/></svg></div>
     <span id="brand-name">Virtual Snack Shop</span>
   </div>
-  <button id="browse-btn" type="button" aria-expanded="false" aria-controls="catalogue"><svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span class="label">Browse</span></button>
+  <button id="browse-btn" type="button" aria-label="Browse all snacks" aria-expanded="false" aria-controls="catalogue"><svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span class="label">Browse</span></button>
   <button id="people-btn" type="button" aria-expanded="false" aria-controls="people" aria-label="Other shoppers" hidden><svg class="i" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5M16 5.2a3.2 3.2 0 0 1 0 5.6M17.5 14.8c2.1.6 3.5 2.4 3.5 5.2"/></svg><span id="people-count">1</span></button>
   <button id="help-btn" type="button" aria-label="How to use the shop"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.3a2.6 2.6 0 1 1 3.6 2.4c-.7.4-1.1.9-1.1 1.8M12 17h.01"/></svg><span class="label">Help</span></button>
   <button id="cart-btn" type="button" class="primary" aria-expanded="false" aria-controls="cart"><svg class="i" viewBox="0 0 24 24"><path d="M5 9h14l-1.4 11H6.4zM9 9a3 3 0 0 1 6 0"/></svg><span class="label">Cart</span><span id="cart-count">0</span><span id="cart-sum" class="label"></span></button>
@@ -326,6 +336,7 @@
 
 <nav id="minimap-wrap" class="needs3d" aria-label="Shop map" hidden>
   <canvas id="minimap" title="Shop map — click anywhere to walk there"></canvas>
+  <ul id="map-legend" aria-label="Map key"><li><i style="background:#caa776"></i>Bundles</li><li><i style="background:#2f6f68"></i>Checkout</li><li><i style="background:#2a9d8f"></i>Door</li><li><i class="you"></i>You</li></ul>
   <button id="entrance-btn" type="button">Back to entrance</button>
 </nav>
 <div id="joystick" class="needs3d" aria-hidden="true"><i></i></div>
@@ -354,6 +365,7 @@
       <li><b>Delivery</b>Free over S$15, otherwise S$1.00. Add your address at checkout.</li>
       <li><b>Pay</b>Scan the PayNow QR, tick “I’ve paid”, then send your order on WhatsApp.</li>
     </ul>
+    <label class="remember"><input id="sound-toggle" type="checkbox" checked> A soft sound and a buzz on my phone when I add something to my cart</label>
     <div class="dialog-btns"><button class="primary" type="button" data-close-dialog>Start shopping</button></div>
     <p style="text-align:center;margin-top:16px"><a href="ka.html" style="color:var(--brand);font-weight:600">Built by Tan Kwan Ann →</a></p>
   </div>
@@ -365,6 +377,7 @@
     <ul id="order-lines"></ul>
     <label>Your name (optional)<input id="order-name" autocomplete="name" maxlength="80"></label>
     <label>Delivery address (required)<textarea id="order-address" rows="2" maxlength="300" placeholder="Block and street, unit number — where should we bring your snacks?" autocomplete="street-address"></textarea></label>
+    <label class="remember"><input id="order-remember" type="checkbox" checked> Remember my name and address on this device</label>
     <p class="fine">Delivery is free for orders of S$15 and over, otherwise S$1.00.</p>
     <label>Note for the shop (optional)<textarea id="order-note" rows="2" maxlength="400" placeholder="Anything else — gate code, a time that suits you…"></textarea></label>
     <div id="paynow-box" hidden>
@@ -531,6 +544,7 @@ const PRODUCTS = db.products.map(p => {
     kind, round: ROUND_KINDS.includes(kind),
     width: m.width || p.width || 0.5, height: m.height || p.height || 0.5, depth: m.depth || p.depth || 0.2,
     photoUrl: tex.image_url || p.texture_url || null, photo: null,
+    badge: m.badge === 'new' || m.badge === 'popular' ? m.badge : '',   // a small "New" or "Popular" tag, set in the product editor
     wrap: tex.wrap === 'once' || tex.wrap === 'front' ? tex.wrap : 'twice',   // round packs: print the art twice around (default), once all the way round, or on the front only
     texSpin: Number.isFinite(tex.rotate) ? Math.min(180, Math.max(-180, tex.rotate)) : 0,   // turn the label around the pack, in degrees
     photoFills: tex.fit === 'cover',                    // the photo is the whole pack front (flat artwork), not a picture of the pack
@@ -544,6 +558,7 @@ const PRODUCTS = db.products.map(p => {
 
 // A bundle may use the same snack more than once (2 × Mamee noodles chicken): group the repeats, keeping the order of first appearance.
 function groupItems(items) { const m = new Map(); items.forEach((p, j) => { const g = m.get(p) || { p, n: 0, js: [] }; g.n++; g.js.push(j); m.set(p, g); }); return [...m.values()]; }
+const badgeEl = p => p.badge ? el('span', { className: 'tag-badge ' + p.badge, textContent: p.badge === 'new' ? 'New' : 'Popular' }) : '';
 const itemsText = (items, sep) => groupItems(items).map(g => (g.n > 1 ? `${g.n} × ` : '') + g.p.name).join(sep);
 // Bundles: ready-made boxes of snacks, from the "bundles" part of products.json.
 // A bundle is a cart item like a product, but its stock is the scarcest of its
@@ -762,6 +777,27 @@ const cartTotals = () => {
   return { subtotal, delivery, total: subtotal + delivery, count };
 };
 function setQty(p, q) { showCartNote([]); if (q <= 0) cart.delete(p); else cart.set(p, Math.min(q, maxQty(p))); renderCart(); }
+// A tiny "added" cue: a soft two-note blip (made on the spot, no sound file) and a short buzz where the phone allows it.
+// Switched on or off from the Help window; the choice is remembered on this device.
+const SOUND_KEY = 'virtual-snack-shop-sound';
+const soundOn = () => { try { return localStorage.getItem(SOUND_KEY) !== 'off'; } catch (e) { return true; } };
+let audioCtx = null;
+function addedCue() {
+  if (!soundOn()) return;
+  try { if (navigator.vibrate) navigator.vibrate(18); } catch (e) {}
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const t = audioCtx.currentTime;
+    [[660, 0], [880, 0.07]].forEach(([hz, at]) => {
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.type = 'sine'; o.frequency.value = hz; g.gain.setValueAtTime(0.0001, t + at); g.gain.exponentialRampToValueAtTime(0.05, t + at + 0.015); g.gain.exponentialRampToValueAtTime(0.0001, t + at + 0.16);
+      o.connect(g).connect(audioCtx.destination); o.start(t + at); o.stop(t + at + 0.18);
+    });
+  } catch (e) {}
+}
+$('sound-toggle').checked = soundOn();
+$('sound-toggle').addEventListener('change', () => { try { localStorage.setItem(SOUND_KEY, $('sound-toggle').checked ? 'on' : 'off'); } catch (e) {} if ($('sound-toggle').checked) addedCue(); });
 function addToCart(p, n = 1) {
   if (!inStock(p)) { showToast(`${p.name} is out of stock`); return; }
   const have = cart.get(p) || 0, room = maxQty(p) - have;
@@ -770,6 +806,7 @@ function addToCart(p, n = 1) {
   setQty(p, have + adding);
   showToast(`Added ${adding > 1 ? adding + ' × ' : ''}${p.name}` + (adding < n ? ` (only ${stockOf(p)} in stock)` : ''));
   const b = $('cart-btn'); b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump');
+  addedCue();
 }
 function stepper(p, qty) {
   const minus = el('button', { type: 'button', textContent: '−', onclick: () => setQty(p, qty - 1) }); minus.setAttribute('aria-label', `One fewer ${p.name}`);
@@ -839,7 +876,7 @@ function updateCard() {
 function selectProduct(p) {
   selected = p; cardQty = 1;
   $('card-thumb').replaceWith(Object.assign(thumbBox(p), { id: 'card-thumb' }));
-  $('card-cat').textContent = p.category; $('card-name').textContent = p.name;
+  $('card-cat').textContent = p.category; $('card-name').textContent = p.name; if (p.badge) $('card-name').append(' ', badgeEl(p));
   updateCard();
   $('card').hidden = false; document.body.classList.add('has-card');
 }
@@ -886,7 +923,7 @@ CATS.forEach(cat => {
     const add = el('button', { type: 'button', className: 'primary', textContent: 'Add', onclick: () => addToCart(p) }); add.setAttribute('aria-label', `Add ${p.name} to cart`);
     const note = el('span');
     const row = el('div', { className: 'item' }, thumbBox(p),
-      el('div', {}, el('div', { className: 'name', textContent: p.name }), el('div', { className: 'meta' }, el('span', { className: 'price', textContent: money(p.price) }), p.pack ? ` · ${p.pack}` : '', note)),
+      el('div', {}, el('div', { className: 'name' }, p.name, badgeEl(p)), el('div', { className: 'meta' }, el('span', { className: 'price', textContent: money(p.price) }), p.pack ? ` · ${p.pack}` : '', note)),
       el('div', { className: 'acts' }, find, add));
     row.dataset.search = p.search; section.appendChild(row);
     listRows.set(p, { row, find, add, note });
@@ -923,7 +960,7 @@ if (COUNTER_PRODUCTS.length) {
     const add = el('button', { type: 'button', className: 'primary', textContent: 'Add', onclick: () => addToCart(p) }); add.setAttribute('aria-label', `Add ${p.name} to cart`);
     const note = el('span');
     const row = el('div', { className: 'item' }, thumbBox(p),
-      el('div', {}, el('div', { className: 'name', textContent: p.name }), el('div', { className: 'meta' }, el('span', { className: 'price', textContent: money(p.price) }), p.pack ? ` · ${p.pack}` : '', note)),
+      el('div', {}, el('div', { className: 'name' }, p.name, badgeEl(p)), el('div', { className: 'meta' }, el('span', { className: 'price', textContent: money(p.price) }), p.pack ? ` · ${p.pack}` : '', note)),
       el('div', { className: 'acts' }, find, add));
     row.dataset.search = p.search; section.appendChild(row);
     listRows.set(p, { row, find, add, note });
@@ -1009,6 +1046,17 @@ function orderText() {
   if (note) lines.push(`Note: ${note}`);
   return lines.join('\n');
 }
+// Remember the name and delivery address on this device only (never sent anywhere until you send an order), so the next
+// order does not have to be typed again. Untick the box and it is forgotten straight away.
+const DETAILS_KEY = 'virtual-snack-shop-details';
+(function rememberDetails() {
+  const name = $('order-name'), address = $('order-address'), box = $('order-remember');
+  const read = () => { try { return JSON.parse(localStorage.getItem(DETAILS_KEY) || 'null'); } catch (e) { return null; } };
+  const saved = read();
+  if (saved) { if (!name.value) name.value = saved.name || ''; if (!address.value) address.value = saved.address || ''; box.checked = saved.on !== false; }
+  const save = () => { try { if (box.checked) localStorage.setItem(DETAILS_KEY, JSON.stringify({ on: true, name: name.value, address: address.value })); else localStorage.setItem(DETAILS_KEY, JSON.stringify({ on: false })); } catch (e) {} };
+  [name, address].forEach(i => i.addEventListener('input', save)); box.addEventListener('change', save);
+})();
 function openCheckout() {
   if (!cart.size) return;
   showOrder();
@@ -1210,11 +1258,14 @@ renderCart();
 // ===========================================================================
 // 4. THE 3D SHOP
 // ===========================================================================
-let modelsPossible = false;   // uploaded 3D models need the loader add-on, which only comes from the first address below
+let modelsPossible = false;   // uploaded 3D models need the loader add-on, which comes with the copy of the 3D library hosted in this repository (vendor/)
 async function loadThree() {
+  // The 3D library is part of the site (vendor/), so it loads from the same place as the page: fast, and it works offline.
+  // The public CDNs are only a fallback, for the case where the vendor folder is missing from a copy of the site.
   const file = 'three@0.160.0/build/three.module.min.js';
+  try { const lib = await import('./vendor/three.module.min.js'); modelsPossible = true; return lib; } catch (e) { console.warn('Could not load the hosted 3D library, trying a CDN.', e); }
   for (const cdn of ['https://unpkg.com/', 'https://cdn.jsdelivr.net/npm/']) {
-    try { const lib = await import(cdn + file); modelsPossible = cdn.includes('unpkg'); return lib; } catch (e) { console.warn('Could not load the 3D library from ' + cdn, e); }
+    try { return await import(cdn + file); } catch (e) { console.warn('Could not load the 3D library from ' + cdn, e); }
   }
   throw new Error('The 3D library could not be downloaded.');
 }
@@ -1312,7 +1363,7 @@ function startWorld(THREE) {
   // Shelf faces are listed in shopping order: left wall, middle aisles, right wall, back wall.
   function plan(G, sideCols) {
     const halfW = Math.max(5.6, (G - 1) / 2 * AISLE + 5.8), sideLen = lenFor(sideCols), gondolaLen = lenFor(Math.max(2, sideCols - 2)), backLen = halfW - 0.6;
-    const halfD = (UNIT_D + 1.5 + sideLen + Math.max(8.6, B_RUN + 3.0)) / 2;                        // back shelves + wall shelves + room at the front for the door and counter
+    const halfD = (UNIT_D + 1.5 + sideLen + Math.max(10.0, B_RUN + 3.0)) / 2;                        // back shelves + wall shelves + room at the front for the door and counter
     const sideZ0 = -halfD + UNIT_D + 1.5, gondolaZ0 = -halfD + UNIT_D + 3.9;  // where the wall shelves and the gondolas start (their back ends)
     const units = [{ x: -halfW + UNIT_D / 2 + 0.06, z0: sideZ0, rotY: Math.PI / 2, length: sideLen }];
     for (let g = 0; g < G; g++) {
@@ -1476,20 +1527,63 @@ function startWorld(THREE) {
   }), { transparent: true, depthWrite: false });
   function floorShadow(x, z, w, d, rotY = 0) { const s = plane(w, d, shadowMat); s.rotation.set(-Math.PI / 2, 0, rotY); s.position.set(x, 0.012, z); s.renderOrder = 1; scene.add(s); }
 
-  // Shelf-edge price tag.
-  function tagTexture(p, accent, soldOut = false) {
-    return canvasTexture(512, 84, (ctx, w, h) => {
-      ctx.fillStyle = '#fffdf6'; ctx.fillRect(0, 0, w, h);
-      ctx.fillStyle = accent; ctx.fillRect(0, 0, 12, h);
-      ctx.textBaseline = 'middle'; ctx.font = `800 42px ${FONT}`;
-      if (soldOut) ctx.font = `800 30px ${FONT}`;
-      const price = soldOut ? 'Out of stock' : money(p.price), pw = ctx.measureText(price).width + 28;
-      ctx.fillStyle = soldOut ? '#e3e6e8' : '#ffd54f'; roundRect(ctx, w - pw - 8, 8, pw, h - 16, 12); ctx.fill();
-      ctx.fillStyle = soldOut ? '#5d6970' : '#b71c1c'; ctx.textAlign = 'center'; ctx.fillText(price, w - pw / 2 - 8, h / 2 + 3);
-      ctx.fillStyle = soldOut ? '#7a8389' : '#222'; ctx.textAlign = 'left';
-      fitOneLine(ctx, p.name, w - pw - 46, 30, '700'); ctx.fillText(p.name, 24, h / 2 + 2);
-    });
+  // Shelf-edge price tags. Every tag in the shop is drawn into ONE atlas texture and rendered as ONE instanced mesh (instead
+  // of a mesh and a texture per tag); each tag instance picks its own rectangle of the atlas. A grey "Out of stock" tag
+  // is drawn for every product too; applyStock() shows one or the other by scaling the other one to nothing.
+  function drawTag(ctx, w, h, p, accent, soldOut) {
+    ctx.fillStyle = '#fffdf6'; ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = accent; ctx.fillRect(0, 0, 12, h);
+    ctx.textBaseline = 'middle'; ctx.font = `800 42px ${FONT}`;
+    if (soldOut) ctx.font = `800 30px ${FONT}`;
+    const price = soldOut ? 'Out of stock' : money(p.price), pw = ctx.measureText(price).width + 28;
+    ctx.fillStyle = soldOut ? '#e3e6e8' : '#ffd54f'; roundRect(ctx, w - pw - 8, 8, pw, h - 16, 12); ctx.fill();
+    ctx.fillStyle = soldOut ? '#5d6970' : '#b71c1c'; ctx.textAlign = 'center'; ctx.fillText(price, w - pw / 2 - 8, h / 2 + 3);
+    ctx.fillStyle = soldOut ? '#7a8389' : '#222'; ctx.textAlign = 'left';
+    fitOneLine(ctx, p.name, w - pw - 46, 30, '700'); ctx.fillText(p.name, 24, h / 2 + 2);
   }
+  const tagBook = [];            // every tag in the shop: { p, accent, sold, m (world matrix), w, h, i (instance) }
+  let tagMesh = null;
+  const ZERO_M = new THREE.Matrix4().makeScale(0, 0, 0);
+  function addTag(p, accent, sold, local, parent, w, h) {   // `local`: Vector3 position inside `parent`; the tag faces the parent's +z
+    parent.updateMatrixWorld(true);
+    const m = new THREE.Matrix4().multiplyMatrices(parent.matrixWorld, new THREE.Matrix4().compose(local, new THREE.Quaternion(), new THREE.Vector3(w, h, 1)));
+    const e = { p, accent, sold, m, i: tagBook.length }; tagBook.push(e); return e;
+  }
+  function buildTagMesh() {
+    if (!tagBook.length) return;
+    const TW = 512, TH = 84, CW = TW + 8, CH = TH + 12, COLS = 4, ROWS = Math.ceil(tagBook.length / COLS);   // tiles have a margin so mipmaps don't bleed between them
+    const keys = new Map(), tiles = [];
+    tagBook.forEach(e => { const k = `${e.p.id}|${e.accent}|${e.sold}`; if (!keys.has(k)) { keys.set(k, tiles.length); tiles.push(e); } e.tile = keys.get(k); });
+    const rows = Math.ceil(tiles.length / COLS), W = COLS * CW, H = rows * CH;
+    const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const ctx = cv.getContext('2d');
+    tiles.forEach((e, t) => {
+      const cx = (t % COLS) * CW, cy = Math.floor(t / COLS) * CH;
+      ctx.fillStyle = '#fffdf6'; ctx.fillRect(cx, cy, CW, CH);
+      ctx.save(); ctx.translate(cx + 4, cy + 6); ctx.beginPath(); ctx.rect(0, 0, TW, TH); ctx.clip(); drawTag(ctx, TW, TH, e.p, e.accent, e.sold); ctx.restore();
+    });
+    const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = maxAniso;
+    const mat = flat(tex);
+    mat.onBeforeCompile = sh => {   // each instance reads its own rectangle of the atlas
+      sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nattribute vec4 uvRect;')
+        .replace('#include <uv_vertex>', '#include <uv_vertex>\n#ifdef USE_MAP\nvMapUv = vMapUv * uvRect.zw + uvRect.xy;\n#endif');
+    };
+    const geo = new THREE.PlaneGeometry(1, 1), rects = new Float32Array(tagBook.length * 4);
+    tagBook.forEach(e => {
+      const t = e.tile, cx = (t % COLS) * CW + 4, cy = Math.floor(t / COLS) * CH + 6;
+      rects.set([cx / W, 1 - (cy + TH) / H, TW / W, TH / H], e.i * 4);
+    });
+    geo.setAttribute('uvRect', new THREE.InstancedBufferAttribute(rects, 4));
+    tagMesh = new THREE.InstancedMesh(geo, mat, tagBook.length);
+    tagMesh.userData.tagOwners = tagBook.map(e => e.p);
+    tagBook.forEach(e => tagMesh.setMatrixAt(e.i, e.sold ? ZERO_M : e.m));
+    tagMesh.instanceMatrix.needsUpdate = true;
+    // Bounding sphere over every tag (also the hidden ones), so culling and picking stay right when stock changes.
+    const all = new THREE.Box3(), tmp = new THREE.Box3(), unit = new THREE.Box3(new THREE.Vector3(-0.5, -0.5, 0), new THREE.Vector3(0.5, 0.5, 0));
+    tagBook.forEach(e => all.union(tmp.copy(unit).applyMatrix4(e.m)));
+    tagMesh.boundingSphere = all.getBoundingSphere(new THREE.Sphere()); tagMesh.boundingBox = all;
+    scene.add(tagMesh); clickable.push(tagMesh);
+  }
+  function setTag(e, on) { if (tagMesh && e) tagMesh.setMatrixAt(e.i, on ? e.m : ZERO_M); }
 
   // Pack shapes. Bags and bars are boxes squeezed flat at their sealed ends.
   function pillowGeometry(w, h, d, seamsOnX) {
@@ -1536,14 +1630,25 @@ function startWorld(THREE) {
     const flat = parts.map(({ geo, mat }) => ({ g: geo.index ? geo.toNonIndexed() : geo, mat }));
     const n = flat.reduce((sum, { g }) => sum + g.attributes.position.count, 0);
     const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3), uv = new Float32Array(n * 2), out = new THREE.BufferGeometry();
-    let at = 0;
+    const segs = []; let at = 0;
     flat.forEach(({ g, mat }) => {
       const count = g.attributes.position.count;
       pos.set(g.attributes.position.array, at * 3); nor.set(g.attributes.normal.array, at * 3); uv.set(g.attributes.uv.array, at * 2);
-      if (Array.isArray(mat)) g.groups.forEach(gr => out.addGroup(at + gr.start, gr.count, mat[gr.materialIndex])); else out.addGroup(at, count, mat);
+      if (Array.isArray(mat)) g.groups.forEach(gr => segs.push({ mat: mat[gr.materialIndex], start: at + gr.start, count: gr.count })); else segs.push({ mat, start: at, count });
       at += count;
     });
-    out.setAttribute('position', new THREE.BufferAttribute(pos, 3)); out.setAttribute('normal', new THREE.BufferAttribute(nor, 3)); out.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+    // Sort the triangles by material so that parts with the same material become ONE group: a box with four plain sides and
+    // two printed faces is then drawn in 2 steps instead of 6, which matters with ~50 products on screen.
+    segs.sort((a, b) => a.mat - b.mat);
+    const P = new Float32Array(n * 3), N = new Float32Array(n * 3), U = new Float32Array(n * 2), groups = []; let w = 0;
+    segs.forEach(sg => {
+      P.set(pos.subarray(sg.start * 3, (sg.start + sg.count) * 3), w * 3); N.set(nor.subarray(sg.start * 3, (sg.start + sg.count) * 3), w * 3); U.set(uv.subarray(sg.start * 2, (sg.start + sg.count) * 2), w * 2);
+      const last = groups[groups.length - 1];
+      if (last && last.mat === sg.mat) last.count += sg.count; else groups.push({ mat: sg.mat, start: w, count: sg.count });
+      w += sg.count;
+    });
+    groups.forEach(gr => out.addGroup(gr.start, gr.count, gr.mat));
+    out.setAttribute('position', new THREE.BufferAttribute(P, 3)); out.setAttribute('normal', new THREE.BufferAttribute(N, 3)); out.setAttribute('uv', new THREE.BufferAttribute(U, 2));
     return out;
   }
   // A shape turned on a lathe from an outline of [radius, height] points; the art runs evenly from bottom to top.
@@ -1696,16 +1801,13 @@ function startWorld(THREE) {
       const slots = [{ c: bay.col + Math.floor(i / LEVELS.length), l: LEVELS.length - 1 - (i % LEVELS.length) }];
       // Every product gets its full set of packs and price tags, plus a grey "Out of stock" tag.
       // applyStock() then shows what matches the stock, and can do so again whenever stock changes.
-      const soldTag = plane(SLOT_W - 0.06, 0.12, flat(tagTexture(p, '#9aa3a7', true)));
-      soldTag.position.set(x0 + slots[0].c * SLOT_W, LEVELS[slots[0].l] - 0.05, UNIT_D / 2 + 0.012); soldTag.userData.product = p;
-      g.add(soldTag); soldTag.updateMatrixWorld(); clickable.push(soldTag);
+      const soldTag = addTag(p, '#9aa3a7', true, new THREE.Vector3(x0 + slots[0].c * SLOT_W, LEVELS[slots[0].l] - 0.05, UNIT_D / 2 + 0.012), g, SLOT_W - 0.06, 0.12);
       p.shelf = { soldTag, tags: [], meshes: [], list: null };
       // Fit the pack into a slot.
       const w = Math.min(p.width, SLOT_W - 0.08), d = Math.min(p.depth, UNIT_D - 0.08);
       const across = Math.max(1, Math.min(3, Math.floor((SLOT_W - 0.06) / (w + 0.03))));
       const rows = Math.max(1, Math.min(6, Math.floor((UNIT_D - 0.08) / (d + 0.03))));
       const list = [];
-      const tagMat = flat(tagTexture(p, bay.cat.sign));
       const tagged = new Set();
       let rand = p.hash;                 // small repeatable wobble so bags don't stand in perfect rows
       const wobble = () => { rand = Math.imul(rand ^ rand >>> 15, 2246822507) >>> 0; return rand / 2 ** 32 - 0.5; };
@@ -1725,9 +1827,7 @@ function startWorld(THREE) {
         // One price tag per shelf level for this product, under its first column on that level.
         if (!tagged.has(l)) {
           tagged.add(l);
-          const tag = plane(SLOT_W - 0.06, 0.12, tagMat);
-          tag.position.set(sx, LEVELS[l] - 0.05, UNIT_D / 2 + 0.012); tag.userData.product = p;
-          g.add(tag); tag.updateMatrixWorld(); clickable.push(tag); p.shelf.tags.push(tag);
+          p.shelf.tags.push(addTag(p, bay.cat.sign, false, new THREE.Vector3(sx, LEVELS[l] - 0.05, UNIT_D / 2 + 0.012), g, SLOT_W - 0.06, 0.12));
         }
       });
       // Front rows first, so that when stock is low the packs that are left are the ones at the front.
@@ -1764,9 +1864,9 @@ function startWorld(THREE) {
   const COUNTER_STAND = { x: HALF_W - 2.6 - 0.1, z: HALF_D - 2.6 - 0.4, w: 1.9, d: 0.2, h: 0.95 };   // the display area on the counter face (centre, width, how far packs stick out, height)
   if (COUNTER_PRODUCTS.length) {
     const face = new THREE.Group(); face.position.set(COUNTER_STAND.x, 0, COUNTER_STAND.z); face.rotation.y = Math.PI; scene.add(face);   // local +z points out into the shop
-    const SLOT_W = 0.85, BACK = 0.03, PACK_Y = 0.5, MAX_H = 0.3;
-    const board = new THREE.Mesh(new THREE.BoxGeometry(SLOT_W * COUNTER_PRODUCTS.length + 0.2, MAX_H + 0.2, BACK), std(0xf1e7d0, { roughness: 0.8 }));
-    board.position.set(0, PACK_Y + MAX_H / 2 + 0.02, BACK / 2); face.add(board);
+    const SLOT_W = 0.85, BACK = 0.03, PACK_Y = 0.6, MAX_H = 0.28;   // packs sit high on the face, which leaves a clear band below them for the labels
+    const board = new THREE.Mesh(new THREE.BoxGeometry(SLOT_W * COUNTER_PRODUCTS.length + 0.2, MAX_H + 0.1, BACK), std(0xf1e7d0, { roughness: 0.8 }));
+    board.position.set(0, PACK_Y + MAX_H / 2, BACK / 2); face.add(board);
     face.updateMatrixWorld(true);
     COUNTER_PRODUCTS.forEach((p, pi) => {
       const w = Math.min(p.width, SLOT_W - 0.08), d = Math.min(p.depth, 0.16);
@@ -1784,12 +1884,8 @@ function startWorld(THREE) {
       }
       list.sort((a, b) => a.front - b.front || a.slotIndex - b.slotIndex);
       // Grey "Out of stock" tag and price tag on the counter face, under the packs.
-      const soldTag = plane(0.6, 0.12, flat(tagTexture(p, '#9aa3a7', true)));
-      soldTag.position.set(x0, PACK_Y - 0.1, 0.012); soldTag.userData.product = p;
-      face.add(soldTag); soldTag.updateMatrixWorld(); clickable.push(soldTag);
-      const tag = plane(0.6, 0.12, flat(tagTexture(p, '#2a9d8f')));
-      tag.position.set(x0, PACK_Y - 0.1, 0.012); tag.userData.product = p;
-      face.add(tag); tag.updateMatrixWorld(); clickable.push(tag);
+      const soldTag = addTag(p, '#9aa3a7', true, new THREE.Vector3(x0, PACK_Y - 0.15, 0.012), face, 0.76, 0.152);
+      const tag = addTag(p, '#2a9d8f', false, new THREE.Vector3(x0, PACK_Y - 0.15, 0.012), face, 0.76, 0.152);
       p.shelf = { soldTag, tags: [tag], meshes: [], list: null };
       productInstances.set(p, list);
     });
@@ -1798,6 +1894,8 @@ function startWorld(THREE) {
     faceSign.position.set(0, 0.2, 0.012); face.add(faceSign);
     face.updateMatrixWorld(true);
   }
+
+  buildTagMesh();   // all the price tags, in one go
 
   // One instanced mesh per product: all its packs drawn in a single batch (fast on phones).
   productInstances.forEach((list, p) => {
@@ -1838,8 +1936,9 @@ function startWorld(THREE) {
       if (!p.shelf || !p.shelf.list) return;
       const n = Math.min(p.shelf.list.length, stockOf(p));
       p.shelf.meshes.forEach(m => { m.count = n; m.visible = n > 0; });
-      p.shelf.tags.forEach(t => { t.visible = n > 0; }); p.shelf.soldTag.visible = n <= 0;
+      p.shelf.tags.forEach(t => setTag(t, n > 0)); setTag(p.shelf.soldTag, n <= 0);
     });
+    if (tagMesh) tagMesh.instanceMatrix.needsUpdate = true;
     BUNDLES.forEach(b => { if (b.plate) b.plate.paint(); });    // a bundle is gone when any of its snacks is
     placeOutline(hoverBox);
     if (selectedItem && selected && selectedItem.index >= stockOf(selected)) placeOutline(selectBox);   // the outlined pack is gone
@@ -1857,7 +1956,7 @@ function startWorld(THREE) {
   counter.updateMatrixWorld(true); addObstacle(counter); floorShadow(counter.position.x, counter.position.z, 3.6, 1.9);
   // Bundles: a table in the middle of the front of the shop, and (only if the table is full) two-tray shelves on the
   // left wall by the entrance. Both hold the same trays: one bundle each, with its snacks standing in it.
-  const BUNDLE_TABLE = { x: 0, z: HALF_D - 5.2, w: TABLE_W, d: TABLE_D };                                                   // the table (centre and size)
+  const BUNDLE_TABLE = { x: 0, z: HALF_D - 7.0, w: TABLE_W, d: TABLE_D };   // far enough from the entrance that there is a clear walking lane between it and the checkout counter                                                   // the table (centre and size)
   const BUNDLE_SHELVES = { x: -HALF_W + 0.05 + B_DEPTH / 2, z: HALF_D - 1.0 - B_RUN / 2, w: B_DEPTH, d: B_RUN };           // the whole run of wall shelves
   if (BUNDLES.length) {
     const BOX_D = TRAY_D, BOX_H = 0.14, BOX_T = 0.04, RISER = 0.08, BOARD = 0.05;
@@ -1912,7 +2011,7 @@ function startWorld(THREE) {
       [[new THREE.BoxGeometry(TABLE_W - 0.3, 0.9, TABLE_D - 0.3), teal, 0, 0.45], [new THREE.BoxGeometry(TABLE_W, 0.06, TABLE_D), wood, 0, 0.93]]
         .forEach(([geo, material, x, y]) => { const m = new THREE.Mesh(geo, material); m.position.set(x, y, 0); table.add(m); clickable.push(m); });
       const sign = new THREE.Sprite(new THREE.SpriteMaterial({ map: signTexture('Bundles', '#2a9d8f', 512, 140) }));
-      sign.scale.set(2.2, 0.6, 1); sign.position.set(0, 2.6, 0); table.add(sign);
+      sign.scale.set(2.2, 0.6, 1); sign.position.set(0, 2.3, 0); table.add(sign);   // low enough not to overlap the shop sign on the back wall
       TABLE_USED.forEach((row, ri) => {
         const front = ri === 0, rowZ = (TABLE_USED.length === 1 ? 0 : (front ? 1 : -1) * (TRAY_D / 2 + 0.06));
         let x = -row.used / 2;
@@ -2123,8 +2222,8 @@ function startWorld(THREE) {
     // or wall is in front of a product, nothing is selected.
     const hit = raycaster.intersectObjects(clickable.concat(blockers), true).find(h => h.object.visible);   // hidden price tags don't count
     if (!hit || hit.distance > 14) return null;
-    const d = hit.object.userData;
-    return { product: d.product, bundle: d.bundle, checkout: d.checkout, floor: d.floor, point: hit.point, item: d.list && hit.instanceId !== undefined ? d.list[hit.instanceId] : (d.product && inStock(d.product) ? d.product.hero : null) };
+    const d = hit.object.userData, owner = d.tagOwners && hit.instanceId !== undefined ? d.tagOwners[hit.instanceId] : d.product;   // a price tag (one instance of the tag mesh) points at its product
+    return { product: owner, bundle: d.bundle, checkout: d.checkout, floor: d.floor, point: hit.point, item: d.list && hit.instanceId !== undefined ? d.list[hit.instanceId] : (owner && inStock(owner) ? owner.hero : null) };
   }
   const tip = $('hover-tip');
   let lookId = null, lastX = 0, lastY = 0, dragDist = 0, hoverAt = null;
@@ -2522,8 +2621,8 @@ function startWorld(THREE) {
       dirty--;
       pos.y = EYE + (reduceMotion ? 0 : Math.sin(walked * 3.4) * 0.022);
       camera.rotation.y = yaw; camera.rotation.x = pitch;
-      renderer.render(scene, camera); drawMap();
-    }
+      renderer.render(scene, camera); drawMap(); adaptResolution(performance.now());
+    } else dpr.last = 0;
     if (firstFrame) { firstFrame = false; window.__shopReady = true; $('splash').classList.add('done'); welcomeOnce(); }
   }
   // -------------------------------------------------------------------------
@@ -2619,6 +2718,58 @@ function startWorld(THREE) {
     setShoppers(me.on);
   }
 
+  // Open the page with ?debug to get its internals on window.__dbg (used by tools/check-shop.mjs to test walking and speed).
+  if (new URLSearchParams(location.search).has('debug')) window.__dbg = { renderer, scene, camera, findPath, isFree, nearestFree, pos, HALF_W, HALF_D, free, GX, GZ, cellX, cellZ, CELL, redraw,
+    // Where Find sends you for every snack and bundle, and where you start: for tools/check-shop.mjs.
+    spots: () => [{ name: 'start', x: START.x, z: START.z }, ...PRODUCTS.filter(p => p.hero).map(p => { const c = new THREE.Vector3().setFromMatrixPosition(p.hero.m), u = p.hero.unit, sp = nearestFree(c.x + Math.sin(u.rotY) * 2.1, c.z + Math.cos(u.rotY) * 2.1); return { name: p.name, x: sp.x, z: sp.z, tx: c.x, tz: c.z }; }), ...BUNDLES.filter(b => b.view).map(b => { const sp = nearestFree(b.view.x, b.view.z); return { name: b.name + ' (bundle)', x: sp.x, z: sp.z, tx: b.view.lookX, tz: b.view.lookZ }; })] };
+  // --- Speed: merge the plain, never-moving boxes and panels (shelf frames, walls, counters, light panels) so that all the
+  // ones sharing a material are drawn in ONE step instead of one each. Anything clickable, see-through, textured, animated
+  // or hand-ordered is left alone, and so are unlit (Basic) panels: some of them sit exactly flush with other surfaces and
+  // their draw order matters, which merging would disturb.
+  (function mergeStatic() {
+    const click = new Set(clickable), block = new Set(blockers), groups = new Map();
+    const isBlocker = o => { for (let n = o; n; n = n.parent) if (block.has(n)) return true; return false; };
+    scene.updateMatrixWorld(true);
+    scene.traverse(o => {
+      if (!o.isMesh || o.isInstancedMesh || click.has(o) || !o.visible || !o.matrixAutoUpdate || o.renderOrder !== 0) return;
+      const g = o.geometry, m = o.material;
+      if (!g || (g.type !== 'BoxGeometry' && g.type !== 'PlaneGeometry') || Array.isArray(m) || !m || m.type !== 'MeshStandardMaterial' || m.map || m.transparent || m.side !== THREE.FrontSide || m.alphaTest) return;
+      const key = m.uuid + (isBlocker(o) ? ':b' : ':n');
+      if (!groups.has(key)) groups.set(key, { m, blocker: isBlocker(o), list: [] });
+      groups.get(key).list.push(o);
+    });
+    let before = 0, after = 0;
+    const skip = new URLSearchParams(location.search).get('nomerge') || '';
+    groups.forEach(({ m, blocker, list }) => {
+      if (list.length < 3 || (skip && (skip === m.type || (m.color && skip === m.color.getHexString())))) return;
+      const parts = list.map(o => { const g = o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone(); g.applyMatrix4(o.matrixWorld); return g; });
+      const n = parts.reduce((t, g) => t + g.attributes.position.count, 0), pos = new Float32Array(n * 3), nor = new Float32Array(n * 3), uv = new Float32Array(n * 2);
+      let at = 0; parts.forEach(g => { pos.set(g.attributes.position.array, at * 3); nor.set(g.attributes.normal.array, at * 3); uv.set(g.attributes.uv.array, at * 2); at += g.attributes.position.count; g.dispose(); });
+      const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); geo.setAttribute('normal', new THREE.BufferAttribute(nor, 3)); geo.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+      geo.computeBoundingSphere();
+      const merged = new THREE.Mesh(geo, m); scene.add(merged); if (blocker) blockers.push(merged);
+      list.forEach(o => { o.parent.remove(o); const i = blockers.indexOf(o); if (i >= 0) blockers.splice(i, 1); o.geometry.dispose(); });
+      before += list.length; after++
+    });
+    if (new URLSearchParams(location.search).has('debug')) console.info(`mergeStatic: ${before} meshes became ${after}`);
+  })();
+
+  // --- Speed: sharpness follows the device. The page starts at full resolution (capped at 2x); if frames keep taking too long
+  // it steps the resolution down (and back up when there is room again), so phones stay smooth.
+  const dpr = { max: Math.min(window.devicePixelRatio || 1, 2), now: Math.min(window.devicePixelRatio || 1, 2), slow: 0, fast: 0, last: 0 };
+  window.addEventListener('resize', () => { dpr.max = Math.min(window.devicePixelRatio || 1, 2); dpr.now = Math.min(dpr.now, dpr.max); });
+  function adaptResolution(now) {
+    if (dpr.last) {
+      const dt = now - dpr.last;
+      if (dt > 0 && dt < 250) {   // ignore long gaps (tab in the background, nothing moving)
+        if (dt > 28) { dpr.slow++; dpr.fast = 0; } else if (dt < 19) { dpr.fast++; dpr.slow = 0; } else { dpr.slow = dpr.fast = 0; }
+        if (dpr.slow >= 20 && dpr.now > 1) { dpr.now = Math.max(1, dpr.now - 0.25); dpr.slow = 0; renderer.setPixelRatio(dpr.now); resize(); }
+        else if (dpr.fast >= 240 && dpr.now < dpr.max) { dpr.now = Math.min(dpr.max, dpr.now + 0.25); dpr.fast = 0; renderer.setPixelRatio(dpr.now); resize(); }
+      }
+    }
+    dpr.last = now;
+  }
+  
   applyStock();
   loadModels();
   frame();
