@@ -230,7 +230,7 @@
     <label class="field">Short description <small>Shown when the bundle is inspected</small><input id="b-blurb" maxlength="300" autocomplete="off"></label>
     <div class="grid">
       <label class="field">Bundle price (S$)<input id="b-price" type="number" min="0" max="9999" step="0.01" inputmode="decimal" required></label>
-      <label class="field">Position<input id="b-sort" type="number" min="0" max="999" step="1" inputmode="numeric" value="0"><small>Lower numbers come first on the table</small></label>
+      <label class="field">Position<input id="b-sort" type="number" min="0" max="999" step="1" inputmode="numeric" value="0"><small>Lower numbers come first on the shelves</small></label>
     </div>
     <div class="field">Snacks in the box <small>Tick to add, in the order you tick them. Up to 12.</small>
       <input id="b-search" type="search" placeholder="Search snacks…" aria-label="Search snacks" style="margin-bottom:6px">
@@ -238,7 +238,7 @@
     </div>
     <ol id="b-picked" aria-label="Snacks in this bundle, in order"></ol>
     <p id="b-sum" role="status"></p>
-    <label class="check"><input id="b-active" type="checkbox" checked> On sale (shown on the bundles table)</label>
+    <label class="check"><input id="b-active" type="checkbox" checked> On sale (shown on the bundle shelves)</label>
     <p id="b-error" class="error" role="alert"></p>
     <div class="dialog-btns">
       <button class="primary" type="submit" id="b-save">Save</button>
@@ -1457,7 +1457,7 @@ async function loadBundles() {
 function renderBundles() {
   const list = $('bundle-list'); list.textContent = '';
   if (!bundles) return;
-  if (!bundles.length) list.append(el('p', { className: 'hint', textContent: 'No bundles yet. Add one, and it appears on the table by the shop entrance.' }));
+  if (!bundles.length) list.append(el('p', { className: 'hint', textContent: 'No bundles yet. Add one, and it appears on the bundle shelves by the shop entrance.' }));
   bundles.forEach(b => {
     const names = (b.items || []).map(id => (products.find(p => p.id === id) || { name: id + ' (missing)' }).name);
     const sum = (b.items || []).reduce((t, id) => t + Number((products.find(p => p.id === id) || {}).price_sgd || 0), 0);
@@ -1522,7 +1522,7 @@ $('bundle-form').addEventListener('submit', async e => {
       let id = 'bundle-' + slug(name), n = 2; while (bundles.some(b => b.id === id)) id = `bundle-${slug(name)}-${n++}`;
       await api('bundles', { method: 'POST', prefer: 'return=minimal', body: { id, ...row } });
     }
-    $('bundle-editor').close(); await loadBundles(); say(`Saved “${name}”. It shows on the bundles table the next time a customer opens the shop.`);
+    $('bundle-editor').close(); await loadBundles(); say(`Saved “${name}”. It shows on the bundle shelves the next time a customer opens the shop.`);
   } catch (err) { $('b-error').textContent = 'Could not save: ' + err.message; }
   $('b-save').disabled = false;
 });
