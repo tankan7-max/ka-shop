@@ -1264,7 +1264,7 @@ function startWorld(THREE) {
   // Snacks are shown at their real size, in two staggered rows, so a tray is as wide as its snacks need.
   const B_TIERS = 3, B_TIER_H = 0.92, B_DEPTH = 1.0, B_GAP = 0.25;
   BUNDLES.forEach(b => {
-    const w = b.items.map(p => p.width), xs = [0];
+    const gr = groupItems(b.items), w = gr.map(g => g.p.width + (g.n - 1) * 0.07), xs = [0];   // identical snacks share one slot, stacked
     for (let i = 1; i < w.length; i++) xs.push(xs[i - 1] + 0.62 * (w[i - 1] + w[i]) / 2);
     const lo = Math.min(...xs.map((x, i) => x - w[i] / 2)), hi = Math.max(...xs.map((x, i) => x + w[i] / 2));
     b.lay = { w: Math.max(0.95, hi - lo + 0.24), xs: xs.map(x => x - (lo + hi) / 2) };
@@ -1812,14 +1812,16 @@ function startWorld(THREE) {
         // Real size (scale 1), zig-zag in two rows; the back row stands on a riser.
         const rz = BOX_D * 0.19;
         const riser = new THREE.Mesh(new THREE.BoxGeometry(BOX_W - 2 * BOX_T - 0.04, RISER, BOX_D * 0.4), kraftDark); riser.position.set(0, BOX_T + RISER / 2, -rz); riser.userData.bundle = b; box.add(riser); clickable.push(riser);
-        b.items.forEach((p, i) => {
-          const back = i % 2 === 1;
-          const mesh = packMesh(p, p.width, p.depth, 1);
-          const pos = new THREE.Vector3(b.lay.xs[i], BOX_T + (back ? RISER : 0) + p.height / 2, back ? -rz : rz);
-          const quat = new THREE.Quaternion().setFromEuler(new THREE.Euler(back ? -0.06 : 0.03, (hashOf(p.id) % 20 - 10) * Math.PI / 180, 0));
-          mesh.setMatrixAt(0, new THREE.Matrix4().compose(pos, quat, new THREE.Vector3(1, 1, 1)));
-          mesh.instanceMatrix.needsUpdate = true;
-          mesh.userData.bundle = b; box.add(mesh); clickable.push(mesh);
+        groupItems(b.items).forEach((g, i) => {
+          const p = g.p, back = i % 2 === 1, n = g.n, step = n > 1 ? Math.min(0.16, (back ? 0.12 : 0.3) / (n - 1)) : 0;
+          for (let c = 0; c < n; c++) {   // identical snacks stand in a little stack: each one a touch behind and to the side of the last
+            const mesh = packMesh(p, p.width, p.depth, 1);
+            const pos = new THREE.Vector3(b.lay.xs[i] - (n - 1) * 0.035 + c * 0.07, BOX_T + (back ? RISER : 0) + p.height / 2, (back ? -rz : rz) - c * step);
+            const quat = new THREE.Quaternion().setFromEuler(new THREE.Euler(back ? -0.06 : 0.03, (hashOf(p.id) % 20 - 10 + c * 3) * Math.PI / 180, 0));
+            mesh.setMatrixAt(0, new THREE.Matrix4().compose(pos, quat, new THREE.Vector3(1, 1, 1)));
+            mesh.instanceMatrix.needsUpdate = true;
+            mesh.userData.bundle = b; box.add(mesh); clickable.push(mesh);
+          }
         });
         // A name card in front of each tray: what it is, what it costs, what you save, and when it is gone.
         const cv = document.createElement('canvas'); cv.width = 640; cv.height = 190;
@@ -2208,21 +2210,27 @@ function startWorld(THREE) {
     const m = packMesh(p, p.width, p.depth, 1); m.setMatrixAt(0, new THREE.Matrix4()); m.instanceMatrix.needsUpdate = true; return m;
   }
   function buildRings(b) {
-    const sys = new THREE.Group(), count = Math.min(b.items.length, 6), rings = [];
+    const sys = new THREE.Group(), groups = groupItems(b.items), count = Math.min(groups.length, 6), rings = [];   // identical snacks stack together on one orbit
     const additive = { transparent: true, depthWrite: false, blending: THREE.AdditiveBlending };
     for (let i = 0; i < count; i++) {
-      const colour = new THREE.Color(shade(b.items[i].color, 0.3)), r = RING_FIRST + i * RING_STEP, dir = i % 2 ? -1 : 1;
+      const colour = new THREE.Color(shade(groups[i].p.color, 0.3)), r = RING_FIRST + i * RING_STEP, dir = i % 2 ? -1 : 1;
       const holder = new THREE.Group(); holder.rotation.set(0.45 + (i % 3) * 0.32, i * 2.4, 0, 'YXZ'); sys.add(holder);   // each ring is tilted its own way
       const spin = new THREE.Group(); holder.add(spin);
       spin.add(new THREE.Mesh(new THREE.CylinderGeometry(r, r, 0.11, 160, 1, true), new THREE.MeshBasicMaterial({ map: ringTexture(dir < 0), color: colour, side: THREE.DoubleSide, ...additive })));
       [-0.055, 0.055].forEach(y => spin.add(new THREE.Mesh(new THREE.TorusGeometry(r, 0.005, 6, 160).rotateX(Math.PI / 2).translate(0, y, 0), new THREE.MeshBasicMaterial({ color: colour, opacity: 0.55, ...additive }))));
       rings.push({ holder, spin, r, speed: dir * (RING_SPEED + 0.1 * i), phase: i * 2.1, packs: [] });
     }
-    b.items.forEach((p, j) => {
-      const ring = rings[j % count], slot = new THREE.Group(), arm = new THREE.Group(), pack = new THREE.Group(), k = RING_SNACK / Math.max(p.width, p.height, p.depth, 0.05);
+    groups.forEach((g, j) => {
+      const p = g.p, n = g.n, ring = rings[j % count], slot = new THREE.Group(), arm = new THREE.Group(), pack = new THREE.Group();
+      const dim = Math.max(p.width, p.height, p.depth, 0.05), k = RING_SNACK / (dim * (1 + 0.2 * (n - 1)));   // a stack is scaled down a little so it still fits its orbit
       slot.rotation.y = Math.floor(j / count) * Math.PI;    // a seventh snack and beyond ride opposite the first
-      arm.position.set(ring.r, 0, 0); pack.scale.setScalar(k); pack.add(inspectObjectFor(p));
-      arm.add(pack); slot.add(arm); ring.spin.add(slot); ring.packs.push({ slot, pack, r: ring.r, k, j });
+      arm.position.set(ring.r, 0, 0); pack.scale.setScalar(k);
+      for (let c = 0; c < n; c++) {   // each copy sits a little behind, beside and above the one in front, like a fanned stack
+        const o = inspectObjectFor(p), m = c - (n - 1) / 2;
+        o.position.set(m * dim * 0.3, m * dim * 0.06, -m * dim * 0.34); o.rotation.y = -m * 0.12;
+        pack.add(o);
+      }
+      arm.add(pack); slot.add(arm); ring.spin.add(slot); ring.packs.push({ slot, pack, r: ring.r, k, j: g.js[0] });
     });
     // The core: a small bright sun with a soft halo, and a little drifting dust to give the space some depth.
     sys.add(new THREE.Mesh(new THREE.SphereGeometry(0.1, 24, 16), new THREE.MeshBasicMaterial({ color: 0xfff1d0 })));
