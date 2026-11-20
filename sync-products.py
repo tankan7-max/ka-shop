@@ -25,7 +25,7 @@ try:
 except json.JSONDecodeError as e:
     raise SystemExit(f"products.json is not valid JSON (line {e.lineno}, column {e.colno}): {e.msg}")
 
-SHAPES = {"bag", "box", "bar", "carton", "can", "tube", "cup"}
+SHAPES = {"bag", "box", "bar", "carton", "can", "tube", "cup", "roll", "hex", "bottle"}
 errors, warnings, seen = [], [], set()
 products = db.get("products")
 if not isinstance(products, list) or not products:

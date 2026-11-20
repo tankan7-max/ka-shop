@@ -14,10 +14,11 @@
       "id": "mamee-chicken",
       "model": {
         "type": "box",
-        "width": 0.4,
-        "height": 0.45,
-        "depth": 0.14,
-        "color": 3046706
+        "color": 16116736,
+        "depth": 0.07,
+        "shape": "bag",
+        "width": 0.23,
+        "height": 0.29
       },
       "name": "Mamee noodles chicken",
       "pack": "1 pack, 25g",
@@ -38,10 +39,11 @@
       "id": "mamee-bbq",
       "model": {
         "type": "box",
-        "width": 0.4,
-        "height": 0.45,
-        "depth": 0.14,
-        "color": 15250432
+        "color": 15250432,
+        "depth": 0.07,
+        "shape": "bag",
+        "width": 0.23,
+        "height": 0.29
       },
       "name": "Mamee noodles BBQ",
       "pack": "1 pack, 25g",
@@ -62,10 +64,11 @@
       "id": "hello-panda",
       "model": {
         "type": "box",
-        "width": 0.35,
-        "height": 0.5,
-        "depth": 0.2,
-        "color": 7162945
+        "color": 16734464,
+        "depth": 0.06,
+        "shape": "bag",
+        "width": 0.2,
+        "height": 0.26
       },
       "name": "Hello Panda",
       "pack": "1 pack, 35g",
@@ -90,10 +93,11 @@
       "pack": "1 pack, 35g",
       "model": {
         "type": "box",
-        "width": 0.35,
-        "height": 0.5,
-        "depth": 0.2,
-        "color": 2792847
+        "color": 2792847,
+        "depth": 0.06,
+        "shape": "bag",
+        "width": 0.2,
+        "height": 0.26
       },
       "texture": {
         "description": "Meiji Hello Panda biscuits, milk flavour pack photo",
@@ -135,10 +139,11 @@
       "id": "twisties-bbq",
       "model": {
         "type": "box",
-        "width": 0.5,
-        "height": 0.55,
-        "depth": 0.18,
-        "color": 5606191
+        "color": 16775219,
+        "depth": 0.1,
+        "shape": "bag",
+        "width": 0.3,
+        "height": 0.4
       },
       "name": "Twisties BBQ",
       "pack": "1 pack, 60g",
@@ -159,10 +164,11 @@
       "id": "lays-bbq",
       "model": {
         "type": "box",
-        "width": 0.5,
-        "height": 0.55,
+        "color": 8017464,
         "depth": 0.18,
-        "color": 15690752
+        "shape": "bag",
+        "width": 0.45,
+        "height": 0.55
       },
       "name": "Lays BBQ",
       "pack": "1 pack, 50g",
@@ -207,10 +213,12 @@
       "id": "korean-seaweed",
       "model": {
         "type": "box",
-        "width": 0.5,
-        "height": 0.35,
+        "badge": "popular",
+        "color": 16773845,
         "depth": 0.22,
-        "color": 16752640
+        "shape": "bag",
+        "width": 0.5,
+        "height": 0.32
       },
       "name": "Korean seaweed",
       "pack": "1 pack, 40g",
@@ -238,7 +246,8 @@
         "width": 0.5,
         "height": 0.55,
         "depth": 0.18,
-        "color": 15909424
+        "color": 15909424,
+        "shape": "bag"
       },
       "texture": {
         "type": "image",
@@ -261,7 +270,8 @@
         "width": 0.5,
         "height": 0.55,
         "depth": 0.18,
-        "color": 14099998
+        "color": 14099998,
+        "shape": "bag"
       },
       "texture": {
         "type": "image",
@@ -284,7 +294,8 @@
         "width": 0.5,
         "height": 0.55,
         "depth": 0.18,
-        "color": 7192133
+        "color": 7192133,
+        "shape": "bag"
       },
       "texture": {
         "type": "image",
@@ -304,10 +315,11 @@
       "pack": "1 tube, 134g",
       "model": {
         "type": "cylinder",
-        "width": 0.26,
-        "height": 0.52,
-        "depth": 0.26,
-        "color": 3055172
+        "color": 3853116,
+        "depth": 0.17,
+        "shape": "tube",
+        "width": 0.17,
+        "height": 0.54
       },
       "texture": {
         "type": "image",
@@ -330,7 +342,8 @@
         "width": 0.24,
         "height": 0.3,
         "depth": 0.24,
-        "color": 13111342
+        "color": 13111342,
+        "shape": "can"
       },
       "texture": {
         "type": "image",
@@ -353,7 +366,8 @@
         "width": 0.5,
         "height": 0.55,
         "depth": 0.18,
-        "color": 16175973
+        "color": 16175973,
+        "shape": "bag"
       },
       "texture": {
         "type": "image",
@@ -376,7 +390,8 @@
         "width": 0.5,
         "height": 0.55,
         "depth": 0.18,
-        "color": 16361509
+        "color": 16361509,
+        "shape": "bag"
       },
       "texture": {
         "type": "image",
@@ -399,7 +414,8 @@
         "width": 0.4,
         "height": 0.45,
         "depth": 0.14,
-        "color": 1793568
+        "color": 1793568,
+        "shape": "bag"
       },
       "texture": {
         "type": "image",
@@ -421,7 +437,8 @@
         "width": 0.4,
         "height": 0.45,
         "depth": 0.14,
-        "color": 16766464
+        "color": 16766464,
+        "shape": "bag"
       },
       "texture": {
         "type": "image",
@@ -443,7 +460,8 @@
         "width": 0.5,
         "height": 0.2,
         "depth": 0.12,
-        "color": 12000284
+        "color": 12000284,
+        "shape": "bag"
       },
       "texture": {
         "type": "image",
@@ -458,14 +476,15 @@
       "id": "julies-peanut-butter",
       "name": "Julie's Peanut Butter Sandwich",
       "category": "Biscuits & cookies",
-      "price_sgd": 6.2,
+      "price_sgd": 6.3,
       "pack": "1 pack, 12 x 30g",
       "model": {
         "type": "box",
-        "width": 0.5,
-        "height": 0.35,
-        "depth": 0.22,
-        "color": 16088064
+        "color": 16088064,
+        "depth": 0.16,
+        "shape": "bag",
+        "width": 0.41,
+        "height": 0.52
       },
       "texture": {
         "type": "image",
@@ -488,7 +507,8 @@
         "width": 0.5,
         "height": 0.35,
         "depth": 0.22,
-        "color": 6111287
+        "color": 6111287,
+        "shape": "bag"
       },
       "texture": {
         "type": "image",
@@ -511,7 +531,8 @@
         "width": 0.5,
         "height": 0.35,
         "depth": 0.22,
-        "color": 1402304
+        "color": 1402304,
+        "shape": "bag"
       },
       "texture": {
         "type": "image",
@@ -534,7 +555,8 @@
         "width": 0.35,
         "height": 0.5,
         "depth": 0.2,
-        "color": 13840175
+        "color": 13840175,
+        "shape": "bag"
       },
       "texture": {
         "type": "image",
@@ -556,7 +578,8 @@
         "width": 0.5,
         "height": 0.35,
         "depth": 0.22,
-        "color": 15022389
+        "color": 15022389,
+        "shape": "bag"
       },
       "texture": {
         "type": "image",
@@ -578,7 +601,8 @@
         "width": 0.5,
         "height": 0.35,
         "depth": 0.22,
-        "color": 1668818
+        "color": 1668818,
+        "shape": "bag"
       },
       "texture": {
         "type": "image",
@@ -593,14 +617,15 @@
       "id": "kinder-bueno-milk",
       "name": "Kinder Bueno Milk",
       "category": "Chocolate",
-      "price_sgd": 3.0,
+      "price_sgd": 2.7,
       "pack": "1 bar, 43g",
       "model": {
         "type": "box",
-        "width": 0.5,
-        "height": 0.2,
-        "depth": 0.12,
-        "color": 15094016
+        "color": 16777215,
+        "depth": 0.06,
+        "shape": "bag",
+        "width": 0.38,
+        "height": 0.13
       },
       "texture": {
         "type": "image",
@@ -616,14 +641,15 @@
       "id": "kinder-bueno-white",
       "name": "Kinder Bueno White",
       "category": "Chocolate",
-      "price_sgd": 2.6,
+      "price_sgd": 2.7,
       "pack": "1 bar, 39g",
       "model": {
         "type": "box",
         "width": 0.5,
         "height": 0.2,
         "depth": 0.12,
-        "color": 15527921
+        "color": 15527921,
+        "shape": "bag"
       },
       "texture": {
         "type": "image",
@@ -646,7 +672,8 @@
         "width": 0.55,
         "height": 0.3,
         "depth": 0.08,
-        "color": 4854924
+        "color": 4854924,
+        "shape": "bag"
       },
       "texture": {
         "type": "image",
@@ -669,7 +696,8 @@
         "width": 0.5,
         "height": 0.2,
         "depth": 0.12,
-        "color": 6953882
+        "color": 6953882,
+        "shape": "bag"
       },
       "texture": {
         "type": "image",
@@ -692,7 +720,8 @@
         "width": 0.55,
         "height": 0.3,
         "depth": 0.08,
-        "color": 8069026
+        "color": 8069026,
+        "shape": "bag"
       },
       "texture": {
         "type": "image",
@@ -712,10 +741,11 @@
       "pack": "1 pack, 6 x 17g",
       "model": {
         "type": "box",
+        "color": 13959168,
+        "depth": 0.04,
+        "shape": "bag",
         "width": 0.5,
-        "height": 0.35,
-        "depth": 0.22,
-        "color": 13959168
+        "height": 0.2
       },
       "texture": {
         "type": "image",
@@ -738,7 +768,8 @@
         "width": 0.5,
         "height": 0.2,
         "depth": 0.12,
-        "color": 5125166
+        "color": 5125166,
+        "shape": "bag"
       },
       "texture": {
         "type": "image",
@@ -760,7 +791,8 @@
         "width": 0.4,
         "height": 0.45,
         "depth": 0.14,
-        "color": 16498733
+        "color": 16498733,
+        "shape": "bag"
       },
       "texture": {
         "type": "image",
@@ -783,7 +815,8 @@
         "width": 0.5,
         "height": 0.2,
         "depth": 0.12,
-        "color": 15483002
+        "color": 15483002,
+        "shape": "bag"
       },
       "texture": {
         "type": "image",
@@ -803,10 +836,11 @@
       "pack": "1 roll, 37.5g",
       "model": {
         "type": "box",
+        "color": 161725,
+        "depth": 0.08,
+        "shape": "roll",
         "width": 0.5,
-        "height": 0.2,
-        "depth": 0.12,
-        "color": 161725
+        "height": 0.08
       },
       "texture": {
         "type": "image",
@@ -828,7 +862,8 @@
         "width": 0.5,
         "height": 0.2,
         "depth": 0.12,
-        "color": 16119260
+        "color": 16119260,
+        "shape": "bag"
       },
       "texture": {
         "type": "image",
@@ -850,7 +885,8 @@
         "width": 0.4,
         "height": 0.45,
         "depth": 0.14,
-        "color": 4073251
+        "color": 4073251,
+        "shape": "bag"
       },
       "texture": {
         "type": "image",
@@ -872,7 +908,8 @@
         "width": 0.4,
         "height": 0.45,
         "depth": 0.14,
-        "color": 12986408
+        "color": 12986408,
+        "shape": "bag"
       },
       "texture": {
         "type": "image",
@@ -894,7 +931,8 @@
         "width": 0.32,
         "height": 0.3,
         "depth": 0.32,
-        "color": 2001125
+        "color": 2001125,
+        "shape": "cup"
       },
       "texture": {
         "type": "image",
@@ -916,7 +954,8 @@
         "width": 0.4,
         "height": 0.45,
         "depth": 0.14,
-        "color": 16635957
+        "color": 16635957,
+        "shape": "bag"
       },
       "texture": {
         "type": "image",
@@ -938,7 +977,8 @@
         "width": 0.5,
         "height": 0.35,
         "depth": 0.22,
-        "color": 16740419
+        "color": 16740419,
+        "shape": "bag"
       },
       "texture": {
         "type": "image",
@@ -960,7 +1000,8 @@
         "width": 0.2,
         "height": 0.34,
         "depth": 0.13,
-        "color": 4431943
+        "color": 4431943,
+        "shape": "bag"
       },
       "texture": {
         "type": "image",
@@ -982,7 +1023,8 @@
         "width": 0.2,
         "height": 0.34,
         "depth": 0.13,
-        "color": 16771899
+        "color": 16771899,
+        "shape": "bag"
       },
       "texture": {
         "type": "image",
@@ -1005,7 +1047,8 @@
         "width": 0.2,
         "height": 0.36,
         "depth": 0.2,
-        "color": 9268835
+        "color": 9268835,
+        "shape": "can"
       },
       "texture": {
         "type": "image",
@@ -1028,7 +1071,8 @@
         "width": 0.2,
         "height": 0.36,
         "depth": 0.2,
-        "color": 3046706
+        "color": 3046706,
+        "shape": "can"
       },
       "texture": {
         "type": "image",
@@ -1051,7 +1095,8 @@
         "width": 0.2,
         "height": 0.36,
         "depth": 0.2,
-        "color": 1402304
+        "color": 1402304,
+        "shape": "can"
       },
       "texture": {
         "type": "image",
@@ -1073,7 +1118,8 @@
         "width": 0.2,
         "height": 0.34,
         "depth": 0.13,
-        "color": 3046706
+        "color": 3046706,
+        "shape": "bag"
       },
       "texture": {
         "type": "image",
@@ -1095,7 +1141,8 @@
         "width": 0.2,
         "height": 0.36,
         "depth": 0.2,
-        "color": 13959168
+        "color": 13959168,
+        "shape": "can"
       },
       "texture": {
         "type": "image",
@@ -1117,7 +1164,8 @@
         "width": 0.4,
         "height": 0.45,
         "depth": 0.14,
-        "color": 15094016
+        "color": 15094016,
+        "shape": "bag"
       },
       "texture": {
         "type": "image",
@@ -1139,7 +1187,8 @@
         "width": 0.4,
         "height": 0.45,
         "depth": 0.14,
-        "color": 10586239
+        "color": 10586239,
+        "shape": "bag"
       },
       "texture": {
         "type": "image",
@@ -1161,7 +1210,8 @@
         "width": 0.5,
         "height": 0.55,
         "depth": 0.18,
-        "color": 8172354
+        "color": 8172354,
+        "shape": "bag"
       },
       "texture": {
         "type": "image",
@@ -1183,7 +1233,8 @@
         "width": 0.5,
         "height": 0.35,
         "depth": 0.22,
-        "color": 3706428
+        "color": 3706428,
+        "shape": "bag"
       },
       "texture": {
         "type": "image",
@@ -1205,7 +1256,8 @@
         "width": 0.3,
         "height": 0.22,
         "depth": 0.12,
-        "color": 2792847
+        "color": 2792847,
+        "shape": "box"
       },
       "texture": {
         "description": "Panadol Original tablets pack photo",
@@ -1229,7 +1281,8 @@
         "width": 0.35,
         "height": 0.22,
         "depth": 0.12,
-        "color": 2792847
+        "color": 2792847,
+        "shape": "box"
       },
       "texture": {
         "description": "Strepsils Honey & Lemon lozenges pack photo",
