@@ -241,8 +241,9 @@
         "color": 15909424
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/calbee-original/front-mwp12rqn.jpg"
       },
       "reference": {
         "note": "FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling. Promotion: any 2 for S$4.30.",
@@ -263,8 +264,9 @@
         "color": 14099998
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/calbee-hot-spicy/front-mwp136i8.jpg"
       },
       "reference": {
         "note": "FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling.",
@@ -285,8 +287,9 @@
         "color": 7192133
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/calbee-snow-peas/front-mwp13qgw.jpg"
       },
       "reference": {
         "note": "FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling.",
@@ -330,8 +333,9 @@
         "color": 13111342
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/pringles-original-small/front-mwp146ta.jpg"
       },
       "reference": {
         "note": "FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling. Price taken from the 42g Sour Cream & Onion listing.",
@@ -352,8 +356,9 @@
         "color": 16175973
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/irvins-salted-egg-chips/front-mwp14qlw.jpg"
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling. Priced like Irvins fish skin.",
@@ -374,8 +379,9 @@
         "color": 16361509
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/irvins-fish-skin/front-mwp156xl.jpg"
       },
       "reference": {
         "note": "FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling.",
@@ -396,8 +402,9 @@
         "color": 1793568
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/tao-kae-noi-original/front-mwp15lvq.jpg"
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
@@ -417,8 +424,9 @@
         "color": 16766464
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/super-ring/front-mwp162bw.jpg"
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
@@ -438,8 +446,9 @@
         "color": 12000284
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/haw-flakes/front-mwp16grw.jpg"
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
@@ -482,8 +491,9 @@
         "color": 6111287
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/julies-choco-more/front-mwp19qjk.jpg"
       },
       "reference": {
         "note": "FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling.",
@@ -504,8 +514,9 @@
         "color": 1402304
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/oreo-vanilla/front-mwp1a8k2.jpg"
       },
       "reference": {
         "note": "FairPrice listing price from an older page; confirm before selling.",
@@ -526,8 +537,9 @@
         "color": 13840175
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/pocky-chocolate/front-mwp1aqw8.jpg"
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
@@ -547,8 +559,9 @@
         "color": 15022389
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/koalas-march-choc/front-mwp1b643.jpg"
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
@@ -568,8 +581,9 @@
         "color": 1668818
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/hup-seng-crackers/front-mwp1bmxw.jpg"
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
@@ -612,8 +626,9 @@
         "color": 15527921
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/kinder-bueno-white/front-mwp1c1g5.jpg"
       },
       "reference": {
         "note": "FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling.",
@@ -634,8 +649,9 @@
         "color": 4854924
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/cadbury-dm-plain/front-mwp1cfqo.jpg"
       },
       "reference": {
         "note": "FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling.",
@@ -656,8 +672,9 @@
         "color": 6953882
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/cadbury-dm-roll/front-mwp1cucz.jpg"
       },
       "reference": {
         "note": "FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling.",
@@ -678,8 +695,9 @@
         "color": 8069026
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/cadbury-roast-almond/front-mwp1d7xg.jpg"
       },
       "reference": {
         "note": "FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling.",
@@ -723,8 +741,9 @@
         "color": 5125166
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/snickers/front-mwp1dm3t.jpg"
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
@@ -744,8 +763,10 @@
         "color": 16498733
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/haribo-goldbears/front-mwp1eyda.jpg",
+        "fit": "cover"
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
@@ -765,8 +786,10 @@
         "color": 15483002
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/hi-chew-strawberry/front-mwp1jqqw.jpg",
+        "fit": "cover"
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
@@ -786,8 +809,9 @@
         "color": 161725
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/mentos-mint/front-mwp1kat3.jpg"
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
@@ -807,8 +831,9 @@
         "color": 16119260
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/fishermans-friend/front-mwp1lag2.jpg"
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
@@ -828,8 +853,9 @@
         "color": 4073251
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/kopiko-candy/front-mwp1lqu4.jpg"
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
@@ -849,8 +875,9 @@
         "color": 12986408
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/indomie-mi-goreng/front-mwp1m4b8.jpg"
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
@@ -870,8 +897,9 @@
         "color": 2001125
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/nissin-cup-seafood/front-mwp1miub.png"
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
@@ -891,8 +919,9 @@
         "color": 16635957
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/maggi-curry/front-mwp1my7h.jpg"
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
@@ -912,8 +941,9 @@
         "color": 16740419
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/prima-taste-laksa/front-mwp1ncp2.jpg"
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
@@ -933,8 +963,9 @@
         "color": 4431943
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/pokka-green-tea/front-mwp1ouon.jpg"
       },
       "reference": {
         "note": "Based on FairPrice carton price S$11.90 for 24 (search snapshot, 3 Nov 2026); single-pack price set by the shop."
@@ -954,8 +985,9 @@
         "color": 16771899
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/yeos-chrysanthemum/front-mwp1r5c2.jpg"
       },
       "reference": {
         "note": "Based on FairPrice carton price S$11.60 for 24 (search snapshot, 3 Nov 2026); single-pack price set by the shop.",
@@ -976,8 +1008,9 @@
         "color": 9268835
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/pokka-oolong-can/front-mwp1rlki.jpg"
       },
       "reference": {
         "note": "Based on FairPrice carton price S$8.75 for 12 (search snapshot, 3 Nov 2026); single-can price set by the shop.",
@@ -998,8 +1031,9 @@
         "color": 3046706
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/pokka-sencha-can/front-mwp1rzny.jpg"
       },
       "reference": {
         "note": "Based on FairPrice carton price S$8.75 for 12 (search snapshot, 3 Nov 2026); single-can price set by the shop.",
@@ -1020,8 +1054,9 @@
         "color": 1402304
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/100plus-can/front-mwp1yf53.jpg"
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
@@ -1041,8 +1076,9 @@
         "color": 3046706
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/milo-uht/front-mwp1trmh.jpg"
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
@@ -1062,8 +1098,9 @@
         "color": 13959168
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/coca-cola-can/front-mwp1vjaw.jpg"
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
@@ -1083,8 +1120,9 @@
         "color": 15094016
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/tong-garden-cashew/front-mwp1vvyx.jpg"
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
@@ -1104,8 +1142,9 @@
         "color": 10586239
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/camel-mixed-nuts/front-mwp1wal7.jpg"
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
@@ -1125,8 +1164,9 @@
         "color": 8172354
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/calbee-harvest-snaps/front-mwp1wln5.jpg"
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
@@ -1146,8 +1186,9 @@
         "color": 3706428
       },
       "texture": {
-        "type": "generated",
-        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo."
+        "type": "image",
+        "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/nature-valley-oats-honey/front-mwp1wymn.jpg"
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
