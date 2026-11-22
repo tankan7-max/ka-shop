@@ -118,7 +118,31 @@
   #toast { position: fixed; z-index: 60; left: 50%; top: calc(72px + env(safe-area-inset-top, 0px)); transform: translateX(-50%); background: rgba(20,26,30,.94); color: #fff; padding: 9px 16px; border-radius: 999px; font-size: 14px; max-width: calc(100vw - 28px); }
   footer.site a { color: var(--brand-dark); }
   footer.site { max-width: 1100px; margin: 0 auto; padding: 8px 14px calc(30px + var(--safe-b)); color: var(--muted); font-size: 13.5px; text-align: center; }
-  @media (max-width: 420px) { .bar a.snacks span.long { display: none; } #grid { gap: 10px; } }
+  #view-btn { white-space: nowrap; min-height: 42px; padding: 0 12px; font-size: 14px; }
+  #view-btn[aria-pressed="true"] { background: var(--brand-soft); border-color: #bfe3dc; color: #14594f; font-weight: 700; }
+  body.mode-3d { overflow: hidden; }
+  body.mode-3d #list-view { display: none; }
+  #world { position: fixed; left: 0; right: 0; bottom: 0; top: var(--bar-h, 62px); z-index: 5; background: #2b2f33; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  #world[hidden] { display: none; }
+  #view { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; outline: none; }
+  #view.dragging { cursor: grabbing; }
+  #view:focus-visible { outline: 3px solid #fff; outline-offset: -3px; }
+  #map-wrap { position: absolute; left: 10px; top: 10px; padding: 6px; background: rgba(255,255,255,.93); border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,.25); }
+  #map { display: block; border-radius: 8px; cursor: pointer; touch-action: none; }
+  #map-door { display: block; width: 100%; margin-top: 6px; min-height: 30px; padding: 3px 8px; font-size: 13px; }
+  #tip { position: absolute; z-index: 3; pointer-events: none; padding: 5px 10px; border-radius: 8px; background: rgba(20,26,30,.92); color: #fff; font-size: 13.5px; max-width: 260px; }
+  #hint { position: absolute; left: 50%; bottom: calc(16px + var(--safe-b)); transform: translateX(-50%); display: flex; align-items: center; gap: 8px; padding: 8px 8px 8px 14px; border-radius: 999px; background: rgba(20,26,30,.9); color: #fff; font-size: 13.5px; max-width: calc(100vw - 20px); }
+  #hint button { min-height: 30px; width: 30px; padding: 0; border-radius: 50%; background: rgba(255,255,255,.18); border: 0; color: #fff; font-size: 18px; line-height: 1; }
+  #hint kbd { display: inline-block; min-width: 20px; padding: 0 4px; margin: 0 1px; border-radius: 5px; background: #fff; color: #1d2327; font: 700 11.5px/18px system-ui; text-align: center; }
+  #hint .touch { display: none; }
+  #joy { position: absolute; left: 18px; bottom: calc(18px + var(--safe-b)); width: 118px; height: 118px; border-radius: 50%; background: rgba(255,255,255,.2); border: 2px solid rgba(255,255,255,.5); display: none; touch-action: none; }
+  #joy i { position: absolute; left: 50%; top: 50%; width: 52px; height: 52px; margin: -26px 0 0 -26px; border-radius: 50%; background: rgba(34,129,116,.92); border: 2px solid #fff; }
+  #loading3d { position: absolute; inset: 0; display: grid; place-items: center; color: #fff; font-weight: 600; background: #2b2f33; transition: opacity .4s; }
+  #loading3d.done { opacity: 0; pointer-events: none; }
+  @media (pointer: coarse) { #joy { display: block; } #hint .desk { display: none; } #hint .touch { display: inline; } #hint { bottom: calc(150px + var(--safe-b)); } }
+  @media (max-width: 520px) { .brand small { display: none; } #map-wrap { padding: 4px; } #map-door { display: none; } }
+  @media (max-width: 400px) { #view-btn .vt { display: none; } #view-btn { min-width: 44px; } }
+  @media (max-width: 420px) { .bar a.snacks span.long { display: none; } #grid { gap: 10px; } .brand { display: none; } .bar { gap: 8px; padding-left: 10px; padding-right: 10px; } #view-btn { padding: 0 10px; } }
   @media (prefers-reduced-motion: reduce) { .card, #bag { transition: none; } #bag-btn.bump { animation: none; } }
 </style>
 </head>
@@ -126,10 +150,12 @@
 <header class="bar">
   <div class="logo" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 32 32" fill="#fff"><path d="M16 5l3.2 6.6 7.3 1-5.3 5.1 1.3 7.2L16 21.4 9.5 24.9l1.3-7.2-5.3-5.1 7.3-1z"/></svg></div>
   <div class="brand"><b id="shop-name">Pre-loved Corner</b><small id="shop-tag">Second-hand finds</small></div>
+  <button id="view-btn" type="button" hidden aria-pressed="false"></button>
   <a class="snacks" href="virtual-snack-shop.html"><span class="long">Snack shop&nbsp;</span>→</a>
   <button id="bag-btn" class="primary" type="button" aria-expanded="false" aria-controls="bag"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 9h14l-1.4 11H6.4zM9 9a3 3 0 0 1 6 0"/></svg><span>Bag</span><span id="bag-count">0</span></button>
 </header>
 
+<div id="list-view">
 <main>
   <div class="hero"><h1 id="hero-title">Pre-loved finds</h1><p id="hero-sub">Every item is one of a kind. Once it is gone, it is gone.</p></div>
   <div class="tools">
@@ -149,6 +175,16 @@
   <div id="empty" hidden><p>No items match. Try another search or category.</p><button id="reset" type="button">Show everything</button></div>
 </main>
 <footer class="site" id="site-foot"></footer>
+</div>
+
+<div id="world" role="region" aria-label="3D shop" hidden>
+  <canvas id="view" tabindex="0" aria-label="3D view of the shop. Walk with W A S D or the arrow keys, drag to look around, and click an item to see it. The list view button gives the same items as a list."></canvas>
+  <div id="map-wrap"><canvas id="map" title="Shop map. Click to walk there."></canvas><button type="button" id="map-door">To the entrance</button></div>
+  <div id="tip" hidden></div>
+  <div id="hint" hidden><span class="desk">Drag to look · <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> to walk · click an item</span><span class="touch">Drag to look · use the pad to walk · tap an item</span><button type="button" id="hint-x" aria-label="Dismiss tip">×</button></div>
+  <div id="joy" aria-hidden="true"><i></i></div>
+  <div id="loading3d" role="status">Opening the shop…</div>
+</div>
 
 <dialog id="item" aria-labelledby="item-name"><div id="item-body"></div></dialog>
 
@@ -276,7 +312,7 @@ function openItem(it) {
       facts,
       it.description ? el('p', { className: 'desc', textContent: it.description }) : '',
       it.sold ? el('p', { className: 'note warn', textContent: 'This item has been sold.' }) : el('p', { className: 'note', textContent: 'One of a kind: only one available.' }),
-      el('div', { className: 'actions' }, add)));
+      el('div', { className: 'actions' }, add, hasWebGL && mode !== '3d' ? el('button', { type: 'button', textContent: '🚶 See it in the shop', onclick: () => { $('item').close(); setMode('3d', it); } }) : '')));
   show(0); $('item').showModal();
 }
 
@@ -286,7 +322,7 @@ function toggleBag(it) {
   if (it.sold) return;
   if (bag.has(it.id)) { bag.delete(it.id); toast('Removed from your bag'); }
   else { bag.add(it.id); toast(`Added ${it.name}`); const b = $('bag-btn'); b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump'); }
-  saveBag(); renderBag(); renderGrid();
+  saveBag(); renderBag(); renderGrid(); if (WORLD.api) WORLD.api.refresh(it);
 }
 const bagItems = () => items.filter(i => bag.has(i.id) && !i.sold);
 function renderBag() {
@@ -354,6 +390,321 @@ $('reset').onclick = () => { Object.assign(view, { q: '', cat: '', cond: '', hid
 $('item').addEventListener('click', e => { if (e.target === $('item')) $('item').close(); });
 $('checkout').addEventListener('click', e => { if (e.target === $('checkout')) $('checkout').close(); });
 
+// =====================================================================================
+// First-person 3D shop. The three.js library is the copy in vendor/, loaded only when the shopper opens the 3D view.
+// Items stand on shelves (and on back-to-back island shelves when there are many), grouped by category, each with a
+// price tag. Click or tap an item to open it; click the floor to walk there.
+// =====================================================================================
+const hasWebGL = (() => { try { const c = document.createElement('canvas'); return !!(c.getContext('webgl2') || c.getContext('webgl')); } catch (e) { return false; } })();
+const WORLD = { api: null, loading: null };
+function loadWorld() {
+  if (WORLD.api) return Promise.resolve(WORLD.api);
+  if (!WORLD.loading) WORLD.loading = import('./vendor/three.module.min.js').then(THREE => { WORLD.api = buildWorld(THREE); if (new URLSearchParams(location.search).has('debug')) window.__t3 = WORLD.api.debug; return WORLD.api; }).catch(e => { WORLD.loading = null; throw e; });
+  return WORLD.loading;
+}
+
+function buildWorld(THREE) {
+  const host = $('world'), canvas = $('view');
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+  const maxAniso = Math.min(4, renderer.capabilities.getMaxAnisotropy());
+  const scene = new THREE.Scene(); scene.background = new THREE.Color(0x2b2f33);
+  const camera = new THREE.PerspectiveCamera(68, 1, 0.05, 60); camera.rotation.order = 'YXZ';
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const EYE = 1.6, RADIUS = 0.32, WALL_H = 3.5, SLOT = 0.62, DEPTH = 0.4, TIERS = [0.28, 0.9, 1.52], UNIT_H = 2.2, CARD = 0.5;
+  let dirty = 3; const redraw = () => { dirty = Math.max(dirty, 2); };
+
+  // ----- 1. How big a room, and where the shelves go -----
+  const list = items.slice().sort((a, b) => (categories.indexOf(a.category) - categories.indexOf(b.category)) || String(b.added || '').localeCompare(String(a.added || '')) || a.name.localeCompare(b.name));
+  const N = list.length, perUnit = len => Math.max(0, Math.floor((len - 0.1) / SLOT)) * TIERS.length;
+  function plan(W, D) {
+    const units = [], wallLen = D - 3.8;
+    units.push({ x: 0, z: -D / 2 + 0.2, rotY: 0, len: W - 1.0, kind: 'wall' });
+    units.push({ x: -W / 2 + 0.2, z: -1.3, rotY: Math.PI / 2, len: wallLen, kind: 'wall' });
+    units.push({ x: W / 2 - 0.2, z: -1.3, rotY: -Math.PI / 2, len: wallLen, kind: 'wall' });
+    const inner = W - 0.8, c = Math.max(0, Math.floor((inner - 1.7) / 2.6)), L = D - 5.5, gap = (inner - c * 0.8) / (c + 1);
+    for (let i = 0; i < c; i++) {
+      const xi = -W / 2 + 0.4 + gap * (i + 1) + 0.8 * i + 0.4;
+      units.push({ x: xi - 0.2, z: -0.65, rotY: -Math.PI / 2, len: L, kind: 'island' }, { x: xi + 0.2, z: -0.65, rotY: Math.PI / 2, len: L, kind: 'island' });
+    }
+    return { W, D, units, cap: units.reduce((t, u) => t + perUnit(u.len), 0) };
+  }
+  const tries = []; for (let D = 6.8; D <= 44; D += 1.2) for (let W = 5.6; W <= 32; W += 1.6) tries.push([W, D]);
+  tries.sort((a, b) => a[0] * a[1] - b[0] * b[1] || Math.abs(a[0] - a[1]) - Math.abs(b[0] - b[1]));
+  let layout = null; for (const [W, D] of tries) { const p = plan(W, D); if (p.cap >= Math.ceil(N * 1.3)) { layout = p; break; } }   // a little spare room, so adding items later does not cram the shelves
+  if (!layout) layout = plan(32, 44);
+  // Hand the items out shelf by shelf (walls first, then islands). Shelves with nothing on them are not built, and a shelf that
+  // is only partly filled has its items centred.
+  const { W, D } = layout, HW = W / 2, HD = D / 2; let left = N;
+  layout.units.forEach(u => { u.cols = Math.floor((u.len - 0.1) / SLOT); u.n = Math.min(left, u.cols * TIERS.length); left -= u.n; const used = Math.ceil(u.n / TIERS.length); u.shift = 0; if (u.n > 0 && u.n < u.cols * TIERS.length) { u.len = Math.max(1.3, used * SLOT + 0.3); u.cols = Math.floor((u.len - 0.1) / SLOT); } });
+  const units = layout.units.filter((u, i) => u.n > 0 || i === 0);   // the back wall always has its shelves
+
+  // ----- 2. Pictures drawn on canvases (photos, tags, signs) -----
+  const tex = c => { const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = maxAniso; return t; };
+  const cnv = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+  const rr = (g, x, y, w, h, r) => { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); };
+  const fit1 = (g, text, maxW, size, weight = '700') => { let px = size; g.font = `${weight} ${px}px system-ui, sans-serif`; while (g.measureText(text).width > maxW && px > 9) { px -= 1; g.font = `${weight} ${px}px system-ui, sans-serif`; } return px; };
+  function drawPhoto(e) {
+    const it = e.it, g = e.photoCv.getContext('2d'), w = 256, h = 256;
+    g.fillStyle = TINT[it.category] || TINT.Other; g.fillRect(0, 0, w, h);
+    if (e.img) { const k = Math.max(w / e.img.naturalWidth, h / e.img.naturalHeight), iw = e.img.naturalWidth * k, ih = e.img.naturalHeight * k; g.drawImage(e.img, (w - iw) / 2, (h - ih) / 2, iw, ih); }
+    else { g.font = '120px system-ui, "Apple Color Emoji", "Segoe UI Emoji", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(GLYPH[it.category] || GLYPH.Other, w / 2, h / 2 + 8); }
+    if (it.sold) { g.fillStyle = 'rgba(20,26,30,.55)'; g.fillRect(0, 0, w, h); g.save(); g.translate(w / 2, h / 2); g.rotate(-0.5); g.fillStyle = '#b3261e'; g.fillRect(-w, -26, w * 2, 52); g.fillStyle = '#fff'; g.font = '800 40px system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('SOLD', 0, 2); g.restore(); }
+    else if (bag.has(it.id)) { g.fillStyle = '#228174'; rr(g, 8, 8, 92, 34, 17); g.fill(); g.fillStyle = '#fff'; g.font = '700 20px system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('In bag', 54, 26); }
+    e.photoTex.needsUpdate = true;
+  }
+  function drawTag(e) {
+    const it = e.it, g = e.tagCv.getContext('2d'), w = 320, h = 60;
+    g.fillStyle = '#fffdf6'; g.fillRect(0, 0, w, h); g.fillStyle = it.sold ? '#8a9399' : '#228174'; g.fillRect(0, 0, 8, h);
+    g.textBaseline = 'middle'; g.textAlign = 'left';
+    g.fillStyle = it.sold ? '#6d777c' : '#b3261e'; g.font = '800 30px system-ui, sans-serif';
+    const price = it.sold ? 'SOLD' : money(it.price); g.fillText(price, 18, h / 2 + 2);
+    const px = 22 + g.measureText(price).width; g.fillStyle = '#1d2327'; const size = fit1(g, it.name, w - px - 10, 21, '650'); g.font = `650 ${size}px system-ui, sans-serif`; g.fillText(it.name, px, h / 2 + 2);
+    e.tagTex.needsUpdate = true;
+  }
+  function signTexture(text, color, w = 512, h = 130) {
+    const c = cnv(w, h), g = c.getContext('2d'); g.fillStyle = color; rr(g, 4, 4, w - 8, h - 8, 22); g.fill(); g.strokeStyle = 'rgba(255,255,255,.55)'; g.lineWidth = 4; rr(g, 12, 12, w - 24, h - 24, 16); g.stroke();
+    g.fillStyle = '#fff'; g.textAlign = 'center'; g.textBaseline = 'middle'; const px = fit1(g, text, w - 60, 64, '800'); g.font = `800 ${px}px system-ui, sans-serif`; g.fillText(text, w / 2, h / 2 + 3); return tex(c);
+  }
+
+  // ----- 3. The room -----
+  const mat = (color, o = {}) => new THREE.MeshStandardMaterial({ color, roughness: 0.85, ...o });
+  const wood = mat(0xb98d5a, { roughness: 0.7 }), woodDark = mat(0x8d6a40, { roughness: 0.75 }), back = mat(0xf0e4cc), wallMat = mat(0xefe3cb), trimMat = mat(0x228174), skirt = mat(0x5b4631);
+  const solids = [], pickables = [], obstacles = [];
+  const box = (w, h, d, m, x, y, z, parent = scene, solid = true) => { const o = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); o.position.set(x, y, z); parent.add(o); if (solid) solids.push(o); return o; };
+  const plane = (w, h, m, parent, x, y, z) => { const o = new THREE.Mesh(new THREE.PlaneGeometry(w, h), m); o.position.set(x, y, z); parent.add(o); return o; };
+  { // floor with planks
+    const c = cnv(512, 512), g = c.getContext('2d'); const cols = ['#b78a5b', '#a97c4f', '#c19564', '#b08358', '#bb8f5f'];
+    for (let i = 0; i < 8; i++) { g.fillStyle = cols[i % cols.length]; g.fillRect(0, i * 64, 512, 64); for (let j = 0; j < 3; j++) { g.fillStyle = 'rgba(0,0,0,.06)'; g.fillRect(((i * 97 + j * 173) % 512), i * 64, 2, 64); } g.fillStyle = 'rgba(0,0,0,.18)'; g.fillRect(0, i * 64, 512, 2); }
+    const t = tex(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(W / 3, D / 3);
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(W, D), new THREE.MeshStandardMaterial({ map: t, roughness: 0.55 })); floor.rotation.x = -Math.PI / 2; floor.userData.floor = true; scene.add(floor); pickables.push(floor);
+    const ceil = new THREE.Mesh(new THREE.PlaneGeometry(W, D), new THREE.MeshBasicMaterial({ color: 0x4a4f54 })); ceil.rotation.x = Math.PI / 2; ceil.position.y = WALL_H; scene.add(ceil);
+  }
+  box(W, WALL_H, 0.2, wallMat, 0, WALL_H / 2, -HD - 0.1); box(0.2, WALL_H, D, wallMat, -HW - 0.1, WALL_H / 2, 0); box(0.2, WALL_H, D, wallMat, HW + 0.1, WALL_H / 2, 0); box(W, WALL_H, 0.2, wallMat, 0, WALL_H / 2, HD + 0.1);
+  [[0, -HD + 0.02, W, 0], [0, HD - 0.02, W, 0], [-HW + 0.02, 0, D, Math.PI / 2], [HW - 0.02, 0, D, Math.PI / 2]].forEach(([x, z, len, r]) => { const b = box(len, 0.14, 0.04, skirt, x, 0.07, z, scene, false); b.rotation.y = r; });
+  [[0, -HD + 0.02, W, 0], [0, HD - 0.02, W, 0], [-HW + 0.02, 0, D, Math.PI / 2], [HW - 0.02, 0, D, Math.PI / 2]].forEach(([x, z, len, r]) => { const b = box(len, 0.1, 0.03, trimMat, x, 1.05, z, scene, false); b.rotation.y = r; });   // a teal stripe round the room
+  // lights: warm and soft, with glowing ceiling panels
+  scene.add(new THREE.HemisphereLight(0xfff4e0, 0x7a6650, 1.05));
+  const panelMat = new THREE.MeshBasicMaterial({ color: 0xffe9b8 }), lights = [];
+  for (let x = -HW + 2.4; x < HW - 1; x += 3.6) for (let z = -HD + 2.4; z < HD - 1; z += 3.8) { box(1.3, 0.04, 0.5, panelMat, x, WALL_H - 0.03, z, scene, false); if (lights.length < 4) { const l = new THREE.PointLight(0xffd9a0, 8, 9, 2); l.position.set(x, WALL_H - 0.4, z); scene.add(l); lights.push(l); } }
+  { // bunting across the front half
+    const flags = 18, pos = [], col = [], pal = ['#e76f51', '#f4a261', '#e9c46a', '#2a9d8f', '#8ab17d', '#6d9dc5'].map(c => new THREE.Color(c)), zRow = [HD - 2.1, HD - 5.4].filter((z, i) => i === 0 || z > -HD + 4);
+    zRow.forEach(zr => { for (let i = 0; i < flags; i++) { const t = (i + 0.5) / flags, x = -HW + 0.4 + t * (W - 0.8), y = 3.0 - 0.28 * Math.sin(Math.PI * t), c = pal[(i + (zr > 0 ? 0 : 2)) % pal.length]; pos.push(x - 0.13, y, zr, x + 0.13, y, zr, x, y - 0.3, zr); for (let k = 0; k < 3; k++) col.push(c.r, c.g, c.b); } });
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+    scene.add(new THREE.Mesh(g, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.DoubleSide })));
+  }
+  { // shop name over the back wall, and the door to the snack shop on the right wall
+    const sg = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 0.8), new THREE.MeshBasicMaterial({ map: signTexture(shop.name || 'Pre-loved Corner', '#228174', 800, 200), transparent: true })); sg.position.set(0, 3.0, -HD + 0.05); scene.add(sg);
+    const door = new THREE.Group(); door.position.set(HW - 0.02, 0, HD - 1.7); door.rotation.y = -Math.PI / 2; scene.add(door);
+    const frame = box(1.2, 2.25, 0.08, woodDark, 0, 1.125, 0, door, false), panel = box(1.0, 2.1, 0.06, trimMat, 0, 1.05, 0.04, door, false); panel.userData.href = 'virtual-snack-shop.html'; frame.userData.href = panel.userData.href; pickables.push(panel, frame);
+    const knob = new THREE.Mesh(new THREE.SphereGeometry(0.05, 12, 8), mat(0xe9c46a, { metalness: 0.6, roughness: 0.3 })); knob.position.set(0.36, 1.0, 0.09); door.add(knob);
+    const ds = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 0.4), new THREE.MeshBasicMaterial({ map: signTexture('Snack shop next door →', '#b3261e', 640, 170), transparent: true })); ds.position.set(0, 2.55, 0.06); ds.userData.href = panel.userData.href; door.add(ds); pickables.push(ds);
+    const mat2 = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 0.7), new THREE.MeshStandardMaterial({ color: 0x3e4a4f, roughness: 1 })); mat2.rotation.x = -Math.PI / 2; mat2.position.set(0, 0.01, 0.45); door.add(mat2);
+  }
+
+  // ----- 4. Shelves, then one card per item -----
+  const slots = [];   // every place an item can go: { unit, group, x (local), y (board top), col }
+  units.forEach(u => {
+    const g = new THREE.Group(); g.position.set(u.x, 0, u.z); g.rotation.y = u.rotY; scene.add(g); u.group = g;
+    const L = u.len, cols = u.cols, x0 = -(cols * SLOT) / 2 + SLOT / 2; u.x0 = x0;
+    box(L, UNIT_H, 0.03, back, 0, UNIT_H / 2, -DEPTH / 2 + 0.015, g);
+    [-1, 1].forEach(s => box(0.05, UNIT_H, DEPTH, woodDark, s * (L / 2 - 0.025), UNIT_H / 2, 0, g));
+    TIERS.forEach(y => box(L, 0.04, DEPTH, wood, 0, y - 0.02, 0, g));
+    box(L, 0.05, DEPTH + 0.04, woodDark, 0, UNIT_H, 0, g);
+    box(L, 0.12, 0.02, woodDark, 0, 0.06, DEPTH / 2, g, false);
+    // The shelf as a solid for walking into (axis-aligned, since turns are quarter turns).
+    const half = Math.abs(Math.sin(u.rotY)) > 0.5 ? [DEPTH / 2, L / 2] : [L / 2, DEPTH / 2];
+    obstacles.push({ minX: u.x - half[0], maxX: u.x + half[0], minZ: u.z - half[1], maxZ: u.z + half[1] });
+    for (let c = 0, k = 0; k < u.n; c++) for (let t = TIERS.length - 1; t >= 0 && k < u.n; t--, k++) slots.push({ u, x: x0 + (u.shift + c) * SLOT, y: TIERS[t], col: c });
+  });
+  const cardGeo = new THREE.BoxGeometry(CARD + 0.04, CARD + 0.04, 0.025), photoGeo = new THREE.PlaneGeometry(CARD, CARD), tagGeo = new THREE.PlaneGeometry(0.54, 0.1), frameMat = mat(0xffffff, { roughness: 0.5 });
+  const cards = []; let lastCat = null;
+  list.forEach((it, i) => {
+    const sl = slots[i]; if (!sl) return;
+    const e = { it, slot: sl, img: null, requested: false, photoCv: cnv(256, 256), tagCv: cnv(320, 60) };
+    e.photoTex = tex(e.photoCv); e.tagTex = tex(e.tagCv); drawPhoto(e); drawTag(e);
+    const grp = new THREE.Group(); grp.position.set(sl.x, sl.y, -0.02); grp.rotation.x = -0.1; sl.u.group.add(grp);
+    const frame = new THREE.Mesh(cardGeo, frameMat); frame.position.set(0, (CARD + 0.04) / 2, 0); grp.add(frame);
+    const photo = new THREE.Mesh(photoGeo, new THREE.MeshBasicMaterial({ map: e.photoTex })); photo.position.set(0, (CARD + 0.04) / 2, 0.014); grp.add(photo);
+    const tag = new THREE.Mesh(tagGeo, new THREE.MeshBasicMaterial({ map: e.tagTex })); tag.position.set(sl.x, sl.y - 0.075, DEPTH / 2 + 0.012); sl.u.group.add(tag);
+    [frame, photo, tag].forEach(m => { m.userData.item = it; pickables.push(m); }); e.grp = grp; e.frame = frame; it._cardEntry = e; cards.push(e);
+  });
+  { // One sign per category on each shelf unit it appears in, as wide as the columns it covers.
+    const spans = new Map(); cards.forEach(e => { const key = units.indexOf(e.slot.u) + '|' + e.it.category, sp = spans.get(key) || { u: e.slot.u, cat: e.it.category, c0: 99999, c1: -1 }; sp.c0 = Math.min(sp.c0, e.slot.col); sp.c1 = Math.max(sp.c1, e.slot.col); spans.set(key, sp); });
+    const byUnit = new Map(); spans.forEach(sp => { const l = byUnit.get(sp.u) || []; l.push(sp); byUnit.set(sp.u, l); });
+    byUnit.forEach(l => { l.sort((x, y) => x.c0 - y.c0); for (let i = 1; i < l.length; i++) { const p = l[i - 1], n = l[i]; if (n.c0 <= p.c1) { if (p.c1 > p.c0) p.c1 = n.c0 - 1; else if (n.c1 > n.c0) n.c0 = p.c1 + 1; } } });   // categories sharing a column: trim so their signs do not overlap
+    spans.forEach(sp => { const w = clamp((sp.c1 - sp.c0 + 1) * SLOT - 0.08, 0.6, 2.4), cx = sp.u.x0 + (sp.u.shift + (sp.c0 + sp.c1) / 2) * SLOT; const sg = new THREE.Mesh(new THREE.PlaneGeometry(w, 0.26), new THREE.MeshBasicMaterial({ map: signTexture(sp.cat || 'Other', '#228174', Math.round(w * 400), 104), transparent: true })); sg.position.set(cx, UNIT_H + 0.22, 0.05); sp.u.group.add(sg); });
+  }
+  scene.updateMatrixWorld(true);
+  const hi = new THREE.Mesh(new THREE.BoxGeometry(CARD + 0.1, CARD + 0.1, 0.02), new THREE.MeshBasicMaterial({ color: 0x2ec4a9 })); hi.matrixAutoUpdate = false; hi.visible = false; scene.add(hi);
+
+  // ----- 5. Where you can walk: a grid of free squares, and a route through them -----
+  const CELL = 0.25, GX = Math.round(W / CELL), GZ = Math.round(D / CELL), cellX = i => -HW + (i + 0.5) * CELL, cellZ = j => -HD + (j + 0.5) * CELL;
+  const blocked = (x, z, pad) => obstacles.some(o => x > o.minX - pad && x < o.maxX + pad && z > o.minZ - pad && z < o.maxZ + pad);
+  const free = new Uint8Array(GX * GZ);
+  for (let j = 0; j < GZ; j++) for (let i = 0; i < GX; i++) { const x = cellX(i), z = cellZ(j); free[j * GX + i] = Math.abs(x) <= HW - 0.45 && Math.abs(z) <= HD - 0.45 && !blocked(x, z, 0.45) ? 1 : 0; }
+  const cellOf = (x, z) => clamp(Math.floor((z + HD) / CELL), 0, GZ - 1) * GX + clamp(Math.floor((x + HW) / CELL), 0, GX - 1);
+  const isFree = (x, z) => Math.abs(x) < HW && Math.abs(z) < HD && free[cellOf(x, z)] === 1;
+  function nearestFree(x, z) { if (isFree(x, z)) return { x, z }; let best = -1, bd = 1e9; for (let c = 0; c < free.length; c++) if (free[c]) { const d = (cellX(c % GX) - x) ** 2 + (cellZ(Math.floor(c / GX)) - z) ** 2; if (d < bd) { bd = d; best = c; } } return best < 0 ? { x, z } : { x: cellX(best % GX), z: cellZ(Math.floor(best / GX)) }; }
+  function clearLine(a, b) { const n = Math.ceil(Math.hypot(b.x - a.x, b.z - a.z) / 0.1); for (let i = 1; i < n; i++) if (!isFree(a.x + (b.x - a.x) * i / n, a.z + (b.z - a.z) * i / n)) return false; return true; }
+  function findPath(from, to) {
+    const a = nearestFree(from.x, from.z), b = nearestFree(to.x, to.z), start = cellOf(a.x, a.z), goal = cellOf(b.x, b.z);
+    const prev = new Int32Array(GX * GZ).fill(-1), q = new Int32Array(GX * GZ); let h = 0, t = 0; q[t++] = start; prev[start] = start;
+    while (h < t && prev[goal] < 0) { const c = q[h++], ci = c % GX; for (const n of [c - GX, c + GX, ci > 0 ? c - 1 : -1, ci < GX - 1 ? c + 1 : -1]) if (n >= 0 && n < free.length && free[n] && prev[n] < 0) { prev[n] = c; q[t++] = n; } }
+    if (prev[goal] < 0) return [b];
+    const cells = [b]; for (let c = goal; c !== start; c = prev[c]) cells.push({ x: cellX(c % GX), z: cellZ(Math.floor(c / GX)) }); cells.push(a); cells.reverse();
+    const path = []; let i = 0; while (i < cells.length - 1) { let j = cells.length - 1; while (j > i + 1 && !clearLine(cells[i], cells[j])) j--; path.push(cells[j]); i = j; } return path;
+  }
+
+  // ----- 6. Moving and looking -----
+  const pos = camera.position, START = { x: 0, z: HD - 1.3 };
+  for (const dx of [0, 0.5, -0.5, 1, -1, 1.5, -1.5, 2, -2, 2.5, -2.5, 3, -3]) if (isFree(dx, START.z) && clearLine({ x: dx, z: START.z }, { x: dx, z: START.z - 3.6 })) { START.x = dx; break; }   // start in an aisle with a clear view ahead
+  pos.set(START.x, EYE, START.z);
+  let yaw = 0, pitch = -0.03, nav = null, walked = 0; const keys = {}, vel = { x: 0, z: 0 }, joy = { x: 0, y: 0, id: null };
+  const marker = new THREE.Mesh(new THREE.RingGeometry(0.16, 0.22, 28), new THREE.MeshBasicMaterial({ color: 0x2ec4a9, transparent: true, opacity: 0.9, depthWrite: false })); marker.rotation.x = -Math.PI / 2; marker.position.y = 0.02; marker.visible = false; scene.add(marker);
+  const turnTo = (from, to, k) => from + Math.atan2(Math.sin(to - from), Math.cos(to - from)) * k;
+  function lookAtFrom(spot, tx, ty, tz) { const dx = tx - spot.x, dz = tz - spot.z; return { yaw: Math.atan2(-dx, -dz), pitch: clamp(Math.atan2(ty - EYE, Math.hypot(dx, dz)), -0.8, 0.6) }; }
+  function walkTo(target, look = null) {
+    const end = nearestFree(target.x, target.z);
+    if (reduceMotion) { pos.x = end.x; pos.z = end.z; if (look) { yaw = look.yaw; pitch = look.pitch; } nav = null; marker.visible = false; redraw(); return; }
+    nav = { path: findPath(pos, end), i: 0, look, settle: 0 }; marker.position.set(end.x, 0.02, end.z); marker.visible = !look; redraw();
+  }
+  const stopNav = () => { nav = null; if (marker.visible) { marker.visible = false; redraw(); } };
+  function walkToItem(it) {
+    const e = it._cardEntry; if (!e) return; const u = e.slot.u, n = { x: Math.sin(u.rotY), z: Math.cos(u.rotY) };
+    const w = new THREE.Vector3(); e.grp.getWorldPosition(w); const spot = nearestFree(w.x + n.x * 1.9, w.z + n.z * 1.9);
+    walkTo(spot, lookAtFrom(spot, w.x, w.y + 0.3, w.z));
+  }
+  function slide(dx, dz) {   // move, but not into a shelf: try each direction on its own so you slide along it
+    const hit = (x, z) => Math.abs(x) > HW - RADIUS || Math.abs(z) > HD - RADIUS || blocked(x, z, RADIUS);
+    if (!hit(pos.x + dx, pos.z)) pos.x += dx; if (!hit(pos.x, pos.z + dz)) pos.z += dz;
+  }
+  window.addEventListener('keydown', e => {
+    if ($('world').hidden || e.ctrlKey || e.metaKey || e.altKey || document.querySelector('dialog[open]') || $('bag').classList.contains('open')) return;
+    const t = e.target; if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+    const k = e.key.toLowerCase(); keys[k] = true; if (k.startsWith('arrow')) e.preventDefault(); if ('wasdqe'.includes(k) || k.startsWith('arrow')) redraw();
+  });
+  window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+  window.addEventListener('blur', () => { for (const k in keys) keys[k] = false; });
+  { // touch walk pad
+    const el = $('joy'), knob = el.firstElementChild, move = e => { const r = el.getBoundingClientRect(), R = r.width / 2; let x = (e.clientX - r.left - R) / R, y = (e.clientY - r.top - R) / R; const m = Math.hypot(x, y); if (m > 1) { x /= m; y /= m; } joy.x = Math.abs(x) < 0.12 ? 0 : x; joy.y = Math.abs(y) < 0.12 ? 0 : y; knob.style.transform = `translate(${x * R * 0.6}px, ${y * R * 0.6}px)`; redraw(); };
+    el.addEventListener('pointerdown', e => { joy.id = e.pointerId; el.setPointerCapture(e.pointerId); stopNav(); move(e); });
+    el.addEventListener('pointermove', e => { if (e.pointerId === joy.id) move(e); });
+    const end = e => { if (e.pointerId !== joy.id) return; joy.id = null; joy.x = joy.y = 0; knob.style.transform = ''; }; el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
+  }
+
+  // ----- 7. Looking around with the mouse or a finger, hovering and picking -----
+  const ray = new THREE.Raycaster(), tip = $('tip');
+  function pick(cx, cy) {
+    const r = canvas.getBoundingClientRect(); ray.setFromCamera(new THREE.Vector2(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1), camera);
+    const hit = ray.intersectObjects(pickables.concat(solids), false)[0]; if (!hit || hit.distance > 16) return null; const d = hit.object.userData;
+    return { item: d.item, href: d.href, floor: d.floor, point: hit.point };
+  }
+  let look = null, lx = 0, ly = 0, dist = 0;
+  canvas.addEventListener('pointerdown', e => { if (look !== null) return; look = e.pointerId; dist = 0; lx = e.clientX; ly = e.clientY; canvas.setPointerCapture(e.pointerId); canvas.classList.add('dragging'); tip.hidden = true; });
+  canvas.addEventListener('pointermove', e => {
+    if (look === null) { if (e.pointerType === 'mouse') hover(e.clientX, e.clientY); return; }
+    if (e.pointerId !== look) return; const dx = e.clientX - lx, dy = e.clientY - ly; dist += Math.abs(dx) + Math.abs(dy); lx = e.clientX; ly = e.clientY;
+    if (dist > 6) { yaw -= dx * 0.0052; pitch = clamp(pitch - dy * 0.0042, -1.1, 1.1); if (nav) nav.look = null; redraw(); }
+  });
+  const endLook = e => { if (e.pointerId !== look) return; look = null; canvas.classList.remove('dragging'); if (e.type === 'pointerup' && dist <= 6) activate(pick(e.clientX, e.clientY)); };
+  canvas.addEventListener('pointerup', endLook); canvas.addEventListener('pointercancel', endLook);
+  canvas.addEventListener('pointerleave', () => { tip.hidden = true; if (hi.visible) { hi.visible = false; redraw(); } });
+  function activate(p) {
+    if (!p) return;
+    if (p.href) { location.href = p.href; return; }
+    if (p.item) { openItem(p.item); return; }
+    if (p.floor) walkTo({ x: p.point.x, z: p.point.z });
+  }
+  function hover(cx, cy) {
+    const p = pick(cx, cy), it = p && p.item;
+    if (it) { const e = it._cardEntry; hi.matrix.copy(e.frame.matrixWorld); hi.visible = true; tip.textContent = `${it.name} · ${it.sold ? 'Sold' : money(it.price)}`; const r = host.getBoundingClientRect(); tip.style.left = clamp(cx - r.left + 14, 4, r.width - 270) + 'px'; tip.style.top = (cy - r.top + 18) + 'px'; tip.hidden = false; canvas.style.cursor = 'pointer'; }
+    else { hi.visible = false; tip.hidden = true; canvas.style.cursor = p && (p.href) ? 'pointer' : ''; }
+    redraw();
+  }
+
+  // ----- 8. The little map -----
+  const map = $('map'), mctx = map.getContext('2d');
+  const MW = innerWidth <= 520 ? 92 : 150, MS = MW / W, MH = Math.round(D * MS); map.width = MW; map.height = MH; map.style.width = MW + 'px'; map.style.height = MH + 'px';
+  const mx = x => (x + HW) * MS, mz = z => (z + HD) * MS;
+  function drawMap() {
+    mctx.fillStyle = '#f3efe6'; mctx.fillRect(0, 0, MW, MH); mctx.fillStyle = '#a98b63';
+    obstacles.forEach(o => mctx.fillRect(mx(o.minX), mz(o.minZ), Math.max(2, (o.maxX - o.minX) * MS), Math.max(2, (o.maxZ - o.minZ) * MS)));
+    mctx.fillStyle = '#b3261e'; mctx.fillRect(MW - 3, mz(HD - 2.3), 3, 1.2 * MS); mctx.fillStyle = '#228174'; mctx.fillRect(mx(-0.8), MH - 3, 1.6 * MS, 3);
+    if (nav && marker.visible) { mctx.strokeStyle = '#228174'; mctx.lineWidth = 1.5; mctx.setLineDash([3, 3]); mctx.beginPath(); mctx.moveTo(mx(pos.x), mz(pos.z)); for (let i = nav.i; i < nav.path.length; i++) mctx.lineTo(mx(nav.path[i].x), mz(nav.path[i].z)); mctx.stroke(); mctx.setLineDash([]); }
+    mctx.save(); mctx.translate(mx(pos.x), mz(pos.z)); mctx.rotate(-yaw); mctx.fillStyle = '#1c2428'; mctx.strokeStyle = '#fff'; mctx.lineWidth = 1.5; mctx.beginPath(); mctx.moveTo(0, -6); mctx.lineTo(4.5, 5); mctx.lineTo(0, 2.5); mctx.lineTo(-4.5, 5); mctx.closePath(); mctx.fill(); mctx.stroke(); mctx.restore();
+  }
+  map.addEventListener('pointerdown', e => { const r = map.getBoundingClientRect(); walkTo({ x: (e.clientX - r.left) / r.width * W - HW, z: (e.clientY - r.top) / r.height * D - HD }); });
+  $('map-door').onclick = () => walkTo(START, { yaw: 0, pitch: -0.03 });
+
+  // ----- 9. The frame loop -----
+  let raf = 0, last = 0, photoClock = 0, active = false;
+  function loadPhotos() {   // only photos that are near you get downloaded
+    cards.forEach(e => {
+      if (e.requested || !(e.it.photos || [])[0]) return; const w = new THREE.Vector3(); e.grp.getWorldPosition(w);
+      if (Math.hypot(w.x - pos.x, w.z - pos.z) > 8) return; e.requested = true;
+      const img = new Image(); img.onload = () => { e.img = img; drawPhoto(e); redraw(); }; img.onerror = () => {}; img.src = e.it.photos[0];
+    });
+  }
+  function resize() { const w = host.clientWidth || 1, h = host.clientHeight || 1; renderer.setSize(w, h, false); camera.aspect = w / h; camera.fov = w < h ? 82 : 68; camera.updateProjectionMatrix(); redraw(); }
+  window.addEventListener('resize', () => { if (active) resize(); });
+  function frame(now) {
+    if (!active) return; raf = requestAnimationFrame(frame);
+    const dt = Math.min((now - (last || now)) / 1000, 0.05); last = now;
+    const turn = (keys['arrowleft'] || keys['q'] ? 1 : 0) - (keys['arrowright'] || keys['e'] ? 1 : 0);
+    const f = clamp((keys['w'] || keys['arrowup'] ? 1 : 0) - (keys['s'] || keys['arrowdown'] ? 1 : 0) - joy.y, -1, 1), r = clamp((keys['d'] ? 1 : 0) - (keys['a'] ? 1 : 0) + joy.x, -1, 1);
+    if (turn) { yaw += turn * 2 * dt; if (nav) nav.look = null; dirty = Math.max(dirty, 1); }
+    if ((f || r) && nav) stopNav();
+    let moving = false;
+    if (nav) {
+      moving = true; const t = nav.path[nav.i];
+      if (t) {
+        const dx = t.x - pos.x, dz = t.z - pos.z, d = Math.hypot(dx, dz); let rest = d; for (let i = nav.i; i < nav.path.length - 1; i++) rest += Math.hypot(nav.path[i + 1].x - nav.path[i].x, nav.path[i + 1].z - nav.path[i].z);
+        const step = Math.min(5.5, 1.2 + rest * 2.6) * dt; if (step >= d) { pos.x = t.x; pos.z = t.z; nav.i++; } else { pos.x += dx / d * step; pos.z += dz / d * step; walked += step; }
+        const facing = nav.look && rest < 1.8; if (facing || d > 0.05) yaw = turnTo(yaw, facing ? nav.look.yaw : Math.atan2(-dx, -dz), 1 - Math.exp(-dt * (facing ? 7 : 5))); pitch += ((facing ? nav.look.pitch : -0.03) - pitch) * (1 - Math.exp(-dt * 5));
+      } else { nav.settle += dt; if (nav.look) { yaw = turnTo(yaw, nav.look.yaw, 1 - Math.exp(-dt * 9)); pitch += (nav.look.pitch - pitch) * (1 - Math.exp(-dt * 9)); } if (!nav.look || nav.settle > 0.7) stopNav(); }
+    } else {
+      const speed = keys['shift'] ? 5 : 3, len = Math.max(1, Math.hypot(f, r)), ease = 1 - Math.exp(-dt * 12);
+      const tx = (-Math.sin(yaw) * f + Math.cos(yaw) * r) / len * speed, tz = (-Math.cos(yaw) * f - Math.sin(yaw) * r) / len * speed;
+      vel.x += (tx - vel.x) * ease; vel.z += (tz - vel.z) * ease;
+      if (Math.abs(vel.x) + Math.abs(vel.z) > 0.01) { slide(vel.x * dt, vel.z * dt); walked += Math.hypot(vel.x, vel.z) * dt; moving = true; } else vel.x = vel.z = 0;
+    }
+    if (moving) dirty = Math.max(dirty, 1);
+    if ((photoClock += dt) > 0.4) { photoClock = 0; loadPhotos(); }
+    if (dirty > 0) { dirty--; pos.y = EYE + (reduceMotion ? 0 : Math.sin(walked * 3.4) * 0.02); camera.rotation.y = yaw; camera.rotation.x = pitch; renderer.render(scene, camera); drawMap(); }
+  }
+  const api = {
+    start() { active = true; host.hidden = false; resize(); last = 0; dirty = 3; loadPhotos(); cancelAnimationFrame(raf); raf = requestAnimationFrame(frame); $('loading3d').classList.add('done'); canvas.focus({ preventScroll: true }); },
+    stop() { active = false; cancelAnimationFrame(raf); host.hidden = true; for (const k in keys) keys[k] = false; },
+    walkToItem, refresh(it) { const e = it._cardEntry; if (e) { drawPhoto(e); drawTag(e); redraw(); } },
+    focus() { canvas.focus({ preventScroll: true }); },
+    debug: { renderer, scene, camera, pos, findPath, isFree, nearestFree, W, D, slots: slots.length, cards, units, walkTo, pick, get yaw() { return yaw; }, set yaw(v) { yaw = v; redraw(); }, set pitch(v) { pitch = v; redraw(); }, redraw },
+  };
+  return api;
+}
+
+// --- Switching between the 3D shop and the list ---
+const VIEW_KEY = 'pre-loved-corner-view';
+let mode = 'list';
+function labelView() { const b = $('view-btn'); b.hidden = !hasWebGL; b.textContent = ''; b.append(el('span', { textContent: mode === '3d' ? '☰' : '🚶' }), el('span', { className: 'vt', textContent: mode === '3d' ? ' List' : ' Walk around' })); b.setAttribute('aria-pressed', String(mode === '3d')); b.setAttribute('aria-label', mode === '3d' ? 'Switch to the list view' : 'Walk around the shop in 3D'); }
+async function setMode(m, focusItem) {
+  if (m === '3d') {
+    if (!hasWebGL) { toast('3D is not available on this device. Showing the list.'); return; }
+    $('view-btn').disabled = true; $('loading3d').classList.remove('done'); document.body.classList.add('mode-3d'); $('world').hidden = false;
+    try { const api = await loadWorld(); mode = '3d'; api.start(); if (focusItem) api.walkToItem(focusItem); if (!store.get('pre-loved-corner-hint')) $('hint').hidden = false; }
+    catch (e) { console.warn(e); document.body.classList.remove('mode-3d'); $('world').hidden = true; mode = 'list'; toast('The 3D shop could not start. Showing the list.'); }
+    $('view-btn').disabled = false;
+  } else { if (WORLD.api) WORLD.api.stop(); document.body.classList.remove('mode-3d'); $('world').hidden = true; mode = 'list'; }
+  store.set(VIEW_KEY, mode); labelView();
+  const u = new URL(location.href); if (mode === 'list') u.searchParams.set('view', 'list'); else u.searchParams.delete('view'); history.replaceState(null, '', u);
+}
+$('view-btn').onclick = () => setMode(mode === '3d' ? 'list' : '3d');
+$('hint-x').onclick = () => { $('hint').hidden = true; store.set('pre-loved-corner-hint', 1); };
+const setBarHeight = () => document.documentElement.style.setProperty('--bar-h', document.querySelector('header.bar').offsetHeight + 'px');
+window.addEventListener('resize', setBarHeight); setBarHeight();
+$('item').addEventListener('close', () => { if (mode === '3d' && WORLD.api) WORLD.api.focus(); });
+
 (async function start() {
   try {
     const res = await fetch('thrift.json', { cache: 'no-cache' }); if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -371,7 +722,11 @@ $('checkout').addEventListener('click', e => { if (e.target === $('checkout')) $
   CONDITIONS.forEach(c => { if (items.some(i => i.condition === c)) $('cond').append(el('option', { value: c, textContent: c })); });
   const saved = store.get(BAG_KEY); if (Array.isArray(saved)) saved.forEach(id => { const it = items.find(i => i.id === id); if (it && !it.sold) bag.add(id); }); saveBag();
   renderChips(); renderGrid(); renderBag();
-  const want = new URLSearchParams(location.search).get('item'); const it = want && items.find(i => i.id === want); if (it) openItem(it);
+  labelView();
+  const qs = new URLSearchParams(location.search), want = qs.get('item'), it = want && items.find(i => i.id === want);
+  const pref = qs.get('view') || (store.get(VIEW_KEY) === 'list' ? 'list' : '3d');
+  if (hasWebGL && pref !== 'list') await setMode('3d', null);
+  if (it) openItem(it);
 })();
 </script>
 </body>
