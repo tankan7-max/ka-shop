@@ -29,8 +29,13 @@ It is one web page (`virtual-snack-shop.html`) plus one product list
 
 ## The thrift shop
 
-`thrift.html` is a simple, quick catalogue for your second-hand goods. Shoppers search, filter by category or condition,
-sort, open an item for its photos and details, add it to their bag and send the order to your WhatsApp. The snack shop's Help
+`thrift.html` is a first-person 3D shop for your second-hand goods. Shoppers walk in (W A S D or arrow keys, drag to look, click
+the floor to walk there, or the round pad on a phone), see items standing on shelves with price tags, click one to read about
+it, add it to their bag and send the order to your WhatsApp. The room builds itself to fit however many items you list (walls
+first, then island shelves), items are grouped by category with signs, and sold items show a red SOLD banner. There is a
+door to the snack shop on the right-hand wall, and a **List** button switches to a quick searchable list with filters,
+sorting and a 'See it in the shop' button on every item. Devices without 3D get the list automatically; add `?view=list`
+to the address to open the list directly. The snack shop's Help
 window links to it, and it links back. Every item is one of a kind, so an item can only be in a bag once and sold items are
 shown as *Sold* and sink to the end.
 
@@ -59,7 +64,7 @@ shown as *Sold* and sink to the end.
 - When something sells, set `"sold": true` (do not delete it right away if you want shoppers to see it went). Delete the entry later to tidy up.
 - `shop` at the top sets the name, tagline, WhatsApp number, PayNow number and the collection note shown at checkout. `categories` sets the category buttons.
 
-The five items in `thrift.json` are **samples**; replace them before going live. Share a single item with `thrift.html?item=ITEM-ID`.
+The five items in `thrift.json` are **samples**; replace them before going live. Share a single item with `thrift.html?item=ITEM-ID`. Photos are only downloaded for shelves near the shopper, so a big shop stays quick; keep each photo around 1000 px wide.
 
 ## Checking the shop
 
