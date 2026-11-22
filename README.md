@@ -19,12 +19,47 @@ It is one web page (`virtual-snack-shop.html`) plus one product list
 | `products.html` | Product manager page (needs the Supabase database): add, edit, hide or delete products, upload pack photos and 3D models. |
 | `vendor/` | A copy of the 3D library (three.js 0.160, MIT licence, see `vendor/LICENSE-three.txt`) and its 3D-model loader, so the shop loads nothing from public CDNs and works offline. The page falls back to unpkg / jsDelivr only if this folder is missing. |
 | `tools/check-shop.mjs` | A walkability and speed check for the 3D shop (see *Checking the shop* below). |
+| `thrift.html`, `thrift.json` | The second-hand shop, *Pre-loved Corner*: a fast browse-and-order page for one-of-a-kind goods. The items and shop details are in `thrift.json`; photos go in `images/thrift/`. See *The thrift shop* below. |
 | `qrcode.js` | The QR code library used for the PayNow code at checkout (MIT licence, by Kazuhiko Arase). |
 | `ka.html` | Tan Kwan Ann's professional page: dark, with a spinning 3D ring, an interactive 3D protein structure and a print-to-PDF résumé (two pages from the browser's print dialog). |
 | `ka2.html` | The joke edition, 鲍鱼王 the Abalone King of the Multiverse: an abalone clicker game, royal decrees, a translated résumé and a universe roller. Links back to `ka.html`. |
 | `images/`, `Tan_Kwan_Ann_Resume.pdf` | Photos and the résumé download used by `ka.html` and `ka2.html`. `ka-og.jpg` and `ka2-og.jpg` are the pictures shown when each page's link is shared. |
 | `data/ka-8z5g.bin` | The backbone of PDB 8Z5G (11,024 amino acids, 52 chains) drawn in 3D by `ka.html`. Data from the Protein Data Bank (free to reuse, CC0). Rebuild it with `tools/make-structure.py`. |
 | `fonts/` | The page's fonts, hosted here so it loads nothing from other websites (open licence, see `fonts/LICENSES.txt`). |
+
+## The thrift shop
+
+`thrift.html` is a simple, quick catalogue for your second-hand goods. Shoppers search, filter by category or condition,
+sort, open an item for its photos and details, add it to their bag and send the order to your WhatsApp. The snack shop's Help
+window links to it, and it links back. Every item is one of a kind, so an item can only be in a bag once and sold items are
+shown as *Sold* and sink to the end.
+
+**Add or change items** by editing `thrift.json`. Each item looks like this:
+
+```json
+{
+  "id": "levis-jacket",
+  "name": "Levi's denim jacket",
+  "category": "Clothing",
+  "price": 25,
+  "was": 90,
+  "condition": "Good",
+  "size": "M",
+  "brand": "Levi's",
+  "added": "2026-12-01",
+  "description": "Light fade, no tears. Measures 58 cm long.",
+  "photos": ["images/thrift/levis-jacket-1.jpg", "images/thrift/levis-jacket-2.jpg"],
+  "sold": false
+}
+```
+
+- `id` must be unique (small letters, digits, dashes). `was` (the original price) is optional and shows a discount badge.
+- `condition` is `Like new`, `Good` or `Fair`. `size` and `brand` are optional. `added` (a date) decides "Newest first".
+- Put photos in `images/thrift/` (JPEG, around 1000 px wide is plenty) and list up to 8 in `photos`. With no photo, the shop shows a tidy coloured tile with an icon.
+- When something sells, set `"sold": true` (do not delete it right away if you want shoppers to see it went). Delete the entry later to tidy up.
+- `shop` at the top sets the name, tagline, WhatsApp number, PayNow number and the collection note shown at checkout. `categories` sets the category buttons.
+
+The five items in `thrift.json` are **samples**; replace them before going live. Share a single item with `thrift.html?item=ITEM-ID`.
 
 ## Checking the shop
 

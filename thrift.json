@@ -1,0 +1,72 @@
+{
+  "shop": {
+    "name": "Pre-loved Corner",
+    "tagline": "Second-hand finds, each one only once.",
+    "whatsapp": "6590896287",
+    "paynow": "+6590896287",
+    "currency": "S$",
+    "collection": "Meet-up or collection in Singapore, or delivery for a small fee. We will confirm on WhatsApp."
+  },
+  "categories": ["Clothing", "Electronics", "Books", "Home", "Toys & games", "Other"],
+  "items": [
+    {
+      "id": "sample-denim-jacket",
+      "name": "Denim jacket (sample item)",
+      "category": "Clothing",
+      "price": 18,
+      "was": 59,
+      "condition": "Good",
+      "size": "M",
+      "added": "2026-11-20",
+      "description": "This is a sample listing so you can see how the shop looks. Replace it with your own goods: edit thrift.json, then add photos under images/thrift/.",
+      "photos": [],
+      "sold": false
+    },
+    {
+      "id": "sample-wireless-earbuds",
+      "name": "Wireless earbuds (sample item)",
+      "category": "Electronics",
+      "price": 25,
+      "was": 89,
+      "condition": "Like new",
+      "added": "2026-11-19",
+      "description": "Sample listing. Tell buyers what works, what does not, and what is in the box.",
+      "photos": [],
+      "sold": false
+    },
+    {
+      "id": "sample-paperback-set",
+      "name": "Paperback novels, set of 5 (sample item)",
+      "category": "Books",
+      "price": 12,
+      "condition": "Fair",
+      "added": "2026-11-18",
+      "description": "Sample listing. Mention any wear, such as creased covers or yellowed pages.",
+      "photos": [],
+      "sold": false
+    },
+    {
+      "id": "sample-desk-lamp",
+      "name": "Desk lamp (sample item)",
+      "category": "Home",
+      "price": 9,
+      "was": 30,
+      "condition": "Good",
+      "added": "2026-11-17",
+      "description": "Sample listing.",
+      "photos": [],
+      "sold": false
+    },
+    {
+      "id": "sample-board-game",
+      "name": "Board game (sample item)",
+      "category": "Toys & games",
+      "price": 15,
+      "condition": "Like new",
+      "added": "2026-11-16",
+      "description": "Sample listing. This one is marked as sold, to show how sold items look. Set \"sold\": true on any item that has gone.",
+      "photos": [],
+      "sold": true
+    }
+  ]
+}
