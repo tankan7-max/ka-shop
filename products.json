@@ -31,7 +31,9 @@
         "description": "Mamee Monster noodle snack, chicken flavour pack photo",
         "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/mamee-chicken/front-mwn3mq2b.jpg",
         "source_url": "https://www.foodpanda.sg/groceries/product/0KA9B1/mamee-monster-noodle-snack--chicken-10s-x-25g",
-        "type": "image"
+        "type": "image",
+        "fit": "cover",
+        "scale": 1.1
       },
       "category": "Local & Asian snacks"
     },
@@ -56,7 +58,9 @@
         "description": "Mamee Monster noodle snack, BBQ flavour pack photo",
         "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/mamee-bbq/front-mwn3qe7m.jpg",
         "source_url": "https://shopee.sg/Mamee-Monster-Noodle-Snack-Family-Pack-(8-x-25g)-i.15167456.25523013678",
-        "type": "image"
+        "type": "image",
+        "fit": "cover",
+        "scale": 1.15
       },
       "category": "Local & Asian snacks"
     },
@@ -79,9 +83,11 @@
       },
       "texture": {
         "description": "Meiji Hello Panda biscuits pack photo",
-        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/hello-panda/front-mwn3qryc.jpg",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/hello-panda/front-mwncxjvo.jpg",
         "source_url": "https://shopee.sg/Meiji-Hello-Panda-Biscuits-35g-pack-Chocolate-Milk-Strawberry-Biscuit-Assorted-Flavours-i.435361035.22368202347",
-        "type": "image"
+        "type": "image",
+        "fit": "cover",
+        "scale": 1.3
       },
       "category": "Biscuits & cookies"
     },
@@ -104,7 +110,7 @@
         "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/hello-panda-milk/front-mwnj0zaj.png",
         "type": "image",
         "fit": "cover",
-        "scale": 1.3
+        "scale": 2
       },
       "reference": {
         "note": "Shopee Singapore single 35g pack listed at SGD 1.30",
@@ -115,10 +121,11 @@
       "id": "cocque-de-asses",
       "model": {
         "type": "box",
-        "width": 0.5,
-        "height": 0.35,
-        "depth": 0.22,
-        "color": 12986408
+        "color": 16119285,
+        "depth": 0.1,
+        "shape": "box",
+        "width": 0.42,
+        "height": 0.3
       },
       "name": "Cocque de asses",
       "pack": "1 box, 12 individually wrapped cookies",
@@ -129,9 +136,10 @@
       },
       "texture": {
         "description": "Couque D'asses cookies pack photo",
-        "image_url": "https://down-sg.img.susercontent.com/file/vn-11134207-7r98o-lt4r1uwjlo6123",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/cocque-de-asses/front-mwtcmx07.jpg",
         "source_url": "https://shopee.sg/search?keyword=Couque%20D%27asses",
-        "type": "image"
+        "type": "image",
+        "fit": "cover"
       },
       "category": "Biscuits & cookies"
     },
@@ -156,7 +164,9 @@
         "description": "Twisties BBQ corn snack pack photo",
         "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/twisties-bbq/front-mwkqnraw.png",
         "source_url": "https://mart.grab.com/sg/en/merchant/grabmart-grocer-mini-s-mart-booze-beachroad-sultan-gate-place/4-C4EGC7T3NYAXAJ/twisties-bbq-curry/SGITE20250221022450177288",
-        "type": "image"
+        "type": "image",
+        "fit": "cover",
+        "scale": 1.35
       },
       "category": "Chips & crisps"
     },
@@ -181,7 +191,9 @@
         "description": "Lay's BBQ potato chips bag photo",
         "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/lays-bbq/front-mwn3r4le.jpg",
         "source_url": "https://www.foodlion.com/groceries/snacks/chips/potato-chips/barbecue-potato-chips/lays-barbecue-potato-chips-1-oz-bag.html",
-        "type": "image"
+        "type": "image",
+        "fit": "cover",
+        "scale": 1.1
       },
       "category": "Chips & crisps"
     },
@@ -189,10 +201,11 @@
       "id": "mo-yu-shuang-mala",
       "model": {
         "type": "box",
-        "width": 0.4,
-        "height": 0.45,
-        "depth": 0.14,
-        "color": 8280002
+        "color": 13840175,
+        "depth": 0.08,
+        "shape": "bag",
+        "width": 0.34,
+        "height": 0.44
       },
       "name": "Mo yu shuang Mala flavour",
       "pack": "1 pack, 50g",
@@ -203,9 +216,10 @@
       },
       "texture": {
         "description": "Weilong Mo Yu Shuang mala konjac snack pack photo",
-        "image_url": "https://down-sg.img.susercontent.com/file/812aeab534993e2b1fd602960d777d75",
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/mo-yu-shuang-mala/front-mwtcpib1.jpg",
         "source_url": "https://shopee.sg/Weilong-Konjac-Shuang-Weilong-Mo-Yu-Shuang-50g-i.1291062615.26854037532",
-        "type": "image"
+        "type": "image",
+        "fit": "cover"
       },
       "category": "Local & Asian snacks"
     },
@@ -231,7 +245,10 @@
         "description": "Korean seaweed snack pack photo",
         "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/korean-seaweed/front-mwn3sw62.jpg",
         "source_url": "https://shopee.sg/HBAF-Korean-Seaweed-Chips-40g-4-Flavors-(Honey-Butter-Wasabi-Salted-Garlic-Bread)-Crispy-Seaweed-Snack-i.1664342463.43126071653",
-        "type": "image"
+        "type": "image",
+        "fit": "cover",
+        "scale": 1.3,
+        "offset_x": -0.1
       },
       "category": "Local & Asian snacks"
     },
@@ -243,16 +260,18 @@
       "pack": "1 pack, 72g",
       "model": {
         "type": "box",
-        "width": 0.5,
-        "height": 0.55,
-        "depth": 0.18,
-        "color": 15909424,
-        "shape": "bag"
+        "color": 15872482,
+        "depth": 0.13,
+        "shape": "bag",
+        "width": 0.34,
+        "height": 0.48
       },
       "texture": {
         "type": "image",
         "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
-        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/calbee-original/front-mwp12rqn.jpg"
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/calbee-original/front-mwp12rqn.jpg",
+        "fit": "cover",
+        "scale": 1.05
       },
       "reference": {
         "note": "FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling. Promotion: any 2 for S$4.30.",
@@ -267,11 +286,11 @@
       "pack": "1 pack, 72g",
       "model": {
         "type": "box",
-        "width": 0.5,
-        "height": 0.55,
-        "depth": 0.18,
         "color": 14099998,
-        "shape": "bag"
+        "depth": 0.18,
+        "shape": "bag",
+        "width": 0.5,
+        "height": 0.55
       },
       "texture": {
         "type": "image",
@@ -291,11 +310,11 @@
       "pack": "1 pack, 80g",
       "model": {
         "type": "box",
-        "width": 0.5,
-        "height": 0.55,
-        "depth": 0.18,
         "color": 7192133,
-        "shape": "bag"
+        "depth": 0.18,
+        "shape": "bag",
+        "width": 0.5,
+        "height": 0.55
       },
       "texture": {
         "type": "image",
@@ -324,7 +343,9 @@
       "texture": {
         "type": "image",
         "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
-        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/pringles-sco/front-mwn3rg3d.jpg"
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/pringles-sco/front-mwn86nhy.jpg",
+        "fit": "cover",
+        "scale": 0.7
       },
       "reference": {
         "note": "FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling.",
@@ -339,16 +360,19 @@
       "pack": "1 tube, 42g",
       "model": {
         "type": "cylinder",
-        "width": 0.24,
-        "height": 0.3,
-        "depth": 0.24,
         "color": 13111342,
-        "shape": "can"
+        "depth": 0.21,
+        "shape": "tube",
+        "width": 0.21,
+        "height": 0.31
       },
       "texture": {
         "type": "image",
         "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
-        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/pringles-original-small/front-mwp146ta.jpg"
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/pringles-original-small/front-mwt8ou14.jpg",
+        "fit": "cover",
+        "scale": 1.75,
+        "offset_y": -0.05
       },
       "reference": {
         "note": "FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling. Price taken from the 42g Sour Cream & Onion listing.",
@@ -363,11 +387,11 @@
       "pack": "1 pack, 105g",
       "model": {
         "type": "box",
-        "width": 0.5,
-        "height": 0.55,
-        "depth": 0.18,
         "color": 16175973,
-        "shape": "bag"
+        "depth": 0.18,
+        "shape": "bag",
+        "width": 0.5,
+        "height": 0.55
       },
       "texture": {
         "type": "image",
@@ -387,11 +411,11 @@
       "pack": "1 pack, 105g",
       "model": {
         "type": "box",
-        "width": 0.5,
-        "height": 0.55,
-        "depth": 0.18,
         "color": 16361509,
-        "shape": "bag"
+        "depth": 0.18,
+        "shape": "bag",
+        "width": 0.5,
+        "height": 0.55
       },
       "texture": {
         "type": "image",
@@ -411,11 +435,11 @@
       "pack": "1 pack, 32g",
       "model": {
         "type": "box",
-        "width": 0.4,
-        "height": 0.45,
-        "depth": 0.14,
         "color": 1793568,
-        "shape": "bag"
+        "depth": 0.14,
+        "shape": "bag",
+        "width": 0.4,
+        "height": 0.45
       },
       "texture": {
         "type": "image",
@@ -434,11 +458,11 @@
       "pack": "1 pack, 60g",
       "model": {
         "type": "box",
-        "width": 0.4,
-        "height": 0.45,
-        "depth": 0.14,
         "color": 16766464,
-        "shape": "bag"
+        "depth": 0.14,
+        "shape": "bag",
+        "width": 0.4,
+        "height": 0.45
       },
       "texture": {
         "type": "image",
@@ -457,16 +481,17 @@
       "pack": "1 roll pack, 10 rolls",
       "model": {
         "type": "box",
-        "width": 0.5,
-        "height": 0.2,
-        "depth": 0.12,
         "color": 12000284,
-        "shape": "bag"
+        "depth": 0.1,
+        "shape": "bag",
+        "width": 0.34,
+        "height": 0.44
       },
       "texture": {
         "type": "image",
         "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
-        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/haw-flakes/front-mwp16grw.jpg"
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/haw-flakes/front-mwtcx4gb.jpg",
+        "scale": 1.4
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
@@ -489,7 +514,8 @@
       "texture": {
         "type": "image",
         "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
-        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/julies-peanut-butter/front-mwn3sknt.jpg"
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/julies-peanut-butter/front-mwn3sknt.jpg",
+        "fit": "cover"
       },
       "reference": {
         "note": "FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling. An older 2-for-S$9.95 promotion has ended.",
@@ -504,11 +530,11 @@
       "pack": "1 pack, 352g",
       "model": {
         "type": "box",
-        "width": 0.5,
-        "height": 0.35,
-        "depth": 0.22,
         "color": 6111287,
-        "shape": "bag"
+        "depth": 0.22,
+        "shape": "bag",
+        "width": 0.5,
+        "height": 0.35
       },
       "texture": {
         "type": "image",
@@ -528,11 +554,11 @@
       "pack": "1 pack, 248.4g",
       "model": {
         "type": "box",
-        "width": 0.5,
-        "height": 0.35,
-        "depth": 0.22,
         "color": 1402304,
-        "shape": "bag"
+        "depth": 0.22,
+        "shape": "bag",
+        "width": 0.5,
+        "height": 0.35
       },
       "texture": {
         "type": "image",
@@ -552,16 +578,17 @@
       "pack": "1 box, 45g",
       "model": {
         "type": "box",
-        "width": 0.35,
-        "height": 0.5,
-        "depth": 0.2,
         "color": 13840175,
-        "shape": "bag"
+        "depth": 0.08,
+        "shape": "box",
+        "width": 0.26,
+        "height": 0.42
       },
       "texture": {
         "type": "image",
         "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
-        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/pocky-chocolate/front-mwp1aqw8.jpg"
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/pocky-chocolate/front-mwp1aqw8.jpg",
+        "scale": 1.3
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
@@ -575,16 +602,17 @@
       "pack": "1 box, 37g",
       "model": {
         "type": "box",
-        "width": 0.5,
-        "height": 0.35,
-        "depth": 0.22,
-        "color": 15022389,
-        "shape": "bag"
+        "color": 3046706,
+        "depth": 0.06,
+        "shape": "box",
+        "width": 0.26,
+        "height": 0.34
       },
       "texture": {
         "type": "image",
         "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
-        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/koalas-march-choc/front-mwp1b643.jpg"
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/koalas-march-choc/front-mwtcoekh.jpg",
+        "scale": 1.45
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
@@ -598,11 +626,11 @@
       "pack": "1 pack, 428g",
       "model": {
         "type": "box",
-        "width": 0.5,
-        "height": 0.35,
-        "depth": 0.22,
         "color": 1668818,
-        "shape": "bag"
+        "depth": 0.22,
+        "shape": "bag",
+        "width": 0.5,
+        "height": 0.35
       },
       "texture": {
         "type": "image",
@@ -630,7 +658,9 @@
       "texture": {
         "type": "image",
         "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
-        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/kinder-bueno-milk/front-mwn3ru1w.jpg"
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/kinder-bueno-milk/front-mwn3ru1w.jpg",
+        "fit": "cover",
+        "scale": 1.1
       },
       "reference": {
         "note": "FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling.",
@@ -645,16 +675,19 @@
       "pack": "1 bar, 39g",
       "model": {
         "type": "box",
-        "width": 0.5,
-        "height": 0.2,
-        "depth": 0.12,
+        "badge": "popular",
         "color": 15527921,
-        "shape": "bag"
+        "depth": 0.06,
+        "shape": "bag",
+        "width": 0.38,
+        "height": 0.13
       },
       "texture": {
         "type": "image",
         "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
-        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/kinder-bueno-white/front-mwp1c1g5.jpg"
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/kinder-bueno-white/front-mwp1c1g5.jpg",
+        "fit": "cover",
+        "scale": 1.3
       },
       "reference": {
         "note": "FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling.",
@@ -669,16 +702,17 @@
       "pack": "1 bar, 50g",
       "model": {
         "type": "box",
-        "width": 0.55,
-        "height": 0.3,
-        "depth": 0.08,
         "color": 4854924,
-        "shape": "bag"
+        "depth": 0.05,
+        "shape": "bar",
+        "width": 0.42,
+        "height": 0.14
       },
       "texture": {
         "type": "image",
         "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
-        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/cadbury-dm-plain/front-mwp1cfqo.jpg"
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/cadbury-dm-plain/front-mwtcqfye.jpg",
+        "scale": 1.2
       },
       "reference": {
         "note": "FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling.",
@@ -693,16 +727,17 @@
       "pack": "1 roll, 55g",
       "model": {
         "type": "box",
-        "width": 0.5,
-        "height": 0.2,
-        "depth": 0.12,
         "color": 6953882,
-        "shape": "bag"
+        "depth": 0.09,
+        "shape": "roll",
+        "width": 0.42,
+        "height": 0.09
       },
       "texture": {
         "type": "image",
         "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
-        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/cadbury-dm-roll/front-mwp1cucz.jpg"
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/cadbury-dm-roll/front-mwtcrvks.jpg",
+        "scale": 1.15
       },
       "reference": {
         "note": "FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling.",
@@ -717,16 +752,16 @@
       "pack": "1 block, 180g",
       "model": {
         "type": "box",
-        "width": 0.55,
-        "height": 0.3,
-        "depth": 0.08,
         "color": 8069026,
-        "shape": "bag"
+        "depth": 0.05,
+        "shape": "bar",
+        "width": 0.22,
+        "height": 0.42
       },
       "texture": {
         "type": "image",
         "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
-        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/cadbury-roast-almond/front-mwp1d7xg.jpg"
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/cadbury-roast-almond/front-mwtcsz53.jpg"
       },
       "reference": {
         "note": "FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling.",
@@ -744,13 +779,15 @@
         "color": 13959168,
         "depth": 0.04,
         "shape": "bag",
-        "width": 0.5,
-        "height": 0.2
+        "width": 0.59,
+        "height": 0.24
       },
       "texture": {
         "type": "image",
         "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
-        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/kitkat-2f-6pack/front-mwn3s7dz.jpg"
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/kitkat-2f-6pack/front-mwn3s7dz.jpg",
+        "fit": "cover",
+        "scale": 1.2
       },
       "reference": {
         "note": "FairPrice listing price seen in a web search on 3 Nov 2026; promotions change, confirm before selling.",
@@ -765,16 +802,17 @@
       "pack": "1 bar, 51g",
       "model": {
         "type": "box",
-        "width": 0.5,
-        "height": 0.2,
-        "depth": 0.12,
         "color": 5125166,
-        "shape": "bag"
+        "depth": 0.05,
+        "shape": "bar",
+        "width": 0.38,
+        "height": 0.13
       },
       "texture": {
         "type": "image",
         "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
-        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/snickers/front-mwp1dm3t.jpg"
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/snickers/front-mwtcus35.jpg",
+        "scale": 1.4
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
@@ -788,11 +826,11 @@
       "pack": "1 pack, 80g",
       "model": {
         "type": "box",
-        "width": 0.4,
-        "height": 0.45,
-        "depth": 0.14,
         "color": 16498733,
-        "shape": "bag"
+        "depth": 0.14,
+        "shape": "bag",
+        "width": 0.4,
+        "height": 0.45
       },
       "texture": {
         "type": "image",
@@ -812,11 +850,11 @@
       "pack": "1 stick, 55g",
       "model": {
         "type": "box",
-        "width": 0.5,
-        "height": 0.2,
-        "depth": 0.12,
         "color": 15483002,
-        "shape": "bag"
+        "depth": 0.05,
+        "shape": "box",
+        "width": 0.34,
+        "height": 0.11
       },
       "texture": {
         "type": "image",
@@ -845,7 +883,8 @@
       "texture": {
         "type": "image",
         "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
-        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/mentos-mint/front-mwp1kat3.jpg"
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/mentos-mint/front-mwtcz3jb.jpg",
+        "scale": 1.1
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
@@ -859,16 +898,17 @@
       "pack": "1 pack, 25g",
       "model": {
         "type": "box",
-        "width": 0.5,
-        "height": 0.2,
-        "depth": 0.12,
         "color": 16119260,
-        "shape": "bag"
+        "depth": 0.04,
+        "shape": "bag",
+        "width": 0.26,
+        "height": 0.18
       },
       "texture": {
         "type": "image",
         "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
-        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/fishermans-friend/front-mwp1lag2.jpg"
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/fishermans-friend/front-mwtcvyo7.jpg",
+        "scale": 1.15
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
@@ -882,11 +922,11 @@
       "pack": "1 pack, 150g",
       "model": {
         "type": "box",
-        "width": 0.4,
-        "height": 0.45,
-        "depth": 0.14,
         "color": 4073251,
-        "shape": "bag"
+        "depth": 0.14,
+        "shape": "bag",
+        "width": 0.4,
+        "height": 0.45
       },
       "texture": {
         "type": "image",
@@ -905,16 +945,17 @@
       "pack": "1 pack, 85g",
       "model": {
         "type": "box",
-        "width": 0.4,
-        "height": 0.45,
-        "depth": 0.14,
         "color": 12986408,
-        "shape": "bag"
+        "depth": 0.06,
+        "shape": "bag",
+        "width": 0.42,
+        "height": 0.33
       },
       "texture": {
         "type": "image",
         "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
-        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/indomie-mi-goreng/front-mwp1m4b8.jpg"
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/indomie-mi-goreng/front-mwtcta9r.jpg",
+        "fit": "cover"
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
@@ -928,11 +969,11 @@
       "pack": "1 cup, 75g",
       "model": {
         "type": "cylinder",
-        "width": 0.32,
-        "height": 0.3,
-        "depth": 0.32,
         "color": 2001125,
-        "shape": "cup"
+        "depth": 0.32,
+        "shape": "cup",
+        "width": 0.32,
+        "height": 0.3
       },
       "texture": {
         "type": "image",
@@ -951,16 +992,17 @@
       "pack": "1 pack, 79g",
       "model": {
         "type": "box",
-        "width": 0.4,
-        "height": 0.45,
-        "depth": 0.14,
         "color": 16635957,
-        "shape": "bag"
+        "depth": 0.06,
+        "shape": "bag",
+        "width": 0.4,
+        "height": 0.44
       },
       "texture": {
         "type": "image",
         "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
-        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/maggi-curry/front-mwp1my7h.jpg"
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/maggi-curry/front-mwp1my7h.jpg",
+        "fit": "cover"
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
@@ -974,11 +1016,11 @@
       "pack": "1 pack, 185g",
       "model": {
         "type": "box",
-        "width": 0.5,
-        "height": 0.35,
-        "depth": 0.22,
         "color": 16740419,
-        "shape": "bag"
+        "depth": 0.22,
+        "shape": "bag",
+        "width": 0.5,
+        "height": 0.35
       },
       "texture": {
         "type": "image",
@@ -997,16 +1039,18 @@
       "pack": "1 packet, 250ml",
       "model": {
         "type": "box",
-        "width": 0.2,
-        "height": 0.34,
-        "depth": 0.13,
         "color": 4431943,
-        "shape": "bag"
+        "depth": 0.09,
+        "shape": "carton",
+        "width": 0.15,
+        "height": 0.34
       },
       "texture": {
         "type": "image",
         "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
-        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/pokka-green-tea/front-mwp1ouon.jpg"
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/pokka-green-tea/front-mwp1ouon.jpg",
+        "fit": "cover",
+        "scale": 1.35
       },
       "reference": {
         "note": "Based on FairPrice carton price S$11.90 for 24 (search snapshot, 3 Nov 2026); single-pack price set by the shop."
@@ -1020,11 +1064,11 @@
       "pack": "1 packet, 250ml",
       "model": {
         "type": "box",
-        "width": 0.2,
-        "height": 0.34,
-        "depth": 0.13,
         "color": 16771899,
-        "shape": "bag"
+        "depth": 0.13,
+        "shape": "bag",
+        "width": 0.2,
+        "height": 0.34
       },
       "texture": {
         "type": "image",
@@ -1044,11 +1088,11 @@
       "pack": "1 can, 300ml",
       "model": {
         "type": "cylinder",
-        "width": 0.2,
-        "height": 0.36,
-        "depth": 0.2,
         "color": 9268835,
-        "shape": "can"
+        "depth": 0.2,
+        "shape": "can",
+        "width": 0.2,
+        "height": 0.36
       },
       "texture": {
         "type": "image",
@@ -1068,11 +1112,11 @@
       "pack": "1 can, 300ml",
       "model": {
         "type": "cylinder",
-        "width": 0.2,
-        "height": 0.36,
-        "depth": 0.2,
         "color": 3046706,
-        "shape": "can"
+        "depth": 0.2,
+        "shape": "can",
+        "width": 0.2,
+        "height": 0.36
       },
       "texture": {
         "type": "image",
@@ -1092,11 +1136,11 @@
       "pack": "1 can, 325ml",
       "model": {
         "type": "cylinder",
-        "width": 0.2,
-        "height": 0.36,
-        "depth": 0.2,
         "color": 1402304,
-        "shape": "can"
+        "depth": 0.2,
+        "shape": "can",
+        "width": 0.2,
+        "height": 0.36
       },
       "texture": {
         "type": "image",
@@ -1115,16 +1159,17 @@
       "pack": "1 packet, 200ml",
       "model": {
         "type": "box",
-        "width": 0.2,
-        "height": 0.34,
-        "depth": 0.13,
         "color": 3046706,
-        "shape": "bag"
+        "depth": 0.13,
+        "shape": "carton",
+        "width": 0.2,
+        "height": 0.34
       },
       "texture": {
         "type": "image",
         "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
-        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/milo-uht/front-mwp1trmh.jpg"
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/milo-uht/front-mwtcukx6.jpg",
+        "fit": "cover"
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
@@ -1138,11 +1183,11 @@
       "pack": "1 can, 320ml",
       "model": {
         "type": "cylinder",
-        "width": 0.2,
-        "height": 0.36,
-        "depth": 0.2,
         "color": 13959168,
-        "shape": "can"
+        "depth": 0.2,
+        "shape": "can",
+        "width": 0.2,
+        "height": 0.36
       },
       "texture": {
         "type": "image",
@@ -1161,16 +1206,17 @@
       "pack": "1 pack, 35g",
       "model": {
         "type": "box",
-        "width": 0.4,
-        "height": 0.45,
-        "depth": 0.14,
         "color": 15094016,
-        "shape": "bag"
+        "depth": 0.07,
+        "shape": "bag",
+        "width": 0.3,
+        "height": 0.36
       },
       "texture": {
         "type": "image",
         "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
-        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/tong-garden-cashew/front-mwp1vvyx.jpg"
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/tong-garden-cashew/front-mwtcvghy.jpg",
+        "fit": "cover"
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
@@ -1184,16 +1230,17 @@
       "pack": "1 pack, 40g",
       "model": {
         "type": "box",
-        "width": 0.4,
-        "height": 0.45,
-        "depth": 0.14,
-        "color": 10586239,
-        "shape": "bag"
+        "color": 10494080,
+        "depth": 0.08,
+        "shape": "bag",
+        "width": 0.34,
+        "height": 0.44
       },
       "texture": {
         "type": "image",
         "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
-        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/camel-mixed-nuts/front-mwp1wal7.jpg"
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/camel-mixed-nuts/front-mwtcsdvp.jpg",
+        "fit": "cover"
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
@@ -1207,11 +1254,11 @@
       "pack": "1 pack, 93g",
       "model": {
         "type": "box",
-        "width": 0.5,
-        "height": 0.55,
-        "depth": 0.18,
         "color": 8172354,
-        "shape": "bag"
+        "depth": 0.18,
+        "shape": "bag",
+        "width": 0.5,
+        "height": 0.55
       },
       "texture": {
         "type": "image",
@@ -1230,16 +1277,17 @@
       "pack": "1 box, 6 x 42g",
       "model": {
         "type": "box",
-        "width": 0.5,
-        "height": 0.35,
-        "depth": 0.22,
         "color": 3706428,
-        "shape": "bag"
+        "depth": 0.08,
+        "shape": "box",
+        "width": 0.32,
+        "height": 0.42
       },
       "texture": {
         "type": "image",
         "description": "Pack art drawn by the shop from the product name and colour. Add an image_url here to use your own photo.",
-        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/nature-valley-oats-honey/front-mwp1wymn.jpg"
+        "image_url": "https://vwokjpnlduzdomsnmqls.supabase.co/storage/v1/object/public/product-files/nature-valley-oats-honey/front-mwp1wymn.jpg",
+        "fit": "cover"
       },
       "reference": {
         "note": "Estimated typical Singapore supermarket shelf price (not checked against a live listing). Confirm before selling."
@@ -1253,11 +1301,11 @@
       "pack": "1 box, 16 tablets",
       "model": {
         "type": "box",
-        "width": 0.3,
-        "height": 0.22,
-        "depth": 0.12,
         "color": 2792847,
-        "shape": "box"
+        "depth": 0.12,
+        "shape": "box",
+        "width": 0.3,
+        "height": 0.22
       },
       "texture": {
         "description": "Panadol Original tablets pack photo",
@@ -1278,11 +1326,11 @@
       "pack": "1 box, 24 lozenges",
       "model": {
         "type": "box",
-        "width": 0.35,
-        "height": 0.22,
-        "depth": 0.12,
         "color": 2792847,
-        "shape": "box"
+        "depth": 0.12,
+        "shape": "box",
+        "width": 0.35,
+        "height": 0.22
       },
       "texture": {
         "description": "Strepsils Honey & Lemon lozenges pack photo",
