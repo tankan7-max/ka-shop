@@ -5,9 +5,18 @@
     "whatsapp": "6590896287",
     "paynow": "+6590896287",
     "currency": "S$",
-    "collection": "Meet-up or collection in Singapore, or delivery for a small fee. We will confirm on WhatsApp."
+    "collection": "Meet-up or collection in Singapore, or delivery for a small fee. We will confirm on WhatsApp.",
+    "supabase_url": "https://vwokjpnlduzdomsnmqls.supabase.co",
+    "supabase_key": "sb_publishable_YaixgZMjAuUvRR0673fZpQ_yTxgygQG"
   },
-  "categories": ["Clothing", "Electronics", "Books", "Home", "Toys & games", "Other"],
+  "categories": [
+    "Clothing",
+    "Electronics",
+    "Books",
+    "Home",
+    "Toys & games",
+    "Other"
+  ],
   "items": [
     {
       "id": "sample-denim-jacket",

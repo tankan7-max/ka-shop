@@ -20,6 +20,7 @@ It is one web page (`virtual-snack-shop.html`) plus one product list
 | `vendor/` | A copy of the 3D library (three.js 0.160, MIT licence, see `vendor/LICENSE-three.txt`) and its 3D-model loader, so the shop loads nothing from public CDNs and works offline. The page falls back to unpkg / jsDelivr only if this folder is missing. |
 | `tools/check-shop.mjs` | A walkability and speed check for the 3D shop (see *Checking the shop* below). |
 | `thrift.html`, `thrift.json` | The second-hand shop, *Pre-loved Corner*: a fast browse-and-order page for one-of-a-kind goods. The items and shop details are in `thrift.json`; photos go in `images/thrift/`. See *The thrift shop* below. |
+| `thrift-admin.html`, `supabase-thrift.sql` | The thrift shop's owner page, which doubles as its inventory: add and edit items with photos, reserve, mark sold, track what you paid and your profit, export. Needs the Supabase database; run `supabase-thrift.sql` once. See *The thrift shop* below. |
 | `qrcode.js` | The QR code library used for the PayNow code at checkout (MIT licence, by Kazuhiko Arase). |
 | `ka.html` | Tan Kwan Ann's professional page: dark, with a spinning 3D ring, an interactive 3D protein structure and a print-to-PDF résumé (two pages from the browser's print dialog). |
 | `ka2.html` | The joke edition, 鲍鱼王 the Abalone King of the Multiverse: an abalone clicker game, royal decrees, a translated résumé and a universe roller. Links back to `ka.html`. |
@@ -63,6 +64,24 @@ shown as *Sold* and sink to the end.
 - Put photos in `images/thrift/` (JPEG, around 1000 px wide is plenty) and list up to 8 in `photos`. With no photo, the shop shows a tidy coloured tile with an icon.
 - When something sells, set `"sold": true` (do not delete it right away if you want shoppers to see it went). Delete the entry later to tidy up.
 - `shop` at the top sets the name, tagline, WhatsApp number, PayNow number and the collection note shown at checkout. `categories` sets the category buttons.
+
+**Managing the thrift stock on a page (recommended)**: open `thrift-admin.html` and sign in with the same owner login as
+`products.html`. One-time set-up: in Supabase, open **SQL Editor → New query**, paste in `supabase-thrift.sql` and press **Run**;
+then press *Copy the items from thrift.json* on the page. After that you never edit `thrift.json` by hand.
+- **Add / edit** items with up to 8 photos (made smaller before upload, first is the cover; reorder or remove them), price,
+  original price, condition, size, brand and description.
+- **Status**: *Available*, *Reserved* (shows as Reserved in the shop and cannot be added to a bag) or *Sold*. **Sold** records what it
+  sold for, the date and who bought it. **Relist** brings a sold item back. Untick *Show in the shop* to hide an item but keep your records.
+- **Inventory and profit** (private, shoppers never see these): what you paid, where you got it, notes. The top of the page
+  shows items available and their value at asking price, reserved, sold and money taken, **profit** on sold items that have a cost,
+  money tied up in unsold stock, and the average days to sell. Items unsold for 60+ days get a flag so you know when to cut the price.
+- **Search and filter** by status, sort by age or price, **Export CSV** (including private columns) for a spreadsheet, and **Download
+  backup** to save the shop's items as `thrift.json` (the shop falls back to that file if the database is unreachable).
+- The public shop reads items through a database function that returns only the public fields, so cost, source, notes and buyer
+  never reach shoppers. Photos are stored in the same `product-files` bucket under `thrift/<item id>/`.
+- The shop only updates when *you* mark things; there is no automatic sold-marking when an order is sent on WhatsApp.
+
+The file-based way (below) still works as a fallback, and is used until the database has items.
 
 The five items in `thrift.json` are **samples**; replace them before going live. Share a single item with `thrift.html?item=ITEM-ID`. Photos are only downloaded for shelves near the shopper, so a big shop stays quick; keep each photo around 1000 px wide.
 
