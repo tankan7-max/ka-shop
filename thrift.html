@@ -66,6 +66,7 @@
   .ph .glyph-lg { font-size: 110px; }
   .badge { position: absolute; top: 8px; left: 8px; padding: 2px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; background: #fff; color: var(--ink); box-shadow: 0 1px 4px rgba(0,0,0,.18); }
   .badge.sold { background: #1d2327; color: #fff; }
+  .badge.rsv { background: #ffe9b3; color: #5e3d00; }
   .badge.deal { background: #ffe9b3; color: #5e3d00; left: auto; right: 8px; }
   .info { padding: 10px 12px 12px; display: grid; gap: 2px; }
   .info .name { font-weight: 650; font-size: 15px; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
@@ -259,7 +260,7 @@ function visible() {
   let list = items.filter(it => (!view.cat || it.category === view.cat) && (!view.cond || it.condition === view.cond) && (!view.hideSold || !it.sold)
     && (!q || `${it.name} ${it.category} ${it.description || ''} ${it.size || ''} ${it.brand || ''}`.toLowerCase().includes(q)));
   const by = { new: (a, b) => String(b.added || '').localeCompare(String(a.added || '')), low: (a, b) => a.price - b.price, high: (a, b) => b.price - a.price }[view.sort];
-  list = list.sort((a, b) => (a.sold - b.sold) || by(a, b));   // sold items sink to the end
+  const rank = i => i.sold ? 2 : i.reserved ? 1 : 0; list = list.sort((a, b) => (rank(a) - rank(b)) || by(a, b));   // available first, then reserved, then sold
   return list;
 }
 function renderGrid() {
@@ -267,16 +268,17 @@ function renderGrid() {
   list.forEach(it => {
     const pic = picture(it);
     if (it.sold) pic.append(el('span', { className: 'badge sold', textContent: 'Sold' }));
+    else if (it.reserved) pic.append(el('span', { className: 'badge rsv', textContent: 'Reserved' }));
     else if (dealPct(it) >= 10) pic.append(el('span', { className: 'badge deal', textContent: `-${dealPct(it)}%` }));
     else if (bag.has(it.id)) pic.append(el('span', { className: 'badge', textContent: 'In bag' }));
     const price = el('div', { className: 'price' }, money(it.price), it.was > it.price ? el('s', { textContent: money(it.was) }) : '');
-    const card = el('button', { type: 'button', className: 'card' + (it.sold ? ' sold' : ''), onclick: () => openItem(it) },
+    const card = el('button', { type: 'button', className: 'card' + (it.sold || it.reserved ? ' sold' : ''), onclick: () => openItem(it) },
       pic, el('div', { className: 'info' }, el('div', { className: 'name', textContent: it.name }), price, el('div', { className: 'meta', textContent: [it.condition, it.size ? 'Size ' + it.size : ''].filter(Boolean).join(' · ') })));
-    card.setAttribute('aria-label', `${it.name}, ${money(it.price)}${it.sold ? ', sold' : ''}`);
+    card.setAttribute('aria-label', `${it.name}, ${money(it.price)}${it.sold ? ', sold' : it.reserved ? ', reserved' : ''}`);
     grid.append(card);
   });
   $('empty').hidden = list.length > 0;
-  const left = items.filter(i => !i.sold).length;
+  const left = items.filter(i => !i.sold && !i.reserved).length;
   $('count').textContent = list.length ? `${list.length} item${list.length === 1 ? '' : 's'} shown · ${left} available` : '';
 }
 function renderChips() {
@@ -303,7 +305,7 @@ function openItem(it) {
   const facts = el('dl', { className: 'facts' });
   [['Condition', it.condition], ['Size', it.size], ['Brand', it.brand], ['Category', it.category]].forEach(([k, v]) => { if (v) facts.append(el('dt', { textContent: k }), el('dd', { textContent: v })); });
   const inBag = bag.has(it.id);
-  const add = el('button', { type: 'button', className: 'primary', textContent: it.sold ? 'Sold' : inBag ? 'Remove from bag' : 'Add to bag', disabled: !!it.sold, onclick: () => { toggleBag(it); $('item').close(); } });
+  const add = el('button', { type: 'button', className: 'primary', textContent: it.sold ? 'Sold' : it.reserved ? 'Reserved' : inBag ? 'Remove from bag' : 'Add to bag', disabled: !!(it.sold || it.reserved), onclick: () => { toggleBag(it); $('item').close(); } });
   const close = el('button', { type: 'button', className: 'close', textContent: '×', onclick: () => $('item').close() }); close.setAttribute('aria-label', 'Close');
   body.append(close, el('div', { className: 'gallery' }, main, photos.length > 1 ? thumbs : ''),
     el('div', { className: 'pad' },
@@ -311,7 +313,7 @@ function openItem(it) {
       el('div', { className: 'price', style: 'font-size:22px' }, money(it.price), it.was > it.price ? el('s', { textContent: money(it.was) }) : ''),
       facts,
       it.description ? el('p', { className: 'desc', textContent: it.description }) : '',
-      it.sold ? el('p', { className: 'note warn', textContent: 'This item has been sold.' }) : el('p', { className: 'note', textContent: 'One of a kind: only one available.' }),
+      it.sold ? el('p', { className: 'note warn', textContent: 'This item has been sold.' }) : it.reserved ? el('p', { className: 'note warn', textContent: 'This item is reserved for someone. Message the seller on WhatsApp in case it comes back.' }) : el('p', { className: 'note', textContent: 'One of a kind: only one available.' }),
       el('div', { className: 'actions' }, add, hasWebGL && mode !== '3d' ? el('button', { type: 'button', textContent: '🚶 See it in the shop', onclick: () => { $('item').close(); setMode('3d', it); } }) : '')));
   show(0); $('item').showModal();
 }
@@ -319,12 +321,12 @@ function openItem(it) {
 // --- Bag ---
 function saveBag() { store.set(BAG_KEY, [...bag]); }
 function toggleBag(it) {
-  if (it.sold) return;
+  if (it.sold || it.reserved) return;
   if (bag.has(it.id)) { bag.delete(it.id); toast('Removed from your bag'); }
   else { bag.add(it.id); toast(`Added ${it.name}`); const b = $('bag-btn'); b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump'); }
   saveBag(); renderBag(); renderGrid(); if (WORLD.api) WORLD.api.refresh(it);
 }
-const bagItems = () => items.filter(i => bag.has(i.id) && !i.sold);
+const bagItems = () => items.filter(i => bag.has(i.id) && !i.sold && !i.reserved);
 function renderBag() {
   const list = bagItems(), box = $('bag-list'); box.textContent = '';
   $('bag-count').textContent = list.length;
@@ -451,15 +453,16 @@ function buildWorld(THREE) {
     if (e.img) { const k = Math.max(w / e.img.naturalWidth, h / e.img.naturalHeight), iw = e.img.naturalWidth * k, ih = e.img.naturalHeight * k; g.drawImage(e.img, (w - iw) / 2, (h - ih) / 2, iw, ih); }
     else { g.font = '120px system-ui, "Apple Color Emoji", "Segoe UI Emoji", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(GLYPH[it.category] || GLYPH.Other, w / 2, h / 2 + 8); }
     if (it.sold) { g.fillStyle = 'rgba(20,26,30,.55)'; g.fillRect(0, 0, w, h); g.save(); g.translate(w / 2, h / 2); g.rotate(-0.5); g.fillStyle = '#b3261e'; g.fillRect(-w, -26, w * 2, 52); g.fillStyle = '#fff'; g.font = '800 40px system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('SOLD', 0, 2); g.restore(); }
+    else if (it.reserved) { g.fillStyle = 'rgba(20,26,30,.35)'; g.fillRect(0, 0, w, h); g.save(); g.translate(w / 2, h / 2); g.rotate(-0.5); g.fillStyle = '#e6a100'; g.fillRect(-w, -26, w * 2, 52); g.fillStyle = '#1d2327'; g.font = '800 34px system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('RESERVED', 0, 2); g.restore(); }
     else if (bag.has(it.id)) { g.fillStyle = '#228174'; rr(g, 8, 8, 92, 34, 17); g.fill(); g.fillStyle = '#fff'; g.font = '700 20px system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('In bag', 54, 26); }
     e.photoTex.needsUpdate = true;
   }
   function drawTag(e) {
     const it = e.it, g = e.tagCv.getContext('2d'), w = 320, h = 60;
-    g.fillStyle = '#fffdf6'; g.fillRect(0, 0, w, h); g.fillStyle = it.sold ? '#8a9399' : '#228174'; g.fillRect(0, 0, 8, h);
+    g.fillStyle = '#fffdf6'; g.fillRect(0, 0, w, h); const off = it.sold || it.reserved; g.fillStyle = off ? '#8a9399' : '#228174'; g.fillRect(0, 0, 8, h);
     g.textBaseline = 'middle'; g.textAlign = 'left';
-    g.fillStyle = it.sold ? '#6d777c' : '#b3261e'; g.font = '800 30px system-ui, sans-serif';
-    const price = it.sold ? 'SOLD' : money(it.price); g.fillText(price, 18, h / 2 + 2);
+    g.fillStyle = off ? '#6d777c' : '#b3261e'; g.font = '800 30px system-ui, sans-serif';
+    const price = it.sold ? 'SOLD' : it.reserved ? 'HELD' : money(it.price); g.fillText(price, 18, h / 2 + 2);
     const px = 22 + g.measureText(price).width; g.fillStyle = '#1d2327'; const size = fit1(g, it.name, w - px - 10, 21, '650'); g.font = `650 ${size}px system-ui, sans-serif`; g.fillText(it.name, px, h / 2 + 2);
     e.tagTex.needsUpdate = true;
   }
@@ -619,7 +622,7 @@ function buildWorld(THREE) {
   }
   function hover(cx, cy) {
     const p = pick(cx, cy), it = p && p.item;
-    if (it) { const e = it._cardEntry; hi.matrix.copy(e.frame.matrixWorld); hi.visible = true; tip.textContent = `${it.name} · ${it.sold ? 'Sold' : money(it.price)}`; const r = host.getBoundingClientRect(); tip.style.left = clamp(cx - r.left + 14, 4, r.width - 270) + 'px'; tip.style.top = (cy - r.top + 18) + 'px'; tip.hidden = false; canvas.style.cursor = 'pointer'; }
+    if (it) { const e = it._cardEntry; hi.matrix.copy(e.frame.matrixWorld); hi.visible = true; tip.textContent = `${it.name} · ${it.sold ? 'Sold' : it.reserved ? 'Reserved' : money(it.price)}`; const r = host.getBoundingClientRect(); tip.style.left = clamp(cx - r.left + 14, 4, r.width - 270) + 'px'; tip.style.top = (cy - r.top + 18) + 'px'; tip.hidden = false; canvas.style.cursor = 'pointer'; }
     else { hi.visible = false; tip.hidden = true; canvas.style.cursor = p && (p.href) ? 'pointer' : ''; }
     redraw();
   }
@@ -705,13 +708,29 @@ const setBarHeight = () => document.documentElement.style.setProperty('--bar-h',
 window.addEventListener('resize', setBarHeight); setBarHeight();
 $('item').addEventListener('close', () => { if (mode === '3d' && WORLD.api) WORLD.api.focus(); });
 
+async function liveItems() {
+  const url = String(shop.supabase_url || '').replace(/\/+$/, ''), key = String(shop.supabase_key || '');
+  if (!url || !key) return null;
+  try {
+    const res = await fetch(`${url}/rest/v1/rpc/thrift_catalogue`, { method: 'POST', headers: { apikey: key, 'Content-Type': 'application/json' }, body: '{}', signal: AbortSignal.timeout ? AbortSignal.timeout(6000) : undefined });
+    if (!res.ok) return null;   // not set up yet: use thrift.json
+    const d = await res.json();
+    return d && d.total > 0 && Array.isArray(d.items) ? d.items : null;
+  } catch (e) { console.warn('Could not read the thrift stock from the database, using thrift.json:', e); return null; }
+}
+
 (async function start() {
   try {
     const res = await fetch('thrift.json', { cache: 'no-cache' }); if (!res.ok) throw new Error('HTTP ' + res.status);
     const d = await res.json();
     shop = d.shop || {};
-    items = (Array.isArray(d.items) ? d.items : []).filter(i => i && i.id && i.name && typeof i.price === 'number').map(i => ({ ...i, sold: !!i.sold, photos: Array.isArray(i.photos) ? i.photos : [] }));
-    categories = Array.isArray(d.categories) && d.categories.length ? d.categories : [...new Set(items.map(i => i.category).filter(Boolean))];
+    // The shop owner's stock lives in the database once thrift-admin.html has been set up; thrift.json is the backup list.
+    let raw = Array.isArray(d.items) ? d.items : [];
+    const live = await liveItems(); if (live) raw = live;
+    items = raw.filter(i => i && i.id && i.name && Number.isFinite(Number(i.price))).map(i => ({ ...i, price: Number(i.price), was: Number(i.was) > 0 ? Number(i.was) : 0,
+      sold: i.status === 'sold' || !!i.sold, reserved: i.status === 'reserved' || !!i.reserved, condition: CONDITIONS.includes(i.condition) ? i.condition : '', photos: (Array.isArray(i.photos) ? i.photos : []).filter(p => typeof p === 'string' && p) }));
+    categories = Array.isArray(d.categories) && d.categories.length ? [...d.categories] : [];
+    items.forEach(i => { if (i.category && !categories.includes(i.category)) categories.push(i.category); });
   } catch (e) {
     $('grid').replaceWith(el('p', { id: 'empty', textContent: 'The items could not be loaded. Open this page from the live website or a local web server.' })); console.warn(e); return;
   }
@@ -720,7 +739,7 @@ $('item').addEventListener('close', () => { if (mode === '3d' && WORLD.api) WORL
   $('hero-title').textContent = shop.name || 'Pre-loved finds';
   $('site-foot').append('Looking for snacks? ', el('a', { href: 'virtual-snack-shop.html', textContent: 'Visit the Virtual Snack Shop' }), '.');
   CONDITIONS.forEach(c => { if (items.some(i => i.condition === c)) $('cond').append(el('option', { value: c, textContent: c })); });
-  const saved = store.get(BAG_KEY); if (Array.isArray(saved)) saved.forEach(id => { const it = items.find(i => i.id === id); if (it && !it.sold) bag.add(id); }); saveBag();
+  const saved = store.get(BAG_KEY); if (Array.isArray(saved)) saved.forEach(id => { const it = items.find(i => i.id === id); if (it && !it.sold && !it.reserved) bag.add(id); }); saveBag();
   renderChips(); renderGrid(); renderBag();
   labelView();
   const qs = new URLSearchParams(location.search), want = qs.get('item'), it = want && items.find(i => i.id === want);

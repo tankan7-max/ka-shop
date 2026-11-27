@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Thrift stock — Pre-loved Corner</title>
+<style>
+  :root { --ink: #1d2327; --muted: #5f6b70; --line: #dfe5e4; --brand: #228174; --brand-dark: #1a6a60; --danger: #b3261e; --warn: #8a5a00; --bg: #f4f7f6; --card: #fff; }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { touch-action: manipulation; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--ink); }
+  header { background: var(--brand); color: #fff; padding: 16px 20px; }
+  header h1 { margin: 0; font-size: 20px; }
+  header p { margin: 4px 0 0; color: #fff; font-size: 14px; }
+  header a { color: #fff; }
+  main { max-width: 980px; margin: 0 auto; padding: 16px 16px 70px; }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  button { touch-action: manipulation; cursor: pointer; border: 1px solid var(--line); background: var(--card); border-radius: 10px; padding: 8px 14px; min-height: 40px; }
+  button.primary { background: var(--brand); border-color: var(--brand); color: #fff; font-weight: 700; }
+  button.primary:hover { background: var(--brand-dark); }
+  button.danger { color: var(--danger); border-color: #f0c4c0; }
+  button.small { min-height: 34px; padding: 3px 11px; font-size: 14px; }
+  button:disabled { opacity: .45; cursor: default; }
+  button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin: 12px 0; font-size: 14px; line-height: 1.5; }
+  #notice { background: #fdecea; border-color: #f5c6c2; color: #7a1f1a; }
+  #setup { background: #fff8e8; border-color: #f0c27a; color: #5f4300; }
+  #live-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; background: #e3f4f1; border-color: #b6e0d9; }
+  body.locked main > :not(#signin):not(#notice) { display: none !important; }
+  #signin label, .field { display: block; font-weight: 600; margin-top: 10px; }
+  #signin input { display: block; width: 100%; max-width: 340px; height: 42px; padding: 0 10px; margin-top: 4px; font-size: 16px; border: 1px solid var(--line); border-radius: 10px; }
+  .error { color: var(--danger); font-weight: 600; min-height: 20px; margin: 8px 0 0; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 12px 0; }
+  .stat { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+  .stat b { display: block; font-size: 22px; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+  .stat span { color: var(--muted); font-size: 13px; }
+  .stat.good b { color: #1b7a3d; } .stat.bad b { color: var(--danger); }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 12px 0 8px; }
+  .toolbar input[type="search"] { flex: 1 1 200px; height: 42px; padding: 0 12px; font-size: 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); }
+  .toolbar select { height: 42px; padding: 0 10px; border: 1px solid var(--line); border-radius: 10px; background: #fff; font-size: 15px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 10px; }
+  .chips button { border-radius: 999px; min-height: 36px; padding: 4px 13px; font-size: 14px; }
+  .chips button[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); color: #fff; font-weight: 700; }
+  #status { color: var(--muted); font-size: 14px; margin: 4px 2px 10px; min-height: 20px; }
+  .row { display: grid; grid-template-columns: 60px 1fr auto; gap: 12px; align-items: center; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px; margin-bottom: 8px; }
+  .row.off { opacity: .62; }
+  .thumb { width: 60px; height: 60px; border-radius: 10px; background: #e9eeee center / cover no-repeat; border: 1px solid var(--line); display: grid; place-items: center; font-size: 28px; }
+  .row .name { font-weight: 650; }
+  .row .meta { font-size: 13px; color: var(--muted); }
+  .row .meta b { color: var(--ink); font-weight: 650; font-variant-numeric: tabular-nums; }
+  .row .acts { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+  .badge { display: inline-block; font-size: 12px; font-weight: 700; padding: 0 8px; border-radius: 999px; margin-left: 6px; background: #e3f4f1; color: #14594f; vertical-align: 1px; }
+  .badge.reserved { background: #ffe9b3; color: #5e3d00; } .badge.sold { background: #1d2327; color: #fff; } .badge.off { background: #eceff1; color: var(--muted); } .badge.old { background: #fdecea; color: #7a1f1a; }
+  dialog { border: 0; border-radius: 16px; padding: 0; width: min(680px, calc(100vw - 20px)); max-height: calc(100dvh - 20px); box-shadow: 0 8px 28px rgba(20,30,35,.25); color: var(--ink); }
+  dialog::backdrop { background: rgba(20,30,35,.45); }
+  dialog form { padding: 18px 20px 0; }
+  dialog h2 { margin: 0 0 4px; font-size: 20px; }
+  .field input:not([type="checkbox"]):not([type="file"]), .field select { display: block; width: 100%; height: 42px; padding: 0 10px; margin-top: 4px; font-size: 16px; font-weight: 400; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+  .field textarea { display: block; width: 100%; margin-top: 4px; padding: 9px 10px; font-size: 16px; font-weight: 400; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+  .field small, .hint { display: block; font-weight: 400; color: var(--muted); font-size: 13px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(135px, 1fr)); gap: 0 12px; }
+  .check { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-weight: 600; }
+  .check input { width: 20px; height: 20px; accent-color: var(--brand); }
+  fieldset { min-width: 0; border: 1px solid var(--line); border-radius: 12px; margin: 14px 0 0; padding: 4px 12px 12px; }
+  legend { font-weight: 700; padding: 0 6px; color: var(--brand-dark); }
+  input[type="file"] { max-width: 100%; }
+  #photos { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .ph { width: 92px; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: #fff; }
+  .ph .im { width: 92px; height: 92px; background: #e9eeee center / cover no-repeat; position: relative; }
+  .ph .im b { position: absolute; left: 4px; top: 4px; background: var(--brand); color: #fff; font-size: 11px; padding: 0 6px; border-radius: 999px; }
+  .ph .bt { display: flex; }
+  .ph .bt button { flex: 1; min-height: 32px; padding: 0; border: 0; border-top: 1px solid var(--line); border-radius: 0; background: #fff; }
+  .ph .bt button + button { border-left: 1px solid var(--line); }
+  .dialog-btns { position: sticky; bottom: 0; z-index: 5; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 16px -20px 0; padding: 12px 20px; background: var(--card); border-top: 1px solid var(--line); }
+  .dialog-btns .spacer { flex: 1; }
+  @media (max-width: 560px) { .row { grid-template-columns: 52px 1fr; } .row .acts { grid-column: 1 / -1; justify-content: flex-start; } .thumb { width: 52px; height: 52px; } }
+</style>
+</head>
+<body class="locked">
+<header>
+  <h1>Thrift stock — Pre-loved Corner</h1>
+  <p>Your second-hand items, what you paid and what you made. <a href="./thrift.html">← The thrift shop</a> · <a href="./products.html">Snack products</a> · <a href="./inventory.html">Snack stock</a></p>
+</header>
+<main>
+  <div id="notice" class="panel" role="alert" hidden></div>
+
+  <form id="signin" class="panel" hidden>
+    <b>Sign in to manage the thrift stock</b>
+    <label>Email<input id="signin-email" type="email" autocomplete="username" required></label>
+    <label>Password<input id="signin-password" type="password" autocomplete="current-password" required></label>
+    <p id="signin-error" class="error" role="alert"></p>
+    <button class="primary" type="submit">Sign in</button>
+  </form>
+
+  <div id="live-bar" class="panel">
+    <span><b>Live.</b> Signed in as <span id="who"></span>. Changes show in the thrift shop the next time someone opens it.</span>
+    <button id="signout" type="button">Sign out</button>
+  </div>
+
+  <div id="setup" class="panel" hidden>
+    <b>One small set-up step is needed.</b> In Supabase, open <b>SQL Editor → New query</b>, paste the contents of
+    <code>supabase-thrift.sql</code> (in the repository) and press <b>Run</b>. Then reload this page. Until then the thrift shop keeps using the items in <code>thrift.json</code>.
+  </div>
+
+  <div id="import-box" class="panel" hidden>
+    <b>The database has no thrift items yet.</b> The shop is using the list in <code>thrift.json</code>.
+    Copy that list in once, and from then on you manage everything here.
+    <div class="toolbar" style="margin-bottom:0"><button id="import" class="primary" type="button">Copy the items from thrift.json</button></div>
+  </div>
+
+  <details class="panel">
+    <summary>How this works</summary>
+    <b>Add an item</b> with photos, price and condition. It appears in the shop straight away. <b>What you paid</b>, <b>where you got it</b> and your <b>notes</b> are only for you: shoppers never see them.<br>
+    <b>Reserve</b> an item when someone has asked for it (it shows as Reserved and can't be added to a bag). <b>Sold</b> records the price you got, the date and who bought it, and feeds the profit figures above. <b>Relist</b> brings a sold item back.<br>
+    <b>Hide</b> (untick “Show in the shop”) keeps an item in your records without showing it. Items that have sat unsold for more than 60 days get a flag, so you know when to drop the price.<br>
+    <b>Download backup</b> saves the shop's items as <code>thrift.json</code>; the shop uses that file if the database is unreachable. <b>Export CSV</b> saves everything, including your private columns, for a spreadsheet.
+  </details>
+
+  <div class="stats" id="stats" aria-label="Summary"></div>
+
+  <div class="toolbar">
+    <label class="sr" for="search" style="position:absolute;left:-9999px">Search</label>
+    <input id="search" type="search" placeholder="Search name, brand, notes, buyer…">
+    <label for="sort" style="position:absolute;left:-9999px">Sort</label>
+    <select id="sort"><option value="new">Newest listed</option><option value="old">Oldest listed</option><option value="high">Price: high to low</option><option value="low">Price: low to high</option><option value="name">Name A–Z</option></select>
+    <button id="add" class="primary" type="button">Add an item</button>
+    <button id="csv" type="button">Export CSV</button>
+    <button id="backup" type="button">Download backup</button>
+  </div>
+  <div class="chips" id="chips" role="group" aria-label="Show"></div>
+  <p id="status" role="status" aria-live="polite"></p>
+  <div id="list"></div>
+</main>
+
+<dialog id="editor" aria-labelledby="ed-title">
+  <form id="ed-form" method="dialog">
+    <h2 id="ed-title">Item</h2>
+    <label class="field">Name<input id="f-name" required maxlength="160" autocomplete="off"></label>
+    <div class="grid">
+      <label class="field">Price (S$)<input id="f-price" type="number" min="0" max="9999" step="0.01" inputmode="decimal" required></label>
+      <label class="field">Original price (S$)<input id="f-was" type="number" min="0" max="9999" step="0.01" inputmode="decimal"><small>Optional. Shown crossed out.</small></label>
+      <label class="field">You paid (S$)<input id="f-cost" type="number" min="0" max="9999" step="0.01" inputmode="decimal"><small>Private</small></label>
+    </div>
+    <div class="grid">
+      <label class="field">Category<select id="f-cat"></select></label>
+      <label class="field" id="f-newcat-wrap" hidden>New category<input id="f-newcat" maxlength="60" autocomplete="off"></label>
+      <label class="field">Condition<select id="f-cond"><option>Like new</option><option selected>Good</option><option>Fair</option></select></label>
+      <label class="field">Size<input id="f-size" maxlength="40" autocomplete="off" placeholder="M, 42, 30 cm…"></label>
+      <label class="field">Brand<input id="f-brand" maxlength="60" autocomplete="off"></label>
+    </div>
+    <label class="field">Description <small>What it is, any flaws, measurements, what is in the box.</small><textarea id="f-desc" rows="4" maxlength="2000"></textarea></label>
+
+    <fieldset>
+      <legend>Photos</legend>
+      <small class="hint">Up to 8. The first is the cover. Pictures are made smaller before upload.</small>
+      <div id="photos" aria-live="polite"></div>
+      <div style="margin-top:8px"><label class="field" style="margin:0">Add photos<input id="f-files" type="file" accept="image/jpeg,image/png,image/webp" multiple style="display:block;margin-top:4px"></label></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Status</legend>
+      <div class="grid">
+        <label class="field">Status<select id="f-status"><option value="available">Available</option><option value="reserved">Reserved</option><option value="sold">Sold</option></select></label>
+        <label class="field">Listed on<input id="f-listed" type="date" required></label>
+      </div>
+      <div class="grid" id="sold-fields" hidden>
+        <label class="field">Sold for (S$)<input id="f-sprice" type="number" min="0" max="9999" step="0.01" inputmode="decimal"></label>
+        <label class="field">Sold on<input id="f-sdate" type="date"></label>
+        <label class="field">Bought by<input id="f-buyer" maxlength="120" autocomplete="off" placeholder="Name or WhatsApp"></label>
+      </div>
+      <label class="check"><input id="f-active" type="checkbox" checked> Show in the shop</label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Private notes</legend>
+      <label class="field">Where you got it<input id="f-source" maxlength="120" autocomplete="off" placeholder="Carousell, a friend, garage sale…"></label>
+      <label class="field">Notes<textarea id="f-notes" rows="2" maxlength="1000"></textarea></label>
+    </fieldset>
+
+    <p id="ed-error" class="error" role="alert"></p>
+    <div class="dialog-btns">
+      <button id="save" class="primary" type="submit">Save</button>
+      <button id="cancel" type="button">Cancel</button>
+      <span class="spacer"></span>
+      <a id="view-link" target="_blank" rel="noopener" hidden>View in shop</a>
+      <button id="delete" class="danger" type="button" hidden>Delete</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="sold-dlg" aria-labelledby="sd-title">
+  <form id="sd-form" method="dialog">
+    <h2 id="sd-title">Mark as sold</h2>
+    <p id="sd-name" class="hint"></p>
+    <div class="grid">
+      <label class="field">Sold for (S$)<input id="sd-price" type="number" min="0" max="9999" step="0.01" inputmode="decimal" required></label>
+      <label class="field">Sold on<input id="sd-date" type="date" required></label>
+    </div>
+    <label class="field">Bought by <small>Optional. A name or WhatsApp number, for your records.</small><input id="sd-buyer" maxlength="120" autocomplete="off"></label>
+    <p id="sd-error" class="error" role="alert"></p>
+    <div class="dialog-btns"><button class="primary" type="submit">Mark as sold</button><button id="sd-cancel" type="button">Cancel</button></div>
+  </form>
+</dialog>
+
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const el = (tag, props = {}, ...kids) => { const n = Object.assign(document.createElement(tag), props); n.append(...kids); return n; };
+const BUCKET = 'product-files', SESSION_KEY = 'virtual-snack-shop-owner-session';   // the same owner login and photo storage as the snack pages
+const GLYPH = { 'Clothing': '👕', 'Electronics': '🎧', 'Books': '📚', 'Home': '🏠', 'Toys & games': '🧸', 'Other': '🎁' };
+const OLD_DAYS = 60;
+let DB_URL = '', DB_KEY = '', session = null, fileData = null, rows = [], categories = [];
+const view = { q: '', status: 'all', sort: 'new' };
+const money = n => 'S$' + Number(n || 0).toFixed(2);
+const today = () => { const d = new Date(); return new Date(d - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10); };
+const daysSince = iso => iso ? Math.max(0, Math.floor((Date.now() - new Date(iso + 'T00:00:00').getTime()) / 864e5)) : 0;
+const say = t => { $('status').textContent = t; };
+const slug = name => name.toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'item';
+const num = v => (v === '' || v === null || v === undefined || !Number.isFinite(Number(v))) ? null : Math.round(Number(v) * 100) / 100;
+function notice(...parts) { const n = $('notice'); n.textContent = ''; n.append(...parts); n.hidden = false; }
+
+// --- Signing in and talking to the database (same owner login as the other owner pages) ---
+function keepSession(s) { session = s; try { if (s) localStorage.setItem(SESSION_KEY, JSON.stringify(s)); else localStorage.removeItem(SESSION_KEY); } catch (e) {} }
+async function authCall(grant, body) {
+  const res = await fetch(`${DB_URL}/auth/v1/token?grant_type=${grant}`, { method: 'POST', headers: { apikey: DB_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const d = await res.json().catch(() => ({}));
+  if (!res.ok || !d.access_token) throw new Error(d.msg || d.error_description || d.message || 'Sign-in failed.');
+  keepSession({ access_token: d.access_token, refresh_token: d.refresh_token, expires_at: Date.now() + (d.expires_in || 3600) * 1000, email: (d.user && d.user.email) || '' });
+}
+async function accessToken() {
+  if (!session) throw new Error('Please sign in.');
+  if (session.expires_at - Date.now() < 60000) { try { await authCall('refresh_token', { refresh_token: session.refresh_token }); } catch (e) { showSignIn('Please sign in again.'); throw new Error('Please sign in again.'); } }
+  return session.access_token;
+}
+async function api(path, { method = 'GET', body, prefer } = {}) {
+  const token = await accessToken();
+  const res = await fetch(`${DB_URL}/rest/v1/${path}`, { method, headers: { apikey: DB_KEY, Authorization: 'Bearer ' + token, 'Content-Type': 'application/json', ...(prefer ? { Prefer: prefer } : {}) }, body: body === undefined ? undefined : JSON.stringify(body) });
+  if (res.status === 401) { showSignIn('Please sign in again.'); throw new Error('Please sign in again.'); }
+  const text = await res.text(); let data = null; try { data = text ? JSON.parse(text) : null; } catch (e) {}
+  if (!res.ok) { const err = new Error((data && (data.message || data.msg)) || 'HTTP ' + res.status); err.status = res.status; throw err; }
+  return data;
+}
+async function upload(path, blob) {
+  const token = await accessToken();
+  const res = await fetch(`${DB_URL}/storage/v1/object/${BUCKET}/${path}`, { method: 'POST', headers: { apikey: DB_KEY, Authorization: 'Bearer ' + token, 'Content-Type': blob.type, 'cache-control': 'max-age=31536000' }, body: blob });
+  if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error('Upload failed: ' + (d.message || d.error || 'HTTP ' + res.status)); }
+  return `${DB_URL}/storage/v1/object/public/${BUCKET}/${path}`;
+}
+const ownPrefix = () => `${DB_URL}/storage/v1/object/public/${BUCKET}/`;
+async function removeFile(url) {
+  if (!url || !url.startsWith(ownPrefix())) return;
+  try { const token = await accessToken(); await fetch(`${DB_URL}/storage/v1/object/${BUCKET}/${url.slice(ownPrefix().length)}`, { method: 'DELETE', headers: { apikey: DB_KEY, Authorization: 'Bearer ' + token } }); } catch (e) { console.warn('Could not remove a photo:', e); }
+}
+function showSignIn(message = '') { keepSession(null); document.body.classList.add('locked'); $('signin').hidden = false; $('signin-error').textContent = message; }
+$('signin').addEventListener('submit', async e => {
+  e.preventDefault(); const btn = $('signin').querySelector('button'); btn.disabled = true; $('signin-error').textContent = '';
+  try { await authCall('password', { email: $('signin-email').value.trim(), password: $('signin-password').value }); $('signin-password').value = ''; await start(); }
+  catch (err) { showSignIn(err.message); }
+  btn.disabled = false;
+});
+$('signout').onclick = async () => {
+  try { await fetch(`${DB_URL}/auth/v1/logout`, { method: 'POST', headers: { apikey: DB_KEY, Authorization: 'Bearer ' + session.access_token } }); } catch (e) {}
+  rows = []; $('list').textContent = ''; showSignIn();
+};
+
+// --- Loading and showing the stock ---
+async function start() {
+  const mine = await api('admins?select=user_id');
+  if (!mine || !mine.length) throw new Error('This login works, but it is not set up as the shop owner yet.');
+  document.body.classList.remove('locked'); $('signin').hidden = true; $('who').textContent = session.email;
+  await reload();
+}
+async function reload() {
+  try { rows = await api('thrift_items?select=*&order=listed_on.desc,name'); $('setup').hidden = true; $('add').disabled = false; }
+  catch (e) {
+    if (e.status === 404 || /thrift_items|relation|schema cache/i.test(e.message)) { rows = null; $('setup').hidden = false; $('add').disabled = true; render(); return; }
+    throw e;
+  }
+  $('import-box').hidden = rows.length > 0 || !(fileData && (fileData.items || []).length);
+  render();
+}
+const catNames = () => { const names = [...categories]; (rows || []).forEach(r => { if (r.category && !names.includes(r.category)) names.push(r.category); }); return names; };
+const cover = r => (r.photos || [])[0] || '';
+const isOld = r => r.status === 'available' && r.active && daysSince(r.listed_on) > OLD_DAYS;
+function renderStats() {
+  const box = $('stats'); box.textContent = ''; if (!rows) return;
+  const live = rows.filter(r => r.status !== 'sold'), sold = rows.filter(r => r.status === 'sold');
+  const ask = live.reduce((t, r) => t + Number(r.price_sgd), 0), tied = live.reduce((t, r) => t + Number(r.cost_sgd || 0), 0);
+  const rev = sold.reduce((t, r) => t + Number(r.sold_price_sgd ?? r.price_sgd), 0);
+  const withCost = sold.filter(r => r.cost_sgd !== null && r.cost_sgd !== undefined), profit = withCost.reduce((t, r) => t + Number(r.sold_price_sgd ?? r.price_sgd) - Number(r.cost_sgd), 0);
+  const days = sold.filter(r => r.sold_on && r.listed_on).map(r => Math.max(0, Math.round((new Date(r.sold_on) - new Date(r.listed_on)) / 864e5)));
+  const avg = days.length ? Math.round(days.reduce((a, b) => a + b, 0) / days.length) : null;
+  const card = (big, small, cls = '') => el('div', { className: 'stat ' + cls }, el('b', { textContent: big }), el('span', { textContent: small }));
+  box.append(card(String(rows.filter(r => r.status === 'available').length), `available · ${money(ask)} at asking price`), card(String(rows.filter(r => r.status === 'reserved').length), 'reserved'),
+    card(String(sold.length), `sold · ${money(rev)} taken`), card((profit >= 0 ? '+' : '−') + money(Math.abs(profit)), withCost.length ? `profit on ${withCost.length} sold item${withCost.length === 1 ? '' : 's'} with a cost` : 'profit (add what you paid)', withCost.length ? (profit >= 0 ? 'good' : 'bad') : ''),
+    card(money(tied), 'paid for items not yet sold'), card(avg === null ? '—' : avg + ' days', 'average time to sell'));
+}
+function visibleRows() {
+  const q = view.q.trim().toLowerCase();
+  let list = (rows || []).filter(r => {
+    if (view.status === 'hidden' ? r.active : view.status !== 'all' && (r.status !== view.status || !r.active)) return false;
+    return !q || `${r.name} ${r.category} ${r.brand} ${r.size} ${r.notes} ${r.source} ${r.buyer} ${r.description}`.toLowerCase().includes(q);
+  });
+  const by = { new: (a, b) => String(b.listed_on).localeCompare(String(a.listed_on)), old: (a, b) => String(a.listed_on).localeCompare(String(b.listed_on)), high: (a, b) => b.price_sgd - a.price_sgd, low: (a, b) => a.price_sgd - b.price_sgd, name: (a, b) => a.name.localeCompare(b.name) }[view.sort];
+  return list.sort(by);
+}
+function renderChips() {
+  const box = $('chips'); box.textContent = ''; if (!rows) return;
+  const count = { all: rows.length, available: rows.filter(r => r.status === 'available' && r.active).length, reserved: rows.filter(r => r.status === 'reserved' && r.active).length, sold: rows.filter(r => r.status === 'sold' && r.active).length, hidden: rows.filter(r => !r.active).length };
+  [['all', 'All'], ['available', 'Available'], ['reserved', 'Reserved'], ['sold', 'Sold'], ['hidden', 'Hidden']].forEach(([k, label]) => {
+    const b = el('button', { type: 'button', textContent: `${label} (${count[k]})`, onclick: () => { view.status = k; render(); } }); b.setAttribute('aria-pressed', String(view.status === k)); box.append(b);
+  });
+}
+function render() {
+  renderStats(); renderChips();
+  const list = $('list'); list.textContent = ''; if (!rows) { say(''); return; }
+  const shown = visibleRows();
+  shown.forEach(r => {
+    const th = el('div', { className: 'thumb' }); if (cover(r)) th.style.backgroundImage = `url("${String(cover(r)).replace(/["\\\n]/g, '')}")`; else { th.textContent = GLYPH[r.category] || GLYPH.Other; th.setAttribute('aria-hidden', 'true'); }
+    const profit = r.status === 'sold' && r.cost_sgd !== null ? Number(r.sold_price_sgd ?? r.price_sgd) - Number(r.cost_sgd) : null;
+    const meta = [r.category, r.condition, r.size ? 'size ' + r.size : '', r.brand].filter(Boolean).join(' · ');
+    const money1 = r.status === 'sold' ? el('span', {}, el('b', { textContent: money(r.sold_price_sgd ?? r.price_sgd) }), ` sold ${r.sold_on || ''}`, profit !== null ? ` · ${profit >= 0 ? '+' : '−'}${money(Math.abs(profit))} profit` : '')
+      : el('span', {}, el('b', { textContent: money(r.price_sgd) }), r.cost_sgd !== null ? ` · paid ${money(r.cost_sgd)}` : '', ` · listed ${daysSince(r.listed_on)} day${daysSince(r.listed_on) === 1 ? '' : 's'} ago`);
+    const act = [];
+    const edit = el('button', { type: 'button', className: 'small', textContent: 'Edit', onclick: () => openEditor(r) }); edit.setAttribute('aria-label', `Edit ${r.name}`);
+    if (r.status !== 'sold') { const sd = el('button', { type: 'button', className: 'small primary', textContent: 'Sold', onclick: () => openSold(r) }); sd.setAttribute('aria-label', `Mark ${r.name} as sold`); act.push(sd); }
+    if (r.status === 'available') { const rs = el('button', { type: 'button', className: 'small', textContent: 'Reserve', onclick: () => quick(r, { status: 'reserved' }, `Reserved “${r.name}”.`) }); rs.setAttribute('aria-label', `Reserve ${r.name}`); act.push(rs); }
+    if (r.status === 'reserved') { const rl = el('button', { type: 'button', className: 'small', textContent: 'Release', onclick: () => quick(r, { status: 'available' }, `“${r.name}” is available again.`) }); rl.setAttribute('aria-label', `Release the reservation on ${r.name}`); act.push(rl); }
+    if (r.status === 'sold') { const rl = el('button', { type: 'button', className: 'small', textContent: 'Relist', onclick: () => quick(r, { status: 'available', sold_price_sgd: null, sold_on: null, buyer: '' }, `Relisted “${r.name}”.`) }); rl.setAttribute('aria-label', `Relist ${r.name}`); act.push(rl); }
+    act.push(edit);
+    list.append(el('div', { className: 'row' + (r.active ? '' : ' off') }, th,
+      el('div', {}, el('div', { className: 'name' }, r.name, el('span', { className: 'badge ' + r.status, textContent: r.status === 'available' ? 'Available' : r.status === 'reserved' ? 'Reserved' : 'Sold' }), r.active ? '' : el('span', { className: 'badge off', textContent: 'Hidden' }), isOld(r) ? el('span', { className: 'badge old', textContent: `${daysSince(r.listed_on)} days: consider a lower price` }) : ''),
+        el('div', { className: 'meta', textContent: meta }), el('div', { className: 'meta' }, money1)),
+      el('div', { className: 'acts' }, ...act)));
+  });
+  say(rows.length ? `${shown.length} of ${rows.length} item${rows.length === 1 ? '' : 's'} shown` : 'No items yet. Add your first one.');
+  if (rows.length && !shown.length) list.append(el('p', { className: 'hint', textContent: 'Nothing matches. Try another search or filter.' }));
+}
+$('search').addEventListener('input', () => { view.q = $('search').value; render(); });
+$('sort').addEventListener('change', () => { view.sort = $('sort').value; render(); });
+
+// --- Quick changes: reserve, release, relist, sold ---
+async function quick(r, patch, message) {
+  try { await api(`thrift_items?id=eq.${encodeURIComponent(r.id)}`, { method: 'PATCH', prefer: 'return=minimal', body: { ...patch, updated_at: new Date().toISOString() } }); await reload(); say(message); }
+  catch (e) { say('Could not save: ' + e.message); }
+}
+let soldRow = null;
+function openSold(r) { soldRow = r; $('sd-name').textContent = `${r.name} · asking ${money(r.price_sgd)}`; $('sd-price').value = Number(r.price_sgd).toFixed(2); $('sd-date').value = today(); $('sd-buyer').value = r.buyer || ''; $('sd-error').textContent = ''; $('sold-dlg').showModal(); $('sd-price').select(); }
+$('sd-cancel').onclick = () => $('sold-dlg').close();
+$('sd-form').addEventListener('submit', async e => {
+  e.preventDefault(); const price = num($('sd-price').value); if (price === null || price < 0) { $('sd-error').textContent = 'Enter the price you sold it for.'; return; }
+  const r = soldRow; $('sold-dlg').close();
+  await quick(r, { status: 'sold', sold_price_sgd: price, sold_on: $('sd-date').value || today(), buyer: $('sd-buyer').value.trim() }, `Marked “${r.name}” as sold for ${money(price)}.`);
+});
+
+// --- The editor, with its photos ---
+let editing = null, photos = [];      // photos: [{ url } or { blob, preview }], in order; the first is the cover
+let removedUrls = [];
+function fillCats(selected) {
+  const sel = $('f-cat'); sel.textContent = '';
+  catNames().forEach(n => sel.append(el('option', { value: n, textContent: n }))); sel.append(el('option', { value: '\u0000new', textContent: '+ New category…' }));
+  sel.value = selected && catNames().includes(selected) ? selected : (catNames()[0] || '\u0000new'); $('f-newcat-wrap').hidden = sel.value !== '\u0000new';
+}
+$('f-cat').onchange = () => { $('f-newcat-wrap').hidden = $('f-cat').value !== '\u0000new'; if (!$('f-newcat-wrap').hidden) $('f-newcat').focus(); };
+$('f-status').onchange = () => { $('sold-fields').hidden = $('f-status').value !== 'sold'; if ($('f-status').value === 'sold') { if (!$('f-sprice').value) $('f-sprice').value = $('f-price').value; if (!$('f-sdate').value) $('f-sdate').value = today(); } };
+function drawPhotos() {
+  const box = $('photos'); box.textContent = '';
+  photos.forEach((p, i) => {
+    const im = el('div', { className: 'im' }); im.style.backgroundImage = `url("${String(p.preview || p.url).replace(/["\\\n]/g, '')}")`; if (i === 0) im.append(el('b', { textContent: 'Cover' }));
+    const mv = (d, txt, label) => { const b = el('button', { type: 'button', textContent: txt, disabled: i + d < 0 || i + d >= photos.length, onclick: () => { [photos[i], photos[i + d]] = [photos[i + d], photos[i]]; drawPhotos(); } }); b.setAttribute('aria-label', `Move photo ${i + 1} ${label}`); return b; };
+    const rm = el('button', { type: 'button', textContent: '✕', onclick: () => { const [g] = photos.splice(i, 1); if (g.url) removedUrls.push(g.url); drawPhotos(); } }); rm.setAttribute('aria-label', `Remove photo ${i + 1}`);
+    box.append(el('div', { className: 'ph' }, im, el('div', { className: 'bt' }, mv(-1, '←', 'earlier'), mv(1, '→', 'later'), rm)));
+  });
+  $('f-files').disabled = photos.length >= 8;
+}
+async function shrink(file) {
+  const img = await new Promise((ok, bad) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => bad(new Error('“' + file.name + '” is not a picture this browser can read.')); i.src = URL.createObjectURL(file); });
+  const k = Math.min(1, 1200 / Math.max(img.naturalWidth, img.naturalHeight)), c = document.createElement('canvas'); c.width = Math.max(1, Math.round(img.naturalWidth * k)); c.height = Math.max(1, Math.round(img.naturalHeight * k));
+  const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(img.src);
+  const blob = await new Promise(ok => c.toBlob(ok, 'image/jpeg', 0.86)); if (!blob) throw new Error('A picture could not be prepared.');
+  return { blob, preview: URL.createObjectURL(blob) };
+}
+$('f-files').onchange = async () => {
+  const files = [...$('f-files').files]; $('f-files').value = '';
+  for (const f of files) { if (photos.length >= 8) break; try { photos.push(await shrink(f)); $('ed-error').textContent = ''; } catch (e) { $('ed-error').textContent = e.message; } }
+  drawPhotos();
+};
+function openEditor(r) {
+  editing = r || null; removedUrls = []; photos = ((r && r.photos) || []).map(url => ({ url }));
+  $('ed-title').textContent = r ? `Edit ${r.name}` : 'Add an item';
+  $('f-name').value = r ? r.name : ''; $('f-price').value = r ? Number(r.price_sgd).toFixed(2) : ''; $('f-was').value = r && r.was_sgd !== null ? Number(r.was_sgd).toFixed(2) : ''; $('f-cost').value = r && r.cost_sgd !== null ? Number(r.cost_sgd).toFixed(2) : '';
+  fillCats(r && r.category); $('f-newcat').value = ''; $('f-cond').value = r ? r.condition : 'Good'; $('f-size').value = r ? r.size : ''; $('f-brand').value = r ? r.brand : ''; $('f-desc').value = r ? r.description : '';
+  $('f-status').value = r ? r.status : 'available'; $('f-listed').value = r ? r.listed_on : today(); $('f-active').checked = r ? r.active : true;
+  $('f-sprice').value = r && r.sold_price_sgd !== null ? Number(r.sold_price_sgd).toFixed(2) : ''; $('f-sdate').value = r && r.sold_on ? r.sold_on : ''; $('f-buyer').value = r ? r.buyer : ''; $('sold-fields').hidden = $('f-status').value !== 'sold';
+  $('f-source').value = r ? r.source : ''; $('f-notes').value = r ? r.notes : '';
+  $('delete').hidden = !r; $('view-link').hidden = !r; if (r) $('view-link').href = `./thrift.html?item=${encodeURIComponent(r.id)}`;
+  $('ed-error').textContent = ''; $('save').disabled = false; drawPhotos(); $('editor').showModal(); $('f-name').focus();
+}
+$('add').onclick = () => openEditor(null);
+$('cancel').onclick = () => $('editor').close();
+$('editor').addEventListener('close', () => { photos.forEach(p => { if (p.preview) URL.revokeObjectURL(p.preview); }); photos = []; });
+$('ed-form').addEventListener('submit', async e => {
+  e.preventDefault(); const err = $('ed-error'); err.textContent = '';
+  const name = $('f-name').value.trim(), price = num($('f-price').value), category = $('f-cat').value === '\u0000new' ? $('f-newcat').value.trim() : $('f-cat').value;
+  if (!name) { err.textContent = 'Give the item a name.'; return; }
+  if (price === null || price < 0) { err.textContent = 'Enter the asking price as a number, like 12.50.'; return; }
+  if (!category) { err.textContent = 'Give the new category a name.'; return; }
+  const status = $('f-status').value;
+  if (status === 'sold' && num($('f-sprice').value) === null) { err.textContent = 'Enter what it sold for.'; $('f-sprice').focus(); return; }
+  let id = editing ? editing.id : slug(name); if (!editing) for (let n = 2; rows.some(r => r.id === id); n++) id = `${slug(name)}-${n}`;
+  $('save').disabled = true;
+  try {
+    const urls = []; let n = 0;
+    for (const p of photos) { if (p.url) urls.push(p.url); else urls.push(await upload(`thrift/${id}/p-${Date.now().toString(36)}-${n++}.jpg`, p.blob)); }   // photos first, so the item is only saved once they are safely uploaded
+    const row = { name, category, price_sgd: price, was_sgd: num($('f-was').value), cost_sgd: num($('f-cost').value), condition: $('f-cond').value, size: $('f-size').value.trim(), brand: $('f-brand').value.trim(), description: $('f-desc').value.trim(), photos: urls,
+      status, active: $('f-active').checked, listed_on: $('f-listed').value || today(), source: $('f-source').value.trim(), notes: $('f-notes').value.trim(),
+      sold_price_sgd: status === 'sold' ? num($('f-sprice').value) : null, sold_on: status === 'sold' ? ($('f-sdate').value || today()) : null, buyer: status === 'sold' ? $('f-buyer').value.trim() : '', updated_at: new Date().toISOString() };
+    if (!categories.includes(category)) categories.push(category);
+    if (editing) await api(`thrift_items?id=eq.${encodeURIComponent(id)}`, { method: 'PATCH', prefer: 'return=minimal', body: row });
+    else await api('thrift_items', { method: 'POST', prefer: 'return=minimal', body: { id, ...row } });
+    for (const u of removedUrls) await removeFile(u);
+    $('editor').close(); await reload(); say(`Saved “${name}”.`);
+  } catch (ex) { err.textContent = 'Could not save: ' + ex.message; }
+  $('save').disabled = false;
+});
+$('delete').onclick = async () => {
+  const r = editing; if (!r || !confirm(`Delete “${r.name}” for good, with its photos? To keep your records, untick “Show in the shop” instead.`)) return;
+  try { await api(`thrift_items?id=eq.${encodeURIComponent(r.id)}`, { method: 'DELETE', prefer: 'return=minimal' }); for (const u of r.photos || []) await removeFile(u); $('editor').close(); await reload(); say(`Deleted “${r.name}”.`); }
+  catch (ex) { $('ed-error').textContent = 'Could not delete: ' + ex.message; }
+};
+
+// --- Import, backup and CSV ---
+$('import').onclick = async () => {
+  const btn = $('import'); btn.disabled = true;
+  try {
+    const src = (fileData.items || []).filter(i => i && i.id && i.name && typeof i.price === 'number');
+    const bad = src.filter(i => !/^[a-z0-9][a-z0-9-]{0,79}$/.test(i.id)); if (bad.length) throw new Error('These ids need fixing in thrift.json first (small letters, digits and dashes): ' + bad.map(i => i.id).join(', '));
+    await api('thrift_items?on_conflict=id', { method: 'POST', prefer: 'resolution=ignore-duplicates,return=minimal', body: src.map((i, k) => ({ id: i.id, name: i.name, category: i.category || 'Other', price_sgd: i.price, was_sgd: i.was || null, condition: ['Like new', 'Good', 'Fair'].includes(i.condition) ? i.condition : 'Good', size: i.size || '', brand: i.brand || '', description: i.description || '', photos: (i.photos || []).slice(0, 8), status: i.sold ? 'sold' : 'available', sold_price_sgd: i.sold ? i.price : null, sold_on: i.sold ? today() : null, listed_on: i.added || today(), sort: k })) });
+    await reload(); say(`Copied ${src.length} items into the database.`);
+  } catch (e) { say('Could not copy the items: ' + e.message); }
+  btn.disabled = false;
+};
+function download(name, text, type) { const a = el('a', { href: URL.createObjectURL(new Blob([text], { type })), download: name }); document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 5000); }
+$('backup').onclick = () => {
+  if (!rows) return;
+  const items = rows.filter(r => r.active).map(r => { const o = { id: r.id, name: r.name, category: r.category, price: Number(r.price_sgd) }; if (r.was_sgd) o.was = Number(r.was_sgd); o.condition = r.condition; if (r.size) o.size = r.size; if (r.brand) o.brand = r.brand; o.added = r.listed_on; o.description = r.description; o.photos = r.photos || []; o.sold = r.status === 'sold'; if (r.status === 'reserved') o.reserved = true; return o; });
+  download('thrift.json', JSON.stringify({ ...fileData, categories: catNames(), items }, null, 2) + '\n', 'application/json');
+  say('Backup downloaded. Upload it to the repository as thrift.json so the shop has a fallback.');
+};
+$('csv').onclick = () => {
+  if (!rows) return;
+  const cols = ['id', 'name', 'category', 'status', 'active', 'price_sgd', 'was_sgd', 'cost_sgd', 'sold_price_sgd', 'sold_on', 'listed_on', 'condition', 'size', 'brand', 'source', 'buyer', 'notes', 'description'];
+  const esc = v => { let t = v === null || v === undefined ? '' : String(v); if (/^[=+\-@]/.test(t)) t = "'" + t; return /[",\n]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t; };   // a leading = + - @ is made harmless for spreadsheets
+  download('thrift-stock.csv', '﻿' + [cols.join(','), ...rows.map(r => cols.map(c => esc(r[c])).join(','))].join('\r\n') + '\r\n', 'text/csv');
+  say('CSV saved, with your private columns.');
+};
+
+(async function load() {
+  try {
+    const res = await fetch('thrift.json', { cache: 'no-cache' }); if (!res.ok) throw new Error('thrift.json: HTTP ' + res.status);
+    fileData = await res.json(); categories = Array.isArray(fileData.categories) ? [...fileData.categories] : [];
+    const shop = fileData.shop || {}; DB_URL = String(shop.supabase_url || '').trim().replace(/\/+$/, ''); DB_KEY = String(shop.supabase_key || '').trim();
+    if (!DB_URL || !DB_KEY) { notice('This page needs the shop’s database. Set "supabase_url" and "supabase_key" under "shop" in thrift.json first.'); return; }
+    try { session = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); } catch (e) { session = null; }
+    if (session && session.refresh_token) { try { await start(); } catch (e) { showSignIn(e.message); } } else showSignIn();
+  } catch (e) { notice('Could not load the shop data (' + e.message + '). Open this page from the live site or a local web server, not straight from a file.'); }
+})();
+</script>
+</body>
+</html>
