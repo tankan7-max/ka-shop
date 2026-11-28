@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script type="importmap">
+{ "imports": { "three": "./vendor/three.module.min.js", "three/addons/": "./vendor/addons/" } }
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pre-loved Corner — second-hand finds</title>
 <meta name="description" content="Second-hand goods, each one only once. Browse, add to your bag and order on WhatsApp.">
@@ -403,11 +406,11 @@ const hasWebGL = (() => { try { const c = document.createElement('canvas'); retu
 const WORLD = { api: null, loading: null };
 function loadWorld() {
   if (WORLD.api) return Promise.resolve(WORLD.api);
-  if (!WORLD.loading) WORLD.loading = import('./vendor/three.module.min.js').then(THREE => { WORLD.api = buildWorld(THREE); if (new URLSearchParams(location.search).has('debug')) window.__t3 = WORLD.api.debug; return WORLD.api; }).catch(e => { WORLD.loading = null; throw e; });
+  if (!WORLD.loading) WORLD.loading = Promise.all([import('./vendor/three.module.min.js'), import('./thrift-model.js')]).then(([THREE, MM]) => { WORLD.api = buildWorld(THREE, MM); if (new URLSearchParams(location.search).has('debug')) window.__t3 = WORLD.api.debug; return WORLD.api; }).catch(e => { WORLD.loading = null; throw e; });
   return WORLD.loading;
 }
 
-function buildWorld(THREE) {
+function buildWorld(THREE, MM) {
   const host = $('world'), canvas = $('view');
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
@@ -449,15 +452,12 @@ function buildWorld(THREE) {
   const cnv = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
   const rr = (g, x, y, w, h, r) => { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); };
   const fit1 = (g, text, maxW, size, weight = '700') => { let px = size; g.font = `${weight} ${px}px system-ui, sans-serif`; while (g.measureText(text).width > maxW && px > 9) { px -= 1; g.font = `${weight} ${px}px system-ui, sans-serif`; } return px; };
-  function drawPhoto(e) {
-    const it = e.it, g = e.photoCv.getContext('2d'), w = 256, h = 256;
-    g.fillStyle = TINT[it.category] || TINT.Other; g.fillRect(0, 0, w, h);
-    if (e.img) { const k = Math.max(w / e.img.naturalWidth, h / e.img.naturalHeight), iw = e.img.naturalWidth * k, ih = e.img.naturalHeight * k; g.drawImage(e.img, (w - iw) / 2, (h - ih) / 2, iw, ih); }
-    else { g.font = '120px system-ui, "Apple Color Emoji", "Segoe UI Emoji", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(GLYPH[it.category] || GLYPH.Other, w / 2, h / 2 + 8); }
-    if (it.sold) { g.fillStyle = 'rgba(20,26,30,.55)'; g.fillRect(0, 0, w, h); g.save(); g.translate(w / 2, h / 2); g.rotate(-0.5); g.fillStyle = '#b3261e'; g.fillRect(-w, -26, w * 2, 52); g.fillStyle = '#fff'; g.font = '800 40px system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('SOLD', 0, 2); g.restore(); }
-    else if (it.reserved) { g.fillStyle = 'rgba(20,26,30,.35)'; g.fillRect(0, 0, w, h); g.save(); g.translate(w / 2, h / 2); g.rotate(-0.5); g.fillStyle = '#e6a100'; g.fillRect(-w, -26, w * 2, 52); g.fillStyle = '#1d2327'; g.font = '800 34px system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('RESERVED', 0, 2); g.restore(); }
-    else if (bag.has(it.id)) { g.fillStyle = '#228174'; rr(g, 8, 8, 92, 34, 17); g.fill(); g.fillStyle = '#fff'; g.font = '700 20px system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('In bag', 54, 26); }
-    e.photoTex.needsUpdate = true;
+  // A small badge in front of an item that is sold, reserved or in the shopper's bag. The item itself is its 3D model.
+  function drawBadge(e) {
+    const it = e.it, state = it.sold ? 'sold' : it.reserved ? 'reserved' : bag.has(it.id) ? 'bag' : ''; e.state = state; e.badge.visible = !!state; e.mdl.setDim(it.sold ? 0.5 : it.reserved ? 0.78 : 1);
+    if (!state) return; const g = e.badgeCv.getContext('2d'), w = 256, h = 96; g.clearRect(0, 0, w, h);
+    g.fillStyle = state === 'sold' ? '#b3261e' : state === 'reserved' ? '#e6a100' : '#228174'; rr(g, 4, 4, w - 8, h - 8, 24); g.fill();
+    g.fillStyle = state === 'reserved' ? '#1d2327' : '#fff'; g.font = '800 44px system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(state === 'sold' ? 'SOLD' : state === 'reserved' ? 'RESERVED' : 'In bag', w / 2, h / 2 + 3); e.badgeTex.needsUpdate = true;
   }
   function drawTag(e) {
     const it = e.it, g = e.tagCv.getContext('2d'), w = 320, h = 60;
@@ -523,17 +523,18 @@ function buildWorld(THREE) {
     obstacles.push({ minX: u.x - half[0], maxX: u.x + half[0], minZ: u.z - half[1], maxZ: u.z + half[1] });
     for (let c = 0, k = 0; k < u.n; c++) for (let t = TIERS.length - 1; t >= 0 && k < u.n; t--, k++) slots.push({ u, x: x0 + (u.shift + c) * SLOT, y: TIERS[t], col: c });
   });
-  const cardGeo = new THREE.BoxGeometry(CARD + 0.04, CARD + 0.04, 0.025), photoGeo = new THREE.PlaneGeometry(CARD, CARD), tagGeo = new THREE.PlaneGeometry(0.54, 0.1), frameMat = mat(0xffffff, { roughness: 0.5 });
+  const tagGeo = new THREE.PlaneGeometry(0.54, 0.1), badgeGeo = new THREE.PlaneGeometry(0.34, 0.128);
   const cards = []; let lastCat = null;
   list.forEach((it, i) => {
     const sl = slots[i]; if (!sl) return;
-    const e = { it, slot: sl, img: null, requested: false, photoCv: cnv(256, 256), tagCv: cnv(320, 60) };
-    e.photoTex = tex(e.photoCv); e.tagTex = tex(e.tagCv); drawPhoto(e); drawTag(e);
-    const grp = new THREE.Group(); grp.position.set(sl.x, sl.y, -0.02); grp.rotation.x = -0.1; sl.u.group.add(grp);
-    const frame = new THREE.Mesh(cardGeo, frameMat); frame.position.set(0, (CARD + 0.04) / 2, 0); grp.add(frame);
-    const photo = new THREE.Mesh(photoGeo, new THREE.MeshBasicMaterial({ map: e.photoTex })); photo.position.set(0, (CARD + 0.04) / 2, 0.014); grp.add(photo);
+    const spec = MM.normalizeModel(it.model, it), e = { it, slot: sl, spec, requested: false, tagCv: cnv(320, 60), badgeCv: cnv(256, 96) };
+    e.tagTex = tex(e.tagCv); e.badgeTex = tex(e.badgeCv);
+    e.mdl = new MM.ThriftModel(spec, { aniso: maxAniso, item: it });          // the item's own 3D model (its settings come from the owner page, or a suggestion for its category)
+    const grp = new THREE.Group(); grp.position.set(sl.x, sl.y, -0.02); grp.add(e.mdl.group); sl.u.group.add(grp);
+    const b = e.mdl.box; e.badge = new THREE.Mesh(badgeGeo, new THREE.MeshBasicMaterial({ map: e.badgeTex, transparent: true, depthWrite: false })); e.badge.position.set(b.cx, Math.min(0.3, b.h * 0.55), b.d / 2 + 0.03); e.badge.renderOrder = 2; grp.add(e.badge);
     const tag = new THREE.Mesh(tagGeo, new THREE.MeshBasicMaterial({ map: e.tagTex })); tag.position.set(sl.x, sl.y - 0.075, DEPTH / 2 + 0.012); sl.u.group.add(tag);
-    [frame, photo, tag].forEach(m => { m.userData.item = it; pickables.push(m); }); e.grp = grp; e.frame = frame; it._cardEntry = e; cards.push(e);
+    e.badge.userData.item = it; tag.userData.item = it; pickables.push(e.mdl.group, e.badge, tag); drawTag(e); drawBadge(e);
+    e.grp = grp; it._cardEntry = e; cards.push(e);
   });
   { // One sign per category on each shelf unit it appears in, as wide as the columns it covers.
     const spans = new Map(); cards.forEach(e => { const key = units.indexOf(e.slot.u) + '|' + e.it.category, sp = spans.get(key) || { u: e.slot.u, cat: e.it.category, c0: 99999, c1: -1 }; sp.c0 = Math.min(sp.c0, e.slot.col); sp.c1 = Math.max(sp.c1, e.slot.col); spans.set(key, sp); });
@@ -542,7 +543,7 @@ function buildWorld(THREE) {
     spans.forEach(sp => { const w = clamp((sp.c1 - sp.c0 + 1) * SLOT - 0.08, 0.6, 2.4), cx = sp.u.x0 + (sp.u.shift + (sp.c0 + sp.c1) / 2) * SLOT; const sg = new THREE.Mesh(new THREE.PlaneGeometry(w, 0.26), new THREE.MeshBasicMaterial({ map: signTexture(sp.cat || 'Other', '#228174', Math.round(w * 400), 104), transparent: true })); sg.position.set(cx, UNIT_H + 0.22, 0.05); sp.u.group.add(sg); });
   }
   scene.updateMatrixWorld(true);
-  const hi = new THREE.Mesh(new THREE.BoxGeometry(CARD + 0.1, CARD + 0.1, 0.02), new THREE.MeshBasicMaterial({ color: 0x2ec4a9 })); hi.matrixAutoUpdate = false; hi.visible = false; scene.add(hi);
+  const hi = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({ color: 0x2ec4a9, transparent: true, opacity: 0.3, depthWrite: false })); hi.renderOrder = 3; hi.visible = false; scene.add(hi);
 
   // ----- 5. Where you can walk: a grid of free squares, and a route through them -----
   const CELL = 0.25, GX = Math.round(W / CELL), GZ = Math.round(D / CELL), cellX = i => -HW + (i + 0.5) * CELL, cellZ = j => -HD + (j + 0.5) * CELL;
@@ -579,7 +580,7 @@ function buildWorld(THREE) {
   function walkToItem(it) {
     const e = it._cardEntry; if (!e) return; const u = e.slot.u, n = { x: Math.sin(u.rotY), z: Math.cos(u.rotY) };
     const w = new THREE.Vector3(); e.grp.getWorldPosition(w); const spot = nearestFree(w.x + n.x * 1.9, w.z + n.z * 1.9);
-    walkTo(spot, lookAtFrom(spot, w.x, w.y + 0.3, w.z));
+    walkTo(spot, lookAtFrom(spot, w.x, w.y + Math.min(0.5, e.mdl.box.h * 0.5), w.z));
   }
   function slide(dx, dz) {   // move, but not into a shelf: try each direction on its own so you slide along it
     const hit = (x, z) => Math.abs(x) > HW - RADIUS || Math.abs(z) > HD - RADIUS || blocked(x, z, RADIUS);
@@ -603,7 +604,7 @@ function buildWorld(THREE) {
   const ray = new THREE.Raycaster(), tip = $('tip');
   function pick(cx, cy) {
     const r = canvas.getBoundingClientRect(); ray.setFromCamera(new THREE.Vector2(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1), camera);
-    const hit = ray.intersectObjects(pickables.concat(solids), false)[0]; if (!hit || hit.distance > 16) return null; const d = hit.object.userData;
+    const hit = ray.intersectObjects(pickables.concat(solids), true)[0]; if (!hit || hit.distance > 16) return null; const d = hit.object.userData;
     return { item: d.item, href: d.href, floor: d.floor, point: hit.point };
   }
   let look = null, lx = 0, ly = 0, dist = 0;
@@ -624,7 +625,7 @@ function buildWorld(THREE) {
   }
   function hover(cx, cy) {
     const p = pick(cx, cy), it = p && p.item;
-    if (it) { const e = it._cardEntry; hi.matrix.copy(e.frame.matrixWorld); hi.visible = true; tip.textContent = `${it.name} · ${it.sold ? 'Sold' : it.reserved ? 'Reserved' : money(it.price)}`; const r = host.getBoundingClientRect(); tip.style.left = clamp(cx - r.left + 14, 4, r.width - 270) + 'px'; tip.style.top = (cy - r.top + 18) + 'px'; tip.hidden = false; canvas.style.cursor = 'pointer'; }
+    if (it) { const e = it._cardEntry, b = e.mdl.box; hi.scale.set(b.w + 0.05, b.h + 0.05, b.d + 0.05); hi.position.copy(e.mdl.group.localToWorld(new THREE.Vector3(b.cx, b.cy, b.cz))); hi.quaternion.copy(e.mdl.group.getWorldQuaternion(new THREE.Quaternion())); hi.visible = true; tip.textContent = `${it.name} · ${it.sold ? 'Sold' : it.reserved ? 'Reserved' : money(it.price)}`; const r = host.getBoundingClientRect(); tip.style.left = clamp(cx - r.left + 14, 4, r.width - 270) + 'px'; tip.style.top = (cy - r.top + 18) + 'px'; tip.hidden = false; canvas.style.cursor = 'pointer'; }
     else { hi.visible = false; tip.hidden = true; canvas.style.cursor = p && (p.href) ? 'pointer' : ''; }
     redraw();
   }
@@ -645,11 +646,13 @@ function buildWorld(THREE) {
 
   // ----- 9. The frame loop -----
   let raf = 0, last = 0, photoClock = 0, active = false;
-  function loadPhotos() {   // only photos that are near you get downloaded
+  function loadPhotos() {   // only what is near you gets downloaded: the photos that wrap onto the models, and any 3D files
     cards.forEach(e => {
-      if (e.requested || !(e.it.photos || [])[0]) return; const w = new THREE.Vector3(); e.grp.getWorldPosition(w);
-      if (Math.hypot(w.x - pos.x, w.z - pos.z) > 8) return; e.requested = true;
-      const img = new Image(); img.onload = () => { e.img = img; drawPhoto(e); redraw(); }; img.onerror = () => {}; img.src = e.it.photos[0];
+      if (e.requested) return; const w = new THREE.Vector3(); e.grp.getWorldPosition(w); if (Math.hypot(w.x - pos.x, w.z - pos.z) > 8) return; e.requested = true;
+      const sp = e.spec, ph = e.it.photos || [];
+      if (sp.kind === 'glb') { if (sp.glb) MM.loadGlb(sp.glb).then(o => { e.mdl.setGlb(o); drawBadge(e); redraw(); }).catch(() => {}); return; }
+      const idxs = [...new Set([sp.tex.src, sp.tex.mode === 'split' ? sp.tex.src2 : null].filter(i => i !== null && ph[i]))]; if (!idxs.length) return;
+      Promise.all(idxs.map(i => MM.loadImage(ph[i]))).then(list => { const arr = []; idxs.forEach((i, k) => { arr[i] = list[k]; }); e.mdl.setImages(arr); drawBadge(e); redraw(); });
     });
   }
   function resize() { const w = host.clientWidth || 1, h = host.clientHeight || 1; renderer.setSize(w, h, false); camera.aspect = w / h; camera.fov = w < h ? 82 : 68; camera.updateProjectionMatrix(); redraw(); }
@@ -682,9 +685,9 @@ function buildWorld(THREE) {
   const api = {
     start() { active = true; host.hidden = false; resize(); last = 0; dirty = 3; loadPhotos(); cancelAnimationFrame(raf); raf = requestAnimationFrame(frame); $('loading3d').classList.add('done'); canvas.focus({ preventScroll: true }); },
     stop() { active = false; cancelAnimationFrame(raf); host.hidden = true; for (const k in keys) keys[k] = false; },
-    walkToItem, refresh(it) { const e = it._cardEntry; if (e) { drawPhoto(e); drawTag(e); redraw(); } },
+    walkToItem, refresh(it) { const e = it._cardEntry; if (e) { drawBadge(e); drawTag(e); redraw(); } },
     focus() { canvas.focus({ preventScroll: true }); },
-    debug: { renderer, scene, camera, pos, findPath, isFree, nearestFree, W, D, slots: slots.length, cards, units, walkTo, pick, get yaw() { return yaw; }, set yaw(v) { yaw = v; redraw(); }, set pitch(v) { pitch = v; redraw(); }, redraw },
+    debug: { walkToItem, renderer, scene, camera, pos, findPath, isFree, nearestFree, W, D, slots: slots.length, cards, units, walkTo, pick, get yaw() { return yaw; }, set yaw(v) { yaw = v; redraw(); }, set pitch(v) { pitch = v; redraw(); }, redraw },
   };
   return api;
 }

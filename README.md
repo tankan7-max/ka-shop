@@ -81,6 +81,14 @@ then press *Copy the items from thrift.json* on the page. After that you never e
   never reach shoppers. Photos are stored in the same `product-files` bucket under `thrift/<item id>/`.
 - The shop only updates when *you* mark things; there is no automatic sold-marking when an order is sent on WhatsApp.
 
+**3D models**: every item is a 3D model on the shelf, and each one can be adjusted in `thrift-admin.html` (the *3D model* section of the item editor, with a live preview you can turn with your finger or mouse). Items with no model of their own get a suggested one from their category or name (a vase for Home, a book for Books, folded clothes for Clothing…).
+- **Shape**: ready-made starting points (hardcover and paperback books, box, board game, shoe box, tablet or frame, phone, speaker, earbuds case, mug, vase, bottle, jar, lamp shade, bowl, plate, ball, soft toy, cushion, folded clothes, tote bag) over five shape families: *block*, *round* (mug, vase, bottle, lamp), *sphere*, *book* and *soft* (bags, cushions, clothes), or your own `.glb` file (up to 8 MB).
+- **Size and placement**: real width, height and depth in cm; how much of the shelf space it uses; turn, tilt and lean; slide it left/right, up/down and forward/back. Items are drawn in real relative size (a lamp shade next to a mug looks right), never smaller than they can be clicked.
+- **Shape details**: rounded corners, top width and depth (taper), twist and puffiness for blocks and soft items; bottom and top width, belly, neck narrowing and height, flared rim, foot, open-top hollow with wall thickness for round items; cover thickness, pages and spine for books.
+- **Material and extras**: colour, roughness, metallic, opacity (glass); a handle, a lid with knob, and a stand underneath.
+- **Photo mapping**: choose which of the item's photos to use and how it goes on (front only, wrapped once round, front and back, two different photos for front and back, or tiled), fit (fill, show all, stretch), stretch across and up, slide, rotate, flip, repeat, turn it round the object, how far round, and which faces of a box get it. **Photo colour**: brightness, contrast, colour strength, hue shift, tint, background and opacity.
+- Settings are saved in the item's `model` (database column added by `supabase-thrift.sql`, so run it again once after updating; it is safe to re-run) and in the `thrift.json` backup. The model code is `thrift-model.js`, shared by the shop and the editor so they always match.
+
 The file-based way (below) still works as a fallback, and is used until the database has items.
 
 The five items in `thrift.json` are **samples**; replace them before going live. Share a single item with `thrift.html?item=ITEM-ID`. Photos are only downloaded for shelves near the shopper, so a big shop stays quick; keep each photo around 1000 px wide.

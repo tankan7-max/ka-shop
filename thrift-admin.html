@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script type="importmap">
+{ "imports": { "three": "./vendor/three.module.min.js", "three/addons/": "./vendor/addons/" } }
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title>Thrift stock — Pre-loved Corner</title>
@@ -53,7 +56,7 @@
   .row .acts { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
   .badge { display: inline-block; font-size: 12px; font-weight: 700; padding: 0 8px; border-radius: 999px; margin-left: 6px; background: #e3f4f1; color: #14594f; vertical-align: 1px; }
   .badge.reserved { background: #ffe9b3; color: #5e3d00; } .badge.sold { background: #1d2327; color: #fff; } .badge.off { background: #eceff1; color: var(--muted); } .badge.old { background: #fdecea; color: #7a1f1a; }
-  dialog { border: 0; border-radius: 16px; padding: 0; width: min(680px, calc(100vw - 20px)); max-height: calc(100dvh - 20px); box-shadow: 0 8px 28px rgba(20,30,35,.25); color: var(--ink); }
+  dialog { border: 0; border-radius: 16px; padding: 0; width: min(760px, calc(100vw - 20px)); max-height: calc(100dvh - 20px); box-shadow: 0 8px 28px rgba(20,30,35,.25); color: var(--ink); }
   dialog::backdrop { background: rgba(20,30,35,.45); }
   dialog form { padding: 18px 20px 0; }
   dialog h2 { margin: 0 0 4px; font-size: 20px; }
@@ -73,6 +76,28 @@
   .ph .bt { display: flex; }
   .ph .bt button { flex: 1; min-height: 32px; padding: 0; border: 0; border-top: 1px solid var(--line); border-radius: 0; background: #fff; }
   .ph .bt button + button { border-left: 1px solid var(--line); }
+  .row-btns { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+  .mdl-stage { position: sticky; top: 0; z-index: 6; margin: 8px 0; border-radius: 14px; overflow: hidden; background: linear-gradient(#eef3f3, #dfe8e8); border: 1px solid var(--line); }
+  #mdl-canvas { display: block; width: 100%; height: clamp(190px, 34vh, 300px); cursor: grab; touch-action: none; outline: none; }
+  #mdl-canvas:active { cursor: grabbing; } #mdl-canvas:focus-visible { outline: 3px solid var(--brand); outline-offset: -3px; }
+  .mdl-chip { position: absolute; left: 8px; top: 8px; padding: 2px 9px; border-radius: 999px; background: rgba(255,255,255,.9); font-size: 12.5px; font-weight: 700; color: var(--ink); }
+  .mdl-bar { position: absolute; left: 6px; right: 6px; bottom: 6px; display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; }
+  .mdl-bar button { min-height: 30px; padding: 2px 9px; font-size: 13px; background: rgba(255,255,255,.92); }
+  .mdl-bar button[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); color: #fff; }
+  #mdl-status { position: absolute; right: 8px; top: 8px; font-size: 12.5px; color: var(--muted); }
+  #mdl-controls details { border: 1px solid var(--line); border-radius: 12px; margin: 8px 0; background: #fff; }
+  #mdl-controls summary { cursor: pointer; font-weight: 700; padding: 9px 12px; color: var(--brand-dark); }
+  #mdl-controls .body { padding: 2px 12px 12px; }
+  .ctl { display: grid; grid-template-columns: minmax(96px, 150px) 1fr 74px; gap: 4px 10px; align-items: center; margin-top: 8px; font-size: 14px; }
+  .ctl > label { font-weight: 600; }
+  .ctl input[type="range"] { width: 100%; height: 26px; accent-color: var(--brand); min-width: 0; }
+  .ctl input[type="number"] { width: 100%; height: 34px; padding: 0 6px; border: 1px solid var(--line); border-radius: 8px; font-size: 14px; }
+  .ctl.wide { grid-template-columns: minmax(96px, 150px) 1fr; }
+  .ctl select, .ctl input[type="color"] { height: 38px; border: 1px solid var(--line); border-radius: 8px; background: #fff; min-width: 0; width: 100%; padding: 0 6px; font-size: 14.5px; }
+  .ctl input[type="color"] { padding: 2px; max-width: 90px; }
+  .ctl.chk { grid-template-columns: 1fr; } .ctl.chk label { display: flex; gap: 8px; align-items: center; font-weight: 600; } .ctl.chk input { width: 20px; height: 20px; accent-color: var(--brand); }
+  .faces { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px 10px; margin-top: 8px; }
+  @media (max-width: 560px) { .ctl { grid-template-columns: 1fr 70px; } .ctl > label { grid-column: 1 / -1; } .ctl.wide { grid-template-columns: 1fr; } }
   .dialog-btns { position: sticky; bottom: 0; z-index: 5; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 16px -20px 0; padding: 12px 20px; background: var(--card); border-top: 1px solid var(--line); }
   .dialog-btns .spacer { flex: 1; }
   @media (max-width: 560px) { .row { grid-template-columns: 52px 1fr; } .row .acts { grid-column: 1 / -1; justify-content: flex-start; } .thumb { width: 52px; height: 52px; } }
@@ -113,7 +138,8 @@
   <details class="panel">
     <summary>How this works</summary>
     <b>Add an item</b> with photos, price and condition. It appears in the shop straight away. <b>What you paid</b>, <b>where you got it</b> and your <b>notes</b> are only for you: shoppers never see them.<br>
-    <b>Reserve</b> an item when someone has asked for it (it shows as Reserved and can't be added to a bag). <b>Sold</b> records the price you got, the date and who bought it, and feeds the profit figures above. <b>Relist</b> brings a sold item back.<br>
+    <b>3D model</b>: every item stands on the shelf as a model. Pick a ready-made shape (book, mug, vase, box, folded clothes…), set its real size in cm, and adjust turn, tilt, corners, taper, neck, handle, lid, colour and shine until it looks right. Your photos wrap onto it, and you control how: front only, wrapped round, two photos (front and back), or tiled, with stretch, slide, rotate, flip, brightness, colour and tint. Items you have not set up get a suggested model from their category or name. You can also upload your own <code>.glb</code> file.<br>
+        <b>Reserve</b> an item when someone has asked for it (it shows as Reserved and can't be added to a bag). <b>Sold</b> records the price you got, the date and who bought it, and feeds the profit figures above. <b>Relist</b> brings a sold item back.<br>
     <b>Hide</b> (untick “Show in the shop”) keeps an item in your records without showing it. Items that have sat unsold for more than 60 days get a flag, so you know when to drop the price.<br>
     <b>Download backup</b> saves the shop's items as <code>thrift.json</code>; the shop uses that file if the database is unreachable. <b>Export CSV</b> saves everything, including your private columns, for a spreadsheet.
   </details>
@@ -157,6 +183,27 @@
       <small class="hint">Up to 8. The first is the cover. Pictures are made smaller before upload.</small>
       <div id="photos" aria-live="polite"></div>
       <div style="margin-top:8px"><label class="field" style="margin:0">Add photos<input id="f-files" type="file" accept="image/jpeg,image/png,image/webp" multiple style="display:block;margin-top:4px"></label></div>
+    </fieldset>
+
+    <fieldset id="mdl-box">
+      <legend>3D model</legend>
+      <p class="hint">Every item stands on the shelf as a 3D model. Pick a starting shape, set its real size, and adjust everything else until it looks like the real thing. Your photos wrap onto it. Drag the picture below to turn it.</p>
+      <div class="mdl-stage">
+        <canvas id="mdl-canvas" tabindex="0" role="img" aria-label="Live 3D preview of the item. Drag to turn it; plus and minus zoom."></canvas>
+        <div class="mdl-chip" id="mdl-dims" aria-hidden="true"></div>
+        <div class="mdl-bar" role="toolbar" aria-label="Preview controls">
+          <button type="button" id="mdl-spin" aria-pressed="true" title="Turn automatically">⟳ Spin</button>
+          <button type="button" id="mdl-space" aria-pressed="false" title="Show the space it has on the shelf">▭ Shelf space</button>
+          <button type="button" data-view="front">Front</button><button type="button" data-view="side">Side</button><button type="button" data-view="top">Top</button>
+        </div>
+        <div id="mdl-status" role="status"></div>
+      </div>
+      <div class="grid" style="margin-top:6px">
+        <label class="field">Start from <select id="mdl-preset"><option value="">Choose a ready-made shape…</option></select></label>
+        <label class="field">Copy settings from <select id="mdl-copy"><option value="">Choose another item…</option></select></label>
+      </div>
+      <div class="row-btns"><button type="button" class="small" id="mdl-suggest">Reset to the suggested model</button><button type="button" class="small" id="mdl-reset-tex">Reset photo settings</button></div>
+      <div id="mdl-controls"></div>
     </fieldset>
 
     <fieldset>
@@ -374,6 +421,7 @@ function drawPhotos() {
     box.append(el('div', { className: 'ph' }, im, el('div', { className: 'bt' }, mv(-1, '←', 'earlier'), mv(1, '→', 'later'), rm)));
   });
   $('f-files').disabled = photos.length >= 8;
+  if (typeof previewImages === 'function' && spec) { if (spec.tex.src >= photos.length) spec.tex.src = 0; if (spec.tex.src2 >= photos.length) spec.tex.src2 = Math.min(1, Math.max(0, photos.length - 1)); previewImages(); if ($('mdl-controls').children.length) buildControls(); }
 }
 async function shrink(file) {
   const img = await new Promise((ok, bad) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => bad(new Error('“' + file.name + '” is not a picture this browser can read.')); i.src = URL.createObjectURL(file); });
@@ -396,7 +444,7 @@ function openEditor(r) {
   $('f-sprice').value = r && r.sold_price_sgd !== null ? Number(r.sold_price_sgd).toFixed(2) : ''; $('f-sdate').value = r && r.sold_on ? r.sold_on : ''; $('f-buyer').value = r ? r.buyer : ''; $('sold-fields').hidden = $('f-status').value !== 'sold';
   $('f-source').value = r ? r.source : ''; $('f-notes').value = r ? r.notes : '';
   $('delete').hidden = !r; $('view-link').hidden = !r; if (r) $('view-link').href = `./thrift.html?item=${encodeURIComponent(r.id)}`;
-  $('ed-error').textContent = ''; $('save').disabled = false; drawPhotos(); $('editor').showModal(); $('f-name').focus();
+  $('ed-error').textContent = ''; $('save').disabled = false; drawPhotos(); $('editor').showModal(); $('f-name').focus(); modelOpen(r);
 }
 $('add').onclick = () => openEditor(null);
 $('cancel').onclick = () => $('editor').close();
@@ -414,7 +462,10 @@ $('ed-form').addEventListener('submit', async e => {
   try {
     const urls = []; let n = 0;
     for (const p of photos) { if (p.url) urls.push(p.url); else urls.push(await upload(`thrift/${id}/p-${Date.now().toString(36)}-${n++}.jpg`, p.blob)); }   // photos first, so the item is only saved once they are safely uploaded
-    const row = { name, category, price_sgd: price, was_sgd: num($('f-was').value), cost_sgd: num($('f-cost').value), condition: $('f-cond').value, size: $('f-size').value.trim(), brand: $('f-brand').value.trim(), description: $('f-desc').value.trim(), photos: urls,
+    let modelOut = spec ? JSON.parse(JSON.stringify(spec)) : (editing && editing.model) || {};
+    if (modelOut.kind === 'glb' && glbFile) { modelOut.glb = await upload(`thrift/${id}/model-${Date.now().toString(36)}.glb`, new Blob([glbFile], { type: 'model/gltf-binary' })); if (editing && editing.model && editing.model.glb) removedUrls.push(editing.model.glb); }
+    else if (modelOut.kind !== 'glb') { if (editing && editing.model && editing.model.glb) removedUrls.push(editing.model.glb); modelOut.glb = ''; }
+    const row = { model: modelOut, name, category, price_sgd: price, was_sgd: num($('f-was').value), cost_sgd: num($('f-cost').value), condition: $('f-cond').value, size: $('f-size').value.trim(), brand: $('f-brand').value.trim(), description: $('f-desc').value.trim(), photos: urls,
       status, active: $('f-active').checked, listed_on: $('f-listed').value || today(), source: $('f-source').value.trim(), notes: $('f-notes').value.trim(),
       sold_price_sgd: status === 'sold' ? num($('f-sprice').value) : null, sold_on: status === 'sold' ? ($('f-sdate').value || today()) : null, buyer: status === 'sold' ? $('f-buyer').value.trim() : '', updated_at: new Date().toISOString() };
     if (!categories.includes(category)) categories.push(category);
@@ -422,14 +473,147 @@ $('ed-form').addEventListener('submit', async e => {
     else await api('thrift_items', { method: 'POST', prefer: 'return=minimal', body: { id, ...row } });
     for (const u of removedUrls) await removeFile(u);
     $('editor').close(); await reload(); say(`Saved “${name}”.`);
-  } catch (ex) { err.textContent = 'Could not save: ' + ex.message; }
+  } catch (ex) { err.textContent = /model/i.test(ex.message) && /column|schema/i.test(ex.message) ? 'The database needs its 3D model column: run supabase-thrift.sql once more in the Supabase SQL Editor, then try again.' : 'Could not save: ' + ex.message; }
   $('save').disabled = false;
 });
 $('delete').onclick = async () => {
   const r = editing; if (!r || !confirm(`Delete “${r.name}” for good, with its photos? To keep your records, untick “Show in the shop” instead.`)) return;
-  try { await api(`thrift_items?id=eq.${encodeURIComponent(r.id)}`, { method: 'DELETE', prefer: 'return=minimal' }); for (const u of r.photos || []) await removeFile(u); $('editor').close(); await reload(); say(`Deleted “${r.name}”.`); }
+  try { await api(`thrift_items?id=eq.${encodeURIComponent(r.id)}`, { method: 'DELETE', prefer: 'return=minimal' }); for (const u of r.photos || []) await removeFile(u); if (r.model && r.model.glb) await removeFile(r.model.glb); $('editor').close(); await reload(); say(`Deleted “${r.name}”.`); }
   catch (ex) { $('ed-error').textContent = 'Could not delete: ' + ex.message; }
 };
+
+// --- The 3D model editor: a live preview and many adjustments, using the same model code as the shop ---
+let MM = null, T3 = null, prev = null, spec = null, glbFile = null, rebuildAt = 0, ctlOpen = new Set(['Size & placement', 'Photo on the model']);
+const get = (o, p) => p.split('.').reduce((a, k) => (a === undefined || a === null ? a : a[k]), o);
+const setp = (o, p, v) => { const ks = p.split('.'), l = ks.pop(); ks.reduce((a, k) => a[k], o)[l] = v; };
+const modelsLoad = async () => { if (!MM) { T3 = await import('three'); MM = await import('./thrift-model.js'); } return MM; };
+const R = (p, label, min, max, step, unit = '', show) => ({ t: 'range', p, label, min, max, step, unit, show });
+const KIND_IS = (...k) => s => k.includes(s.kind);
+const SCHEMA = () => [
+  { g: 'Size & placement', f: [R('size.w', 'Width', 0.5, 150, 0.5, ' cm'), R('size.h', 'Height', 0.5, 150, 0.5, ' cm'), R('size.d', 'Depth (front to back)', 0.2, 150, 0.5, ' cm'),
+    R('fit', 'Size on the shelf', 20, 140, 1, '%'), R('rot.yaw', 'Turn left / right', -180, 180, 1, '°'), R('rot.tilt', 'Tilt forward / back', -90, 90, 1, '°'), R('rot.roll', 'Lean sideways', -90, 90, 1, '°'),
+    R('offset.x', 'Slide left / right', -100, 100, 1, '%'), R('offset.y', 'Raise / lower', -100, 100, 1, '%'), R('offset.z', 'Move forward / back', -100, 100, 1, '%')] },
+  { g: 'Shape', show: KIND_IS('block'), f: [R('shape.corner', 'Rounded corners', 0, 50, 1, '%'), R('shape.taperX', 'Top width', 10, 250, 1, '%'), R('shape.taperZ', 'Top depth', 10, 250, 1, '%'), R('shape.twist', 'Twist', -180, 180, 1, '°')] },
+  { g: 'Shape', show: KIND_IS('pillow'), f: [R('shape.bulge', 'Puffiness', 0, 100, 1, '%'), R('shape.taperX', 'Top width', 10, 250, 1, '%'), R('shape.taperZ', 'Top depth', 10, 250, 1, '%'), R('shape.twist', 'Twist', -180, 180, 1, '°')] },
+  { g: 'Shape', show: KIND_IS('round'), f: [R('shape.botR', 'Bottom width', 5, 250, 1, '%'), R('shape.topR', 'Top width', 5, 250, 1, '%'), R('shape.belly', 'Belly (bulge in the middle)', -60, 200, 1, '%'), R('shape.neck', 'Neck narrowing', 0, 95, 1, '%'), R('shape.neckH', 'Neck height', 5, 80, 1, '%'),
+    R('shape.lip', 'Flared rim', 0, 100, 1, '%'), R('shape.foot', 'Foot / base flare', 0, 100, 1, '%'), { t: 'check', p: 'shape.open', label: 'Open on top (hollow, like a mug or vase)' }, R('shape.wall', 'Wall thickness', 1, 40, 1, '%', s => s.shape.open)] },
+  { g: 'Shape', show: KIND_IS('book'), f: [R('shape.cover', 'Cover thickness', 1, 30, 1, '%'), { t: 'check', p: 'shape.pages', label: 'Show the pages' }, { t: 'check', p: 'shape.spine', label: 'Show the spine' }] },
+  { g: 'Material', show: s => s.kind !== 'glb', f: [{ t: 'color', p: 'look.color', label: 'Main colour' }, { t: 'color', p: 'look.color2', label: 'Pages colour', show: KIND_IS('book') }, R('look.rough', 'Roughness (low = shiny)', 0, 100, 1, '%'), R('look.metal', 'Metallic', 0, 100, 1, '%'), R('look.opacity', 'Opacity (low = glass)', 10, 100, 1, '%')] },
+  { g: 'Extras', show: KIND_IS('round', 'block'), f: [{ t: 'check', p: 'acc.handle', label: 'Handle' }, R('acc.handleSize', 'Handle size', 10, 140, 1, '%', s => s.acc.handle), R('acc.handleAngle', 'Handle position', -180, 180, 1, '°', s => s.acc.handle),
+    { t: 'check', p: 'acc.lid', label: 'Lid' }, R('acc.lidH', 'Lid height', 2, 40, 1, '%', s => s.acc.lid), R('acc.lidScale', 'Lid width', 30, 150, 1, '%', s => s.acc.lid), { t: 'check', p: 'acc.knob', label: 'Knob on the lid', show: s => s.acc.lid }, { t: 'color', p: 'acc.lidColor', label: 'Lid colour', show: s => s.acc.lid },
+    { t: 'check', p: 'acc.base', label: 'Stand / base underneath' }, R('acc.baseH', 'Stand height', 2, 60, 1, '%', s => s.acc.base), R('acc.baseGrow', 'Stand width', -90, 100, 1, '%', s => s.acc.base), { t: 'color', p: 'acc.baseColor', label: 'Stand colour', show: s => s.acc.base }] },
+  { g: 'Photo on the model', show: s => s.kind !== 'glb', f: [{ t: 'select', p: 'tex.mode', label: 'How the photo goes on', options: s => MM.MODES[s.kind] }, { t: 'select', p: 'tex.src', label: 'Photo to use', options: () => photoOptions(), num: true },
+    { t: 'select', p: 'tex.src2', label: 'Photo for the back', options: () => photoOptions(), num: true, show: s => s.tex.mode === 'split' },
+    { t: 'select', p: 'tex.fit', label: 'Fit the photo', options: () => ({ cover: 'Fill (crop the edges)', contain: 'Show all of it', stretch: 'Stretch to fit' }) },
+    R('tex.scaleX', 'Stretch across', 10, 800, 1, '%'), R('tex.scaleY', 'Stretch up / down', 10, 800, 1, '%'), R('tex.offX', 'Slide left / right', -200, 200, 1, '%'), R('tex.offY', 'Slide up / down', -200, 200, 1, '%'), R('tex.rot', 'Rotate the photo', -180, 180, 1, '°'),
+    { t: 'check', p: 'tex.flipX', label: 'Flip left to right' }, { t: 'check', p: 'tex.flipY', label: 'Flip upside down' },
+    R('tex.repeatX', 'Repeat across', 1, 12, 1, '×', s => s.tex.mode === 'tile'), R('tex.repeatY', 'Repeat up', 1, 12, 1, '×', s => s.tex.mode === 'tile'),
+    R('tex.seam', 'Turn it round the object', -180, 180, 1, '°', s => s.kind === 'round' || s.kind === 'sphere'), R('tex.arc', 'How far round (front mode)', 20, 360, 1, '°', s => (s.kind === 'round' || s.kind === 'sphere') && s.tex.mode === 'front')] },
+  { g: 'Photo colour', show: s => s.kind !== 'glb', f: [R('tex.bright', 'Brightness', -100, 100, 1), R('tex.contrast', 'Contrast', -100, 100, 1), R('tex.sat', 'Colour strength', -100, 100, 1), R('tex.hue', 'Shift the colours', -180, 180, 1, '°'),
+    { t: 'color', p: 'tex.tint', label: 'Tint' }, R('tex.tintAmt', 'Tint strength', 0, 100, 1, '%'), { t: 'color', p: 'tex.bg', label: 'Behind the photo' }, R('tex.opacity', 'Photo opacity', 0, 100, 1, '%')] },
+  { g: 'Which faces get the photo', show: s => (s.kind === 'block' || s.kind === 'pillow') && (s.tex.mode === 'all' || s.tex.mode === 'tile'), faces: true },
+];
+const photoOptions = () => { const o = {}; photos.forEach((p, i) => { o[i] = 'Photo ' + (i + 1) + (i === 0 ? ' (cover)' : ''); }); if (!photos.length) o[0] = 'No photos yet: add some above'; return o; };
+function ctlRow(f) {
+  const id = 'c-' + f.p.replace(/\./g, '-'), v = get(spec, f.p);
+  if (f.t === 'check') { const cb = el('input', { type: 'checkbox', id, checked: !!v }); cb.onchange = () => { setp(spec, f.p, cb.checked); modelChanged(f.p === 'acc.handle' || /^acc\.(lid|base)$|shape\.open/.test(f.p)); }; return el('div', { className: 'ctl chk' }, el('label', { htmlFor: id }, cb, f.label)); }
+  if (f.t === 'color') { const c = el('input', { type: 'color', id, value: v }); c.oninput = () => { setp(spec, f.p, c.value); modelChanged(false); }; return el('div', { className: 'ctl wide' }, el('label', { htmlFor: id, textContent: f.label }), c); }
+  if (f.t === 'select') {
+    const sel = el('select', { id }), opts = f.options(spec); Object.keys(opts).forEach(k => sel.append(el('option', { value: k, textContent: opts[k] }))); sel.value = String(v);
+    sel.onchange = () => { setp(spec, f.p, f.num ? Number(sel.value) : sel.value); modelChanged(f.p === 'tex.mode'); }; return el('div', { className: 'ctl wide' }, el('label', { htmlFor: id, textContent: f.label }), sel);
+  }
+  /* the number box uses step 'any' so typed values need not land on a slider step */
+  const r = el('input', { type: 'range', id, min: f.min, max: f.max, step: f.step, value: v }), n = el('input', { type: 'number', min: f.min, max: f.max, step: 'any', value: Math.round(v * 100) / 100 }); n.setAttribute('aria-label', f.label + (f.unit ? ' (' + f.unit.trim() + ')' : ''));
+  const apply = val => { val = Math.min(f.max, Math.max(f.min, Number(val))); if (!Number.isFinite(val)) return; setp(spec, f.p, val); r.value = val; n.value = Math.round(val * 100) / 100; modelChanged(false); };
+  r.oninput = () => apply(r.value); n.onchange = () => apply(n.value);
+  return el('div', { className: 'ctl' }, el('label', { htmlFor: id, textContent: f.label }), r, n);
+}
+function buildControls() {
+  const box = $('mdl-controls'); box.textContent = ''; if (!spec) return;
+  const kindSel = el('select', { id: 'c-kind' }); Object.keys(MM.KINDS).forEach(k => kindSel.append(el('option', { value: k, textContent: MM.KINDS[k] }))); kindSel.value = spec.kind;
+  kindSel.onchange = () => { spec.kind = kindSel.value; if (!MM.MODES[spec.kind][spec.tex.mode] && spec.kind !== 'glb') spec.tex.mode = Object.keys(MM.MODES[spec.kind])[0]; if (spec.kind === 'glb') { spec.size = spec.size; } modelChanged(true); };
+  box.append(el('div', { className: 'ctl wide' }, el('label', { htmlFor: 'c-kind', textContent: 'Type of shape' }), kindSel));
+  if (spec.kind === 'glb') {
+    const file = el('input', { type: 'file', accept: '.glb,model/gltf-binary', id: 'c-glb' }); file.setAttribute('aria-label', '3D model file');
+    file.onchange = async () => { const fl = file.files[0]; if (!fl) return; const magic = new TextDecoder().decode(await fl.slice(0, 4).arrayBuffer()); if (magic !== 'glTF') { $('ed-error').textContent = 'That is not a .glb file. Export the model as “glTF Binary (.glb)”.'; file.value = ''; return; } if (fl.size > 8 * 1048576) { $('ed-error').textContent = 'That model is over 8 MB. Make it simpler and try again.'; file.value = ''; return; } $('ed-error').textContent = ''; glbFile = fl; spec.glb = URL.createObjectURL(fl); loadGlbIntoPreview(); };
+    box.append(el('div', { className: 'ctl wide' }, el('label', { htmlFor: 'c-glb', textContent: '3D file (.glb)' }), el('div', {}, file, el('small', { className: 'hint', textContent: spec.glb ? (glbFile ? `Chosen: ${glbFile.name}. It is uploaded when you save.` : 'This item has a 3D file. Choose another to replace it.') : 'A .glb file up to 8 MB. Set its size and placement below; it is scaled to fit inside the size you give.' }))));
+  }
+  SCHEMA().filter(g => !g.show || g.show(spec)).forEach(g => {
+    const d = el('details', { open: ctlOpen.has(g.g) }), body = el('div', { className: 'body' }); d.append(el('summary', { textContent: g.g }), body); d.ontoggle = () => { if (d.open) ctlOpen.add(g.g); else ctlOpen.delete(g.g); };
+    if (g.faces) { const w = el('div', { className: 'faces' }); ['front', 'back', 'left', 'right', 'top', 'bottom'].forEach(k => { const cb = el('input', { type: 'checkbox', checked: !!spec.tex[k], id: 'face-' + k }); cb.onchange = () => { spec.tex[k] = cb.checked; modelChanged(false); }; w.append(el('div', { className: 'ctl chk', style: 'margin-top:0' }, el('label', { htmlFor: 'face-' + k }, cb, k[0].toUpperCase() + k.slice(1)))); }); body.append(w); }
+    else g.f.filter(f => !f.show || f.show(spec)).forEach(f => body.append(ctlRow(f)));
+    box.append(d);
+  });
+}
+function previewInit() {
+  if (prev) return;
+  const canvas = $('mdl-canvas'), renderer = new T3.WebGLRenderer({ canvas, antialias: true, alpha: true }); renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+  const scene = new T3.Scene(), camera = new T3.PerspectiveCamera(32, 1, 0.05, 20);
+  scene.add(new T3.HemisphereLight(0xffffff, 0x9a8b78, 1.25)); const key = new T3.DirectionalLight(0xfff1dc, 1.4); key.position.set(1.5, 2.5, 3); scene.add(key); const rim = new T3.DirectionalLight(0xcfe4ff, 0.6); rim.position.set(-2, 1.5, -2); scene.add(rim);
+  const board = new T3.Mesh(new T3.CylinderGeometry(0.42, 0.42, 0.02, 48), new T3.MeshStandardMaterial({ color: 0xc9a56d, roughness: 0.7 })); board.position.y = -0.01; scene.add(board);
+  const space = new T3.LineSegments(new T3.EdgesGeometry(new T3.BoxGeometry(MM.FIT.w, MM.FIT.h, MM.FIT.d)), new T3.LineBasicMaterial({ color: 0x228174 })); space.position.y = MM.FIT.h / 2; space.visible = false; scene.add(space);
+  prev = { canvas, renderer, scene, camera, space, model: null, yaw: 0.6, pitch: 0.28, zoom: 1, spin: true, dirty: true, raf: 0, last: 0, drag: null };
+  const down = e => { prev.drag = { x: e.clientX, y: e.clientY, id: e.pointerId }; canvas.setPointerCapture(e.pointerId); prev.spin = false; $('mdl-spin').setAttribute('aria-pressed', 'false'); };
+  canvas.addEventListener('pointerdown', down);
+  canvas.addEventListener('pointermove', e => { const d = prev.drag; if (!d || e.pointerId !== d.id) return; prev.yaw -= (e.clientX - d.x) * 0.01; prev.pitch = Math.max(-0.2, Math.min(1.4, prev.pitch + (e.clientY - d.y) * 0.008)); d.x = e.clientX; d.y = e.clientY; prev.dirty = true; });
+  const up = e => { if (prev.drag && e.pointerId === prev.drag.id) prev.drag = null; }; canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up);
+  canvas.addEventListener('wheel', e => { e.preventDefault(); prev.zoom = Math.max(0.5, Math.min(2.4, prev.zoom * Math.exp(-e.deltaY * 0.0012))); prev.dirty = true; }, { passive: false });
+  canvas.addEventListener('keydown', e => { const k = { ArrowLeft: () => prev.yaw += 0.12, ArrowRight: () => prev.yaw -= 0.12, ArrowUp: () => prev.pitch = Math.min(1.4, prev.pitch + 0.08), ArrowDown: () => prev.pitch = Math.max(-0.2, prev.pitch - 0.08), '+': () => prev.zoom = Math.min(2.4, prev.zoom * 1.1), '=': () => prev.zoom = Math.min(2.4, prev.zoom * 1.1), '-': () => prev.zoom = Math.max(0.5, prev.zoom / 1.1) }[e.key]; if (k) { e.preventDefault(); k(); prev.spin = false; prev.dirty = true; } });
+  $('mdl-spin').onclick = () => { prev.spin = !prev.spin; $('mdl-spin').setAttribute('aria-pressed', String(prev.spin)); prev.dirty = true; };
+  $('mdl-space').onclick = () => { prev.space.visible = !prev.space.visible; $('mdl-space').setAttribute('aria-pressed', String(prev.space.visible)); prev.dirty = true; };
+  document.querySelectorAll('.mdl-bar [data-view]').forEach(b => b.onclick = () => { const v = { front: [0, 0.05], side: [-Math.PI / 2, 0.05], top: [0, 1.4] }[b.dataset.view]; prev.yaw = v[0]; prev.pitch = v[1]; prev.spin = false; $('mdl-spin').setAttribute('aria-pressed', 'false'); prev.dirty = true; });
+  const tick = now => {
+    prev.raf = requestAnimationFrame(tick); if (!$('editor').open) return;
+    const dt = Math.min(0.05, (now - (prev.last || now)) / 1000); prev.last = now; if (prev.spin && !matchMedia('(prefers-reduced-motion: reduce)').matches) { prev.yaw += dt * 0.7; prev.dirty = true; }
+    if (!prev.dirty) return; prev.dirty = false;
+    const w = canvas.clientWidth || 1, h = canvas.clientHeight || 1; if (canvas.width !== Math.round(w * renderer.getPixelRatio()) || canvas.height !== Math.round(h * renderer.getPixelRatio())) { renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+    const bx = prev.model ? prev.model.box : { w: 0.5, h: 0.5, d: 0.3 }, size = Math.max(bx.w, bx.h * 0.95, bx.d), dist = Math.max(0.55, Math.min(1.55, size * 3.1)) / prev.zoom * (w / h < 1.2 ? 1.25 : 1);
+    /* come closer for small things */
+    camera.position.set(Math.sin(prev.yaw) * Math.cos(prev.pitch) * dist, bx.h / 2 + Math.sin(prev.pitch) * dist, Math.cos(prev.yaw) * Math.cos(prev.pitch) * dist); camera.lookAt(0, bx.h / 2, 0);
+    renderer.render(scene, camera);
+  };
+  prev.raf = requestAnimationFrame(tick);
+}
+async function loadGlbIntoPreview() {
+  if (!spec || spec.kind !== 'glb' || !prev || !prev.model) return;
+  if (!spec.glb) { prev.model.setGlb(null); prev.dirty = true; return; }
+  $('mdl-status').textContent = 'Loading the 3D file…';
+  try { const obj = await MM.loadGlb(spec.glb); prev.model.setGlb(obj); $('mdl-status').textContent = ''; } catch (e) { $('mdl-status').textContent = 'That file could not be shown.'; }
+  prev.dirty = true;
+}
+function modelChanged(rebuildPanel) {
+  if (rebuildPanel) buildControls();
+  if (!prev || !prev.model) return;
+  cancelAnimationFrame(rebuildAt); rebuildAt = requestAnimationFrame(() => {
+    prev.model.update(spec); prev.dirty = true; const s = spec.size; $('mdl-dims').textContent = `${+s.w.toFixed(1)} × ${+s.h.toFixed(1)} × ${+s.d.toFixed(1)} cm`;
+    if (spec.kind === 'glb') loadGlbIntoPreview();
+  });
+}
+async function previewImages() {
+  if (!prev || !prev.model) return; const urls = photos.map(p => p.preview || p.url);
+  const imgs = await Promise.all(urls.map(u => MM.loadImage(u))); if (!prev || !prev.model || urls.join('|') !== photos.map(p => p.preview || p.url).join('|')) return;
+  prev.model.setImages(imgs); prev.dirty = true;
+}
+function fillModelMenus(current) {
+  const pre = $('mdl-preset'); pre.textContent = ''; pre.append(el('option', { value: '', textContent: 'Choose a ready-made shape…' })); Object.keys(MM.PRESETS).forEach(k => pre.append(el('option', { value: k, textContent: MM.PRESETS[k].label })));
+  const cp = $('mdl-copy'); cp.textContent = ''; cp.append(el('option', { value: '', textContent: 'Choose another item…' })); (rows || []).filter(r => r.id !== (current && current.id) && r.model && r.model.kind).forEach(r => cp.append(el('option', { value: r.id, textContent: r.name })));
+}
+const itemLike = () => ({ name: $('f-name').value, category: $('f-cat').value === '\u0000new' ? $('f-newcat').value : $('f-cat').value });
+$('mdl-preset').onchange = () => { const id = $('mdl-preset').value; if (!id) return; spec = MM.applyPreset(id, true, spec); $('mdl-preset').value = ''; modelChanged(true); };
+$('mdl-copy').onchange = () => { const r = (rows || []).find(x => x.id === $('mdl-copy').value); if (!r) return; spec = MM.normalizeModel(JSON.parse(JSON.stringify(r.model)), r); $('mdl-copy').value = ''; modelChanged(true); previewImages(); };
+$('mdl-suggest').onclick = () => { spec = MM.normalizeModel({}, itemLike()); glbFile = null; modelChanged(true); };
+$('mdl-reset-tex').onclick = () => { spec.tex = MM.baseModel().tex; if (!MM.MODES[spec.kind][spec.tex.mode] && spec.kind !== 'glb') spec.tex.mode = Object.keys(MM.MODES[spec.kind])[0]; modelChanged(true); };
+async function modelOpen(r) {
+  $('mdl-status').textContent = 'Loading the 3D tools…'; glbFile = null;
+  try { await modelsLoad(); } catch (e) { $('mdl-status').textContent = '3D preview is not available here. The model settings still save.'; return; }
+  if (!$('editor').open) return;
+  spec = MM.normalizeModel(r && r.model ? JSON.parse(JSON.stringify(r.model)) : {}, r || itemLike());
+  previewInit(); if (prev.model) { prev.scene.remove(prev.model.group); prev.model.dispose(); }
+  prev.model = new MM.ThriftModel(spec, { aniso: 4, detail: 'high' }); prev.scene.add(prev.model.group); prev.spin = true; prev.yaw = 0.6; $('mdl-spin').setAttribute('aria-pressed', 'true');
+  fillModelMenus(r); buildControls(); $('mdl-status').textContent = ''; modelChanged(false); previewImages(); if (spec.kind === 'glb') loadGlbIntoPreview();
+}
+$('editor').addEventListener('close', () => { if (prev && prev.model) { prev.scene.remove(prev.model.group); prev.model.dispose(); prev.model = null; } spec = null; });
+$('f-cat').addEventListener('change', () => { if (spec && !editing) { /* a new item: keep the shape the owner picked */ } });
 
 // --- Import, backup and CSV ---
 $('import').onclick = async () => {
@@ -437,7 +621,7 @@ $('import').onclick = async () => {
   try {
     const src = (fileData.items || []).filter(i => i && i.id && i.name && typeof i.price === 'number');
     const bad = src.filter(i => !/^[a-z0-9][a-z0-9-]{0,79}$/.test(i.id)); if (bad.length) throw new Error('These ids need fixing in thrift.json first (small letters, digits and dashes): ' + bad.map(i => i.id).join(', '));
-    await api('thrift_items?on_conflict=id', { method: 'POST', prefer: 'resolution=ignore-duplicates,return=minimal', body: src.map((i, k) => ({ id: i.id, name: i.name, category: i.category || 'Other', price_sgd: i.price, was_sgd: i.was || null, condition: ['Like new', 'Good', 'Fair'].includes(i.condition) ? i.condition : 'Good', size: i.size || '', brand: i.brand || '', description: i.description || '', photos: (i.photos || []).slice(0, 8), status: i.sold ? 'sold' : 'available', sold_price_sgd: i.sold ? i.price : null, sold_on: i.sold ? today() : null, listed_on: i.added || today(), sort: k })) });
+    await api('thrift_items?on_conflict=id', { method: 'POST', prefer: 'resolution=ignore-duplicates,return=minimal', body: src.map((i, k) => ({ id: i.id, name: i.name, category: i.category || 'Other', price_sgd: i.price, was_sgd: i.was || null, condition: ['Like new', 'Good', 'Fair'].includes(i.condition) ? i.condition : 'Good', size: i.size || '', brand: i.brand || '', description: i.description || '', photos: (i.photos || []).slice(0, 8), status: i.sold ? 'sold' : 'available', sold_price_sgd: i.sold ? i.price : null, sold_on: i.sold ? today() : null, listed_on: i.added || today(), sort: k, model: i.model && typeof i.model === 'object' ? i.model : {} })) });
     await reload(); say(`Copied ${src.length} items into the database.`);
   } catch (e) { say('Could not copy the items: ' + e.message); }
   btn.disabled = false;
@@ -445,7 +629,7 @@ $('import').onclick = async () => {
 function download(name, text, type) { const a = el('a', { href: URL.createObjectURL(new Blob([text], { type })), download: name }); document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 5000); }
 $('backup').onclick = () => {
   if (!rows) return;
-  const items = rows.filter(r => r.active).map(r => { const o = { id: r.id, name: r.name, category: r.category, price: Number(r.price_sgd) }; if (r.was_sgd) o.was = Number(r.was_sgd); o.condition = r.condition; if (r.size) o.size = r.size; if (r.brand) o.brand = r.brand; o.added = r.listed_on; o.description = r.description; o.photos = r.photos || []; o.sold = r.status === 'sold'; if (r.status === 'reserved') o.reserved = true; return o; });
+  const items = rows.filter(r => r.active).map(r => { const o = { id: r.id, name: r.name, category: r.category, price: Number(r.price_sgd) }; if (r.was_sgd) o.was = Number(r.was_sgd); o.condition = r.condition; if (r.size) o.size = r.size; if (r.brand) o.brand = r.brand; o.added = r.listed_on; o.description = r.description; o.photos = r.photos || []; o.sold = r.status === 'sold'; if (r.status === 'reserved') o.reserved = true; if (r.model && r.model.kind) o.model = r.model; return o; });
   download('thrift.json', JSON.stringify({ ...fileData, categories: catNames(), items }, null, 2) + '\n', 'application/json');
   say('Backup downloaded. Upload it to the repository as thrift.json so the shop has a fallback.');
 };

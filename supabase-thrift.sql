@@ -8,7 +8,8 @@
 --     bought it are never sent to shoppers.
 --   * Only the shop owner (a row in the "admins" table, the same login as products.html) can read or change the table itself.
 --
--- Photos are stored in the same "product-files" storage bucket as the snack photos, under thrift/<item id>/.
+-- Run it again after updating the site: it adds anything new (such as the 3D model column) and never removes your data.
+-- Photos and 3D files are stored in the same "product-files" storage bucket as the snack photos, under thrift/<item id>/.
 
 create table if not exists public.thrift_items (
   id             text primary key check (id ~ '^[a-z0-9][a-z0-9-]{0,79}$'),
@@ -36,6 +37,9 @@ create table if not exists public.thrift_items (
   updated_at     timestamptz not null default now()
 );
 
+-- 3D model settings for each item (shape, size, material, photo mapping). Added in a later version, so this is safe on an existing table.
+alter table public.thrift_items add column if not exists model jsonb not null default '{}'::jsonb;
+
 alter table public.thrift_items enable row level security;
 
 drop policy if exists "owner manages thrift items" on public.thrift_items;
@@ -62,7 +66,7 @@ as $$
       select jsonb_agg(jsonb_build_object(
         'id', id, 'name', name, 'category', category, 'price', price_sgd, 'was', was_sgd,
         'condition', condition, 'size', size, 'brand', brand, 'description', description,
-        'photos', to_jsonb(photos), 'status', status, 'added', listed_on
+        'photos', to_jsonb(photos), 'status', status, 'added', listed_on, 'model', model
       ) order by sort, listed_on desc, name)
       from public.thrift_items where active
     ), '[]'::jsonb)
